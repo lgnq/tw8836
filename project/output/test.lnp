@@ -1,0 +1,12 @@
+".\output\OS_CORE.obj",
+".\output\OS_Q.obj",
+".\output\OS_SEM.obj",
+".\output\main.obj",
+".\output\cpu.obj",
+".\output\OS_CPU_C.obj",
+".\output\OS_CPU_A.obj" 
+TO ".\output\test" 
+PRINT(".\output\test.m51") RAMSIZE(256) 
+OVERLAY( main~TaskB,main~TaskC,main~TaskD )
+CODE( 0X0000-0XFFFF )
+XDATA( 0X0000-0X0FFF,0XC000-0XC0FF )

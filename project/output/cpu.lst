@@ -1,0 +1,251 @@
+C51 COMPILER V9.51   CPU                                                                   07/19/2013 23:42:42 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE CPU
+OBJECT MODULE PLACED IN .\output\cpu.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE cpu.c LARGE OPTIMIZE(7,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\output\cpu.
+                    -lst) TABS(2) OBJECT(.\output\cpu.obj)
+
+line level    source
+
+   1          #include "cpu.h"
+   2          #include "reg.h"
+   3          #include "TW8836.h"
+   4          #include "uart.h"
+*** WARNING C318 IN LINE 4 OF cpu.c: can't open file 'uart.h'
+   5          
+   6          DATA  BYTE  INT_STATUS=0;
+   7          DATA  BYTE  INT_MASK=0;
+   8          DATA  BYTE  INT_STATUS2=0;
+   9          DATA  BYTE  INT_STATUS3=0;  //for debug ext4_intr
+  10          DATA  BYTE  INT_STATUS_ACC=0;
+  11          DATA  BYTE  INT_STATUS2_ACC=0;
+  12          DATA  BYTE  EXINT_STATUS = 0;
+  13          DATA  WORD  MCU_INT_STATUS=0;
+  14          DATA  WORD  VH_Loss_Changed=0;
+  15          
+  16          volatile BYTE XDATA *DATA regTW88 = REG_START_ADDRESS;
+  17          
+  18          void ext0_int(void) interrupt 0 using 1
+  19          {
+  20   1        SFR_EA = 0;
+  21   1      /*
+  22   1        if (access == 0)
+  23   1        {
+  24   1          SFR_EA = 1;
+  25   1          return;
+  26   1        }
+  27   1      */
+  28   1        INT_STATUS  = ReadTW88(REG002) & 0xEF;
+  29   1        INT_MASK    = ReadTW88(REG003);
+  30   1        INT_STATUS2 = ReadTW88(REG004);
+  31   1        WriteTW88(REG002, INT_STATUS );       //clear 
+  32   1        WriteTW88(REG004, INT_STATUS2 & 0x07);    //clear
+  33   1      
+  34   1        if(INT_STATUS & 0x02)           //keep 0x02.
+  35   1          VH_Loss_Changed++;
+  36   1      
+  37   1        INT_STATUS_ACC |= INT_STATUS;
+  38   1        INT_STATUS2_ACC |= INT_STATUS2;
+  39   1      
+  40   1        SFR_EA = 1;
+  41   1      }
+  42          
+  43          void ext4_int(void) interrupt 9 using 1
+  44          {
+  45   1        SFR_EA = 0;
+  46   1      
+  47   1      //  ExtIntCount++;
+  48   1        INT_STATUS3 = ReadTW88(REG002) & 0x10;
+  49   1        WriteTW88(REG002, INT_STATUS3);   //clear 
+  50   1      
+  51   1        //If you want to test, use SFR_EINT4 and skip "SFR_EINT4=1".
+  52   1        SFR_EA=1;
+  53   1      }
+C51 COMPILER V9.51   CPU                                                                   07/19/2013 23:42:42 PAGE 2   
+
+  54          
+  55          void init_cpu(void)
+  56          {
+  57   1        TWBASE = 0x00;          // Base address of TW88xx
+  58   1        SFR_CAMC = 1;         // Chip Access Mode Control. E2[0]=1b:16bit mode
+  59   1      
+  60   1        //---------- Initialize Timer Divider ---------
+  61   1      //  WriteTW88Page(PAGE4_CLOCK);
+  62   1      
+  63   1        WriteTW88(REG4E2, 0x69);    // Timer0 Divider : system tic 0. 
+  64   1        WriteTW88(REG4E3, 0x78);    // 27M/27000 = 1msec
+  65   1      
+  66   1        WriteTW88(REG4E4, 0x01);    // Timer1 Divider : for Touch
+  67   1        WriteTW88(REG4E5, 0x0e);    // 27M/270 = 10usec 
+  68   1      
+  69   1        WriteTW88(REG4E6, 0);     // Timer2 Divider : remo timer
+  70   1        WriteTW88(REG4E7, 0x1b);    // 27M/27 = 1usec
+  71   1      
+  72   1        WriteTW88(REG4E8, 0);     // Timer3 Divider : baudrate for UART0
+  73   1        WriteTW88(REG4E9, 0x0c);    // (22.1184M/16) / 12 = 115200bps on SM0=1  
+  74   1      
+  75   1        WriteTW88(REG4EA, 0);     // Timer4 Divider : baudrate for UART1
+  76   1        WriteTW88(REG4EB, 0x0c);    // (22.1184M/16) / 12 = 115200bps on SM1=1  
+  77   1      
+  78   1        //---------- Initialize interrupt -------------
+  79   1        SFR_CKCON = 0x00;   // Clock control register     
+  80   1                    // 0000 0000
+  81   1                    // |||| |||+-- MD0 \.
+  82   1                    // |||| ||+--- MD1  > MD[2:0] Stretch RD/WR timing
+  83   1                    // |||| |+---- MD2 /
+  84   1                    // |||| +----- T0M:  Timer0 Pre-Divider 0=div by 12,  1=div by 4
+  85   1                    // |||+------- T1M:  Timer1 Pre-Divider 0=div by 12,  1=div by 4
+  86   1                    // ||+-------- ---
+  87   1                    // |+--------- WD0 \ Watchdong Timeout Period
+  88   1                    // +---------- WD1 / 00=2^17,  01=2^20,  10=2^23,  11=2^26
+  89   1      
+  90   1        SFR_TMOD = 0x66;    // 0110 0110
+  91   1                            // |||| ||||   << Timer 0 >>
+  92   1                            // |||| |||+-- M0 \  00= 8bit timer,counter /32  01= 16bit timer,counter
+  93   1                            // |||| ||+--- M1 /  10= 8bit auto reload        11= 8bit timer,counter
+  94   1                            // |||| |+---- CT:   0=Timer Mode,    1=Counter Mode
+  95   1                            // |||| +----- GATE: 0=GATE not used, 1=GATE used
+  96   1                            // ||||        << Timer 1 >>
+  97   1                            // |||+------- M0 \  00= 8bit timer,counter /32  01= 16bit timer,counter
+  98   1                            // ||+-------- M1 /  10= 8bit auto reload        11= 8bit timer,counter
+  99   1                            // |+--------- CT:   0=Timer Mode,    1=Counter Mode
+ 100   1                            // +---------- GATE: 0=GATE not used, 1=GATE used
+ 101   1      
+ 102   1        SFR_TCON = 0x55;    // 0101 0101
+ 103   1                            // |||| |||+-- IT0:  INT0 Trigger 0=level, 1=edge
+ 104   1                            // |||| ||+--- IE0:  INT0 Interrupt Flag
+ 105   1                            // |||| |+---- IT1:  INT1 Trigger 0=level, 1=edge
+ 106   1                            // |||| +----- IE1:  INT1 Interrupt Flag
+ 107   1                            // |||+------- TR0:  Timer0 Run
+ 108   1                            // ||+-------- TF0:  Timer0 Flag
+ 109   1                            // |+--------- TR1:  Timer1 Run
+ 110   1                            // +---------- TF0:  Timer1 Flag
+ 111   1                    
+ 112   1        SFR_TH0 = 0xf6;     // 10 msec
+ 113   1        SFR_TL0 = 0xf6;     //
+ 114   1      
+ 115   1                    // for TOUCH SAR sensing timer
+C51 COMPILER V9.51   CPU                                                                   07/19/2013 23:42:42 PAGE 3   
+
+ 116   1        SFR_TH1 = 206;      // 
+ 117   1                    // TH1 = 156. 1ms
+ 118   1                    // TH1 = 206. 0.5ms = 50*10usec
+ 119   1      
+ 120   1        SFR_PCON = 0xc0;    // 1100 0000
+ 121   1                    // |||| |||+-- PMM:  Power Management Mode 0=Disable,  1=Enable
+ 122   1                    // |||| ||+--- STOP: Stop Mode             0=Disable,  1=Enable
+ 123   1                    // |||| |+---- SWB:  Switch Back from STOP 0=Disable,  1=Enable
+ 124   1                    // |||| +----- ---
+ 125   1                    // |||+------- PWE:  (Program write Enable)
+ 126   1                    // ||+-------- ---
+ 127   1                    // |+--------- SMOD1:UART1 Double baudrate bit
+ 128   1                    // +---------- SMOD0:UART0 Double baudrate bit
+ 129   1      
+ 130   1        SFR_SCON = 0x50;    // 0101 0000
+ 131   1                    // |||| |||+-- RI:   Receive Interrupt Flag
+ 132   1                    // |||| ||+--- TI:   Transmit Interrupt Flag
+ 133   1                    // |||| |+---- RB08: 9th RX data
+ 134   1                    // |||| +----- TB08: 9th TX data
+ 135   1                    // |||+------- REN:  Enable Serial Reception
+ 136   1                    // ||+-------- SMO2: Enable Multiprocessor communication
+ 137   1                    // |+--------- SM01 \   Baudrate Mode
+ 138   1                    // +---------- SM00 / 00=f/12,  01=8bit var,  10=9bit,f/32,f/64,  11=9bit var
+ 139   1      
+ 140   1        SFR_SCON1 = 0x50;   // 0101 0000
+ 141   1                    // |||| |||+-- RI:   Receive Interrupt Flag
+ 142   1                    // |||| ||+--- TI:   Transmit Interrupt Flag
+ 143   1                    // |||| |+---- RB08: 9th RX data
+ 144   1                    // |||| +----- TB08: 9th TX data
+ 145   1                    // |||+------- REN:  Enable Serial Reception
+ 146   1                    // ||+-------- SMO2: Enable Multiprocessor communication
+ 147   1                    // |+--------- SM11 \   Baudrate Mode
+ 148   1                    // +---------- SM10 / 00=f/12,  01=8bit var,  10=9bit,f/32,f/64,  11=9bit var
+ 149   1      
+ 150   1        SFR_IP   = 0x02;    // 0000 0000 interrupt priority         
+ 151   1                    // -  PS1 PT2 PS PT1 PX1 PT0 PX0               
+ 152   1      
+ 153   1        //---------- Enable Individual Interrupt ----------
+ 154   1                    // IE(0xA8) = EA ES1 ET2 ES  ET1 EX1 ET0 EX0
+ 155   1        SFR_EX0  = 0;     // INT0   : Chip Interrupt
+ 156   1        SFR_ET0  = 1;     // Timer0 : System Tic
+ 157   1        SFR_EX1  = 0;     // INT1   : DE end
+ 158   1        SFR_ET1  = 0;     // Timer1 : touch
+ 159   1        SFR_ET2  = 0;     // Timer2 : Remote
+ 160   1        SFR_ES   = 0;     // UART0    : Debug port
+ 161   1        SFR_UART0FIFO = 0x80; //          : UART0 FIFO
+ 162   1      
+ 163   1      #ifdef SUPPORT_UART1
+                SFR_ES1  = 1;     // UART1    : External MCU
+                SFR_UART1FIFO = 0x80; //          : UART1 FIFO
+              #else
+ 167   1        SFR_ES1  = 0;     // UART1    : External MCU
+ 168   1      #endif
+ 169   1      
+ 170   1        SFR_EA   = 0;     // Global Interrupt
+ 171   1      
+ 172   1        //---------- Extended Interrupt -------------------
+ 173   1                    // 0xe8 xx xx EWDI EINT6 EINT5 EINT4 EINT3 EINT2
+ 174   1        SFR_EINT2 = 0;      // INT2   : SPI-DMA done
+ 175   1        SFR_EINT3 = 0;      // INT3   : Touch Ready
+ 176   1      //#ifdef MODEL_TW8835
+ 177   1      //  SFR_EINT4 = 0;      // INT4   : reserved 
+C51 COMPILER V9.51   CPU                                                                   07/19/2013 23:42:42 PAGE 4   
+
+ 178   1      //#else
+ 179   1        SFR_EINT4 = 0;      // INT4   : SW 7FF 
+ 180   1      //#endif
+ 181   1        SFR_EINT5 = 0;      // INT5   : reserved
+ 182   1        SFR_EINT6 = 0;      // INT6   : Pen
+ 183   1        //---------- Extended Interrupt 7~14 Config. ---------------
+ 184   1                    // EINT14 EINT13 EINT12 EINT11 EINT10 EINT9 EINT8 EINT7
+ 185   1                    //
+ 186   1                    // EINT9 : Remocon. SW will enable 9 later.
+ 187   1                    // EINT10: MODEL_TW8835_EXTI2C. VideoISR. 
+ 188   1                    //       MODEL_TW8835_SLAVE. Master I2C active. SW will enable INT10 later.
+ 189   1                    // EINT14:
+ 190   1        SFR_E2IF  = 0x00;   // (0xFA) 0000 0000 : Interrupt Flag         
+ 191   1        SFR_E2IE  = 0x00;   // (0xFB) 0000 0000 : Interrupt Enable.
+ 192   1        SFR_E2IP  = 0x00;   // (0xFC) 0000 0000 : Interrupt Priority
+ 193   1        SFR_E2IM  = 0xff;   // (0xFD) 0000 0000 : Interrupt Mode(0=Edge,  1=Level)
+ 194   1        SFR_E2IT  = 0x00;   // (0xFE) 0000 0000 : Level/Edge Polarity  (0=Low/Falling, 1=High/Rising)   0xFE
+ 195   1        //BKTODO120606 Why Level ?. 0x08
+ 196   1      
+ 197   1      //  Puts("\n\n\n\n\nInitCPU ");
+ 198   1      //  Puts("16Bit Access");
+ 199   1      
+ 200   1        //------- Remote Controller (INT9, Timer2) --------
+ 201   1      
+ 202   1        SFR_T2CON = 0x00;   //ClearRemoTimer. RemoINTR(EINT9) will be activateed in RemoTimer   
+ 203   1      
+ 204   1        //cache on :: sfr 9b = 1;
+ 205   1      //  Puts(" CACHE");
+ 206   1      //  SFR_CACHE_EN = 0x01;  //cache ON. No Power Down
+ 207   1      
+ 208   1      //#ifdef MODEL_TW8835
+ 209   1      //  Puts(" SFR EX0 ET0 EA");
+ 210   1      //#else
+ 211   1      //  Puts(" SFR EX0 ET0 EA EINT4");
+ 212   1      //#endif
+ 213   1      
+ 214   1      #ifdef MODEL_TW8836FPGA
+                //TW8836 don't have PORT_NOINIT_MODE. FW starts as NOINIT
+                SFR_EX0 = 0;
+              //  Printf("\nSKIP EX0");
+              #endif
+ 219   1      }
+ 220          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    378    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     13    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
