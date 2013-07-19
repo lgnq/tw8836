@@ -1,7 +1,6 @@
 #include "cpu.h"
 #include "reg.h"
 #include "TW8836.h"
-#include "uart.h"
 
 DATA	BYTE	INT_STATUS=0;
 DATA	BYTE	INT_MASK=0;
