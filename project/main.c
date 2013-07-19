@@ -42,11 +42,6 @@
 #include "config.h"
 #include "cpu.h"
 
-void TaskA(void);
-void TaskB(void);
-void TaskC(void);
-void TaskD(void);
-
 void putch(uint8 Data)
 {
     uint8 i,j;
@@ -65,6 +60,7 @@ void putch(uint8 Data)
 void init_task(void)
 {
 	init_cpu();
+	
 	EA = 1;
 	
 	while (1)
@@ -79,93 +75,9 @@ void main(void)
     OSInit();
 	
 		OSTaskCreate(init_task, NULL, 0);
-//    OSTaskCreate(TaskA, NULL, 0);
-//    OSTaskCreate(TaskB, NULL, 1);
-//    OSTaskCreate(TaskC, NULL, 2);
-//    OSTaskCreate(TaskD, NULL, 3);
 
     while(1)
     {
 			;
-//        PCON = PCON | 0x01;                     /* CPU½øÈëÐÝÃß×´Ì¬ */
     }
-}
-
-void TaskA(void)
-{
-	init_cpu();
-/*
-	TMOD = (TMOD & 0XF0) | 0X01;
-	TL0 = 0x0;
-	TH0 = 0x0;
-	TR0 = 1;
-	ET0 = 1;
-	TF0 = 0;
-*/	
-  EA = 1;
-    
-	OSSemCreate(0,1);
-    while (1)
-    {
-        OSSemPend(0,0);
-        putch('A');
-        putch('0');
-        putch('1');
-        putch('2');
-        putch('3');
-        putch('\n');
-        OSSemPost(0);
-        OSWait(K_TMO,TL0);
-    } 
-}
-
-void TaskB(void)
-{
-    while (1)
-    {
-        OSSemPend(0,0);
-        putch('B');
-        putch('0');
-        putch('1');
-        putch('2');
-        putch('3');
-        putch('\n');
-        OSSemPost(0);
-        OSWait(K_TMO,TL0);
-    } 
-}
-
-void TaskC(void)
-{
-    while (1)
-    {
-        OSSemPend(0,0);
-        putch('C');
-        putch('0');
-        putch('1');
-        putch('2');
-        putch('3');
-        putch('\n');
-        OSSemPost(0);
-        OSWait(K_TMO,TL0);
-    } 
-}
-
-void TaskD(void)
-{
-    uint8 i;
-    
-    while (1)
-    {
-        OSSemPend(0,0);
-        for (i = 0; i < 100; i++)
-        {
-            putch('D');
-            putch('E');
-            putch('F');
-            putch('G');
-            putch(' ');
-        }
-        OSSemPost(0);
-    } 
 }
