@@ -49,7 +49,7 @@ void init_task(void)
 	init_uart();
 	
 	EA = 1;
-	
+
 	while (1)
 	{
 		put_char('x');

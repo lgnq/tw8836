@@ -63,7 +63,7 @@
 #define EN_OS_Q_POST            1           /* 禁止(0)或允许(1)FIFO方式向对列发送消息                   */
 #define EN_OS_Q_POST_FRONT      1           /* 禁止(0)或允许(1)LIFO方式向对列发送消息                   */
 #define EN_OS_Q_NMsgs           1           /* 禁止(0)或允许(1)取得队列中消息数                         */
-#define EN_OS_Q_SIZE            0           /* 禁止(0)或允许(1)取得队列总容量                           */
+#define EN_OS_Q_SIZE            1           /* 禁止(0)或允许(1)取得队列总容量                           */
 #define EN_OS_Q_FLUSH           0           /* 禁止(0)或允许(1)清空队列                                 */
 
 #define EN_OS_SEM               1           /* 禁止(0)或允许(1)信号量                                   */
