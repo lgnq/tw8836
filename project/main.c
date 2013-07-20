@@ -41,31 +41,18 @@
 ********************************************************************************************************/
 #include "config.h"
 #include "cpu.h"
-
-void putch(uint8 Data)
-{
-    uint8 i,j;
-
-    SBUF = Data;
-    i = 2048 / 256;
-    j = 2048 % 256;
-    do
-    {
-        do
-        {
-        } while (--j !=0);
-    } while (--i != 0);    
-}
+#include "uart.h"
 
 void init_task(void)
 {
 	init_cpu();
+	init_uart();
 	
 	EA = 1;
 	
 	while (1)
 	{
-		putch('x');
+		put_char('x');
 		OSWait(K_TMO, 100);		
 	}
 }
@@ -76,7 +63,7 @@ void main(void)
 	
 		OSTaskCreate(init_task, NULL, 0);
 
-    while(1)
+    while (1)
     {
 			;
     }

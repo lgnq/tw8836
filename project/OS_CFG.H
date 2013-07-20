@@ -54,13 +54,13 @@
 #define TICK_TIMER_SHARING      1           /* 定义进入多少次硬件中断为一次系统定时器软中断             */
 #define OSWait_EN               1           /* 禁止(0)或允许(1)调用兼容函数OSWait  */
 
-#define EN_OS_Q                 0           /* 禁止(0)或允许(1)消息队列                                 */
+#define EN_OS_Q                 1           /* 禁止(0)或允许(1)消息队列                                 */
 #define EN_OS_Q_CHK             0           /* 禁止(0)或允许(1)校验消息队列指针                         */
 #define OS_Q_MEM_SEL            xdata       /* 消息队列存储空间选择，keil c51有用，必须为idata、xdata   */
                                             /* 不是keil c51时它必须为空格                               */
 #define EN_OS_Q_PENT            1           /* 禁止(0)或允许(1)等待队列中的消息                         */
-#define EN_OS_Q_ACCEPT          0           /* 禁止(0)或允许(1)无等待的从队列中取得消息                 */
-#define EN_OS_Q_POST            0           /* 禁止(0)或允许(1)FIFO方式向对列发送消息                   */
+#define EN_OS_Q_ACCEPT          1           /* 禁止(0)或允许(1)无等待的从队列中取得消息                 */
+#define EN_OS_Q_POST            1           /* 禁止(0)或允许(1)FIFO方式向对列发送消息                   */
 #define EN_OS_Q_POST_FRONT      1           /* 禁止(0)或允许(1)LIFO方式向对列发送消息                   */
 #define EN_OS_Q_NMsgs           1           /* 禁止(0)或允许(1)取得队列中消息数                         */
 #define EN_OS_Q_SIZE            0           /* 禁止(0)或允许(1)取得队列总容量                           */

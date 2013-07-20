@@ -5,7 +5,6 @@
 // TW8835 8051 Special Function Register (SFR)
 //===================================================================
 
- 
 /*
 I2C[8A]>mcu ds
 Dump DP8051 SFR
@@ -37,8 +36,6 @@ I2C[8A]>
 */
  
 #define	REG_START_ADDRESS	0xc000	// register start 0xc000, for page0, 0xc100-page1 
-
-#define RS_BUF_MAX 	32
 
 void init_cpu(void);
 

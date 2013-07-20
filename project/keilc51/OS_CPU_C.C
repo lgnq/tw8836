@@ -295,7 +295,7 @@ void TaskIdle(void)   small;
 ** 输　入: 无
 ** 输　出 : 无
 ** 全局变量: 无
-** 调用模块: OS_IBT_ENTER,(UserTickTimer),OSTimeTick,OSIntExit
+** 调用模块: OS_INT_ENTER,(UserTickTimer),OSTimeTick,OSIntExit
 ** 
 ** 作　者: 陈明计
 ** 日　期: 2002年2月22日

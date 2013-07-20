@@ -2,54 +2,7 @@
 #include "reg.h"
 #include "TW8836.h"
 
-DATA	BYTE	INT_STATUS=0;
-DATA	BYTE	INT_MASK=0;
-DATA	BYTE	INT_STATUS2=0;
-DATA	BYTE	INT_STATUS3=0;	//for debug ext4_intr
-DATA	BYTE	INT_STATUS_ACC=0;
-DATA	BYTE	INT_STATUS2_ACC=0;
-DATA	BYTE	EXINT_STATUS = 0;
-DATA	WORD	MCU_INT_STATUS=0;
-DATA	WORD	VH_Loss_Changed=0;
-
 volatile BYTE	XDATA *DATA regTW88 = REG_START_ADDRESS;
-
-void ext0_int(void) interrupt 0 using 1
-{
-	SFR_EA = 0;
-/*
-	if (access == 0)
-	{
-		SFR_EA = 1;
-		return;
-	}
-*/
-	INT_STATUS  = ReadTW88(REG002) & 0xEF;
-	INT_MASK    = ReadTW88(REG003);
-	INT_STATUS2 = ReadTW88(REG004);
-	WriteTW88(REG002, INT_STATUS );				//clear	
-	WriteTW88(REG004, INT_STATUS2 & 0x07);		//clear
-
-	if(INT_STATUS & 0x02)						//keep 0x02.
-		VH_Loss_Changed++;
-
-	INT_STATUS_ACC |= INT_STATUS;
-	INT_STATUS2_ACC |= INT_STATUS2;
-
-	SFR_EA = 1;
-}
-
-void ext4_int(void) interrupt 9 using 1
-{
-	SFR_EA = 0;
-
-//	ExtIntCount++;
-	INT_STATUS3 = ReadTW88(REG002) & 0x10;
-	WriteTW88(REG002, INT_STATUS3);		//clear	
-
-	//If you want to test, use SFR_EINT4 and skip "SFR_EINT4=1".
-	SFR_EA=1;
-}
 
 void init_cpu(void)
 {
@@ -150,7 +103,7 @@ void init_cpu(void)
 							// -  PS1 PT2 PS PT1 PX1 PT0 PX0	 		         
 
 	//---------- Enable Individual Interrupt ----------
-							// IE(0xA8) = EA ES1 ET2 ES  ET1 EX1 ET0 EX0
+	// IE(0xA8) = EA ES1 ET2 ES  ET1 EX1 ET0 EX0
 	SFR_EX0  = 0;			// INT0		: Chip Interrupt
 	SFR_ET0  = 1;			// Timer0	: System Tic
 	SFR_EX1  = 0;			// INT1		: DE end
@@ -169,14 +122,16 @@ void init_cpu(void)
 	SFR_EA   = 0;			// Global Interrupt
 
 	//---------- Extended Interrupt -------------------
-							// 0xe8	xx xx EWDI EINT6 EINT5 EINT4 EINT3 EINT2
+	// 0xe8	xx xx EWDI EINT6 EINT5 EINT4 EINT3 EINT2
 	SFR_EINT2 = 0;			// INT2		: SPI-DMA done
 	SFR_EINT3 = 0;			// INT3		: Touch Ready
+
 //#ifdef MODEL_TW8835
 //	SFR_EINT4 = 0;			// INT4		: reserved 
 //#else
 	SFR_EINT4 = 0;			// INT4		: SW 7FF 
 //#endif
+
 	SFR_EINT5 = 0;			// INT5		: reserved
 	SFR_EINT6 = 0;			// INT6		: Pen
 	//---------- Extended Interrupt 7~14 Config. ---------------
