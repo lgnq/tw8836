@@ -2,7 +2,7 @@
 #include "reg.h"
 #include "TW8836.h"
 
-volatile BYTE	XDATA *DATA regTW88 = REG_START_ADDRESS;
+volatile unsigned char xdata *data regTW88 = REG_START_ADDRESS;
 
 void init_cpu(void)
 {

@@ -1,6 +1,5 @@
 #include "reg.h"
 #include "uart.h"
-#include "typedefs.h"
 
 void init_uart(void)
 {

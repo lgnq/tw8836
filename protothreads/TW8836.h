@@ -1,8 +1,6 @@
 #ifndef _TW8836_H_
 #define	_TW8836_H_
 
-#include "typedefs.h"
-
 //==<<PAGE & TWBASE>>=================================================
 #define PAGE0_GENERAL		0x00
 #define PAGE0_OUTPUT		0x00	//0x007::0x00F & 0x01F
@@ -1830,9 +1828,9 @@
 //	#define WriteTW88(a,b)	(*((unsigned char volatile xdata *) (REG_START_ADDRESS+a) )) = ((BYTE)(b))
 //	#define	ReadTW88(a)		(*((unsigned char volatile xdata *) (REG_START_ADDRESS+a) ))
 //===================================================================
-extern volatile BYTE XDATA *DATA regTW88;
+extern volatile unsigned char xdata *data regTW88;
 
-#define WriteTW88(a, b)			regTW88[a] = ((BYTE)(b))
+#define WriteTW88(a, b)			regTW88[a] = ((unsigned char)(b))
 #define	ReadTW88(a)				regTW88[a]
 
 //TW8836 uses only 16bit index. below is for backward compatibility.
@@ -1841,9 +1839,9 @@ extern volatile BYTE XDATA *DATA regTW88;
 #define ReadTW88Page(p)		
 
 //wrong name. WriteTW88_8bit_index
-#define WriteTW88Byte(a, b)		regTW88[(BYTE)(a)] = ((BYTE)(b))   
-#define	ReadTW88Byte(a)			regTW88[(BYTE)(a)]
-#define WriteTW88BytePage(p)	regTW88[(BYTE)0xff] = ((BYTE)(p))
+#define WriteTW88Byte(a, b)		regTW88[(unsigned char)(a)] = ((unsigned char)(b))   
+#define	ReadTW88Byte(a)			regTW88[(unsigned char)(a)]
+#define WriteTW88BytePage(p)	regTW88[(unsigned char)0xff] = ((unsigned char)(p))
 #define ReadTW88BytePage(p)		p = ReadTW88(0xff)
 
 
@@ -1866,7 +1864,7 @@ extern volatile BYTE XDATA *DATA regTW88;
 #define Read3TW88(rhi,rmid,rlo,value) value=ReadTW88(rhi); value <<= 8; value |= ReadTW88(rmid); value <<= 8; value |= ReadTW88(rlo)
 #define Read4TW88(r3,r2,r1,r0,value) value=ReadTW88(r3); value <<= 8; value |= ReadTW88(r2); value <<= 8; value |= ReadTW88(r1); value <<= 8; value |= ReadTW88(r0)
 
-void WriteBlockTW88(WORD index, BYTE *val, BYTE cnt);
+//void WriteBlockTW88(WORD index, BYTE *val, BYTE cnt);
 
 /* status register */
 #define TW8835_R002	(*((unsigned char volatile xdata *) (REG_START_ADDRESS+0x002) ))
