@@ -104,7 +104,7 @@ code REG_IDX_DATA_t InitDefault_Table[] =
 #elif defined(PANEL_FP_LSB)
 	{0x007,	0x02},
 #else
-	{0x007,	0x00},
+	{0x007,	0x80},
 #endif		
 //#endif
 								//R008[5]:TRI_FPD
