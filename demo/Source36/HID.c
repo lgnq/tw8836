@@ -354,46 +354,54 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 
 	UpdateOsdTimerClock();
 
-	//
-	if(TaskGetGrid()) {
+	if (TaskGetGrid())
+	{
 		value = ActionGridRemo(_RemoDataCode);
-		if(value==0xFF)
+		if (value == 0xFF)
 			return 0;
 		//else passthru..
 	}
+
 #if defined(SUPPORT_HDMI_EP907M)
 	//It have to work only when the CEC was enabled...
-	if(MenuGetLevel()==0 && _RemoDataCode != REMO_MENU ) {
+	if (MenuGetLevel()==0 && _RemoDataCode != REMO_MENU)
+	{
 		//return ActionRemoEP907M(_RemoDataCode, AutoKey);
 		value = ActionRemoEP907M(_RemoDataCode, AutoKey);
-		if(value == 0xFF)
+		if (value == 0xFF)
 			return 0;
 		//else passthru..
 	}
 #endif
-	if(MenuGetLevel()) {
+
+	if (MenuGetLevel())
+	{
 		//SPI SETUP MENU
 		value = ActionRemo_SOsdMenu(_RemoDataCode, AutoKey);
-		if(value == 0xFF)
+		if (value == 0xFF)
 			return 0;
 		//else passthru..
 	}
 
-	switch(_RemoDataCode) {
-
+	switch (_RemoDataCode)
+	{
 	case REMO_STANDBY:				// power
-		if( AutoKey )				// need repeat key. 
+		if (AutoKey)				// need repeat key. 
 			return REQUEST_POWER_OFF;
 		return 0;					// power off
 
 	case REMO_MUTE:
 #ifdef SUPPORT_FOSD_MENU
-		if( AutoKey ) return 1;
+		if (AutoKey)
+			return 1;
 //		ToggleAudioMute();
-		if( IsAudioMuteOn() )		DisplayMuteInfo();
-		else{						
+		if (IsAudioMuteOn())
+			DisplayMuteInfo();
+		else
+		{						
 			ClearMuteInfo();
-			if( DisplayInputHold ) FOsdDisplayInput();
+			if (DisplayInputHold)
+				FOsdDisplayInput();
 		}
 #endif
 		break;
@@ -407,15 +415,18 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 #endif
 		break;
 	case REMO_INFO:
-		if(MenuGetLevel()==0) {
+		if (MenuGetLevel() == 0)
+		{
 			//toggle current video information.
-			if(TaskNoSignal_getCmd()==TASK_CMD_DONE) {
+			if (TaskNoSignal_getCmd() == TASK_CMD_DONE)
+			{
 #ifdef SUPPORT_FOSD_MENU
 				FOsdDisplayInput();	
 #else
 				ReadTW88Page(page);
 				WriteTW88Page(PAGE3_FOSD);
-				if((ReadTW88(REG310) & 0x80)==0) {
+				if ((ReadTW88(REG310) & 0x80) == 0)
+				{
 					FOsdCopyMsgBuff2Osdram(OFF);
 				}
 				WriteTW88Page(page);
@@ -436,19 +447,19 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 	case REMO_NUM8:
 	case REMO_NUM9:
 		break;
-
 	
 	case REMO_SELECT:
 #ifdef SUPPORT_FOSD_MENU
-		if( AutoKey ) return 1;
-		if(  DisplayedOSD & FOSD_MENU  )
+		if (AutoKey)
+			return 1;
+		if (DisplayedOSD & FOSD_MENU)
 			FOsdMenuProcSelectKey();
 #endif
 		break;
 
 	case REMO_CHNUP:
 #ifdef SUPPORT_FOSD_MENU
-		if(DisplayedOSD & FOSD_MENU)
+		if (DisplayedOSD & FOSD_MENU)
 			FOsdMenuMoveCursor(FOSD_UP);
 #else
   		dPuts("\nREMO_CHNUP pressed!!!");
@@ -456,7 +467,7 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 		break;
 	case REMO_CHNDN:
 #ifdef SUPPORT_FOSD_MENU
-		if(DisplayedOSD & FOSD_MENU)
+		if (DisplayedOSD & FOSD_MENU)
 			FOsdMenuMoveCursor(FOSD_DN);
 #else
   		dPuts("\nREMO_CHNDN pressed!!!");
@@ -464,9 +475,12 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 		break;
 	case REMO_VOLUP:
 #ifdef SUPPORT_FOSD_MENU
-		if(  DisplayedOSD & FOSD_MENU  ) {
-			if( OnChangingValue ) 	FOsdMenuValueUpDn(FOSD_UP );
-			else					FOsdMenuProcSelectKey();			
+		if (DisplayedOSD & FOSD_MENU)
+		{
+			if (OnChangingValue)
+				FOsdMenuValueUpDn(FOSD_UP);
+			else
+				FOsdMenuProcSelectKey();			
 		}
 		else 
 		{
@@ -479,9 +493,12 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 		break;
 	case REMO_VOLDN:
 #ifdef SUPPORT_FOSD_MENU
-		if(  DisplayedOSD & FOSD_MENU  ) {
-			if( OnChangingValue ) FOsdMenuValueUpDn(FOSD_DN );
-			else FOsdHighMenu();	
+		if (DisplayedOSD & FOSD_MENU)
+		{
+			if (OnChangingValue)
+				FOsdMenuValueUpDn(FOSD_DN);
+			else
+				FOsdHighMenu();	
 		}
 		else 
 		{
@@ -506,16 +523,15 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 //			FOsdMenuOpen();		
 //		}
 //#else
-		if(MenuGetLevel()==0)
+		if (MenuGetLevel() == 0)
 			MenuStart();	
 //#endif
 		break;
 
-
 	case REMO_EXIT:
   		dPuts("\nREMO_EXIT pressed!!!");
 #ifdef SUPPORT_FOSD_MENU
-		if(  DisplayedOSD & FOSD_MENU  )		
+		if (DisplayedOSD & FOSD_MENU)		
 			FOsdMenuDoAction(EXITMENU);
 #else
 #endif
@@ -523,7 +539,8 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 
 	case REMO_PIPON:
 		dPuts("\nPIP Display mode change");
-		if(InputMain==INPUT_HDMIPC ||  InputMain==INPUT_HDMITV) {
+		if (InputMain == INPUT_HDMIPC ||  InputMain==INPUT_HDMITV)
+		{
 			dPuts("\nCEC_AUTO ON");
 			WriteI2CI16Byte(0x68, 0x800, 0x01);
 		}
@@ -533,12 +550,15 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 		break;
 	case REMO_SWAP:
 		//Printf("\n=====SWAP InputMode:%bd",InputMain);
-		if(InputMain==INPUT_BT656) {
+		if (InputMain == INPUT_BT656)
+		{
 			ReadTW88Page(page);
 			WriteTW88Page(PAGE0_GENERAL);
 			value = ReadTW88(REG006);
-			if(value & 0x40) 	WriteTW88(REG006, value & ~0x40);
-			else				WriteTW88(REG006, value | 0x40);
+			if (value & 0x40)
+				WriteTW88(REG006, value & ~0x40);
+			else
+				WriteTW88(REG006, value | 0x40);
 			WriteTW88Page(page);
 		}			
 		break;
@@ -549,7 +569,6 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 
 	case REMO_TTXRED:
 		break;
-
 
 	case REMO_TTXYELLOW:
 		break;
@@ -565,8 +584,8 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 
 	case REMO_ASPECT:
 		break;
-
 	}
+	
 	return 1;
 }
 

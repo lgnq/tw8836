@@ -136,20 +136,22 @@ void PrintRemoCapture(void)
 */
 BYTE IsRemoDataReady(BYTE *DataCode, BYTE *AutoKey)
 {
-	BYTE	togglebit;
-	static BYTE	LastToggle=0;
-	static BYTE AutoWait=0;
-	static DWORD	LastTime = 0;
+	BYTE togglebit;
+	static BYTE	LastToggle = 0;
+	static BYTE AutoWait = 0;
+	static DWORD LastTime = 0;
 
 	BYTE _RemoSystemCode;
 	BYTE _RemoDataCode;
 
-	if( !RemoDataReady ) return 0;
+	if (!RemoDataReady)
+		return 0;
 
 	_RemoSystemCode = RemoSystemCode;
 	_RemoDataCode = RemoDataCode;
 
-	if ( ( RemoReceivedTime - LastTime ) > 100 ) LastToggle = 0;		// time out means newkey
+	if ((RemoReceivedTime - LastTime) > 100)
+		LastToggle = 0;		// time out means newkey
 	LastTime = RemoReceivedTime;
 
 	ClearRemoTimer();			
@@ -163,8 +165,10 @@ BYTE IsRemoDataReady(BYTE *DataCode, BYTE *AutoKey)
 #endif
 
 	//check start1 & start2 and 5BIT ADDRESS
-	if( (_RemoSystemCode & 0xc0) != 0xc0 )			return 0;
-	if( (_RemoSystemCode & 0x1f) != REMO_CUSTOM )	return 0;
+	if ((_RemoSystemCode & 0xc0) != 0xc0)
+		return 0;
+	if ((_RemoSystemCode & 0x1f) != REMO_CUSTOM)
+		return 0;
 
 	//check toggle
 	togglebit = LastToggle;
@@ -175,11 +179,14 @@ BYTE IsRemoDataReady(BYTE *DataCode, BYTE *AutoKey)
 	*/
 
 	*AutoKey = 0;
-	if( LastToggle != togglebit ) {			// new key
+	if (LastToggle != togglebit)// new key
+	{			
 		AutoWait =  0;
 	}
-	else {								// auto key
-		if(AutoWait < 4) {				// wait 4 auto key
+	else								// auto key
+	{
+		if (AutoWait < 4)				// wait 4 auto key
+		{
 			AutoWait++;
 #ifdef DEBUG_KEYREMO
 			dPrintf("  autowait:%bd",AutoWait);
@@ -196,6 +203,7 @@ BYTE IsRemoDataReady(BYTE *DataCode, BYTE *AutoKey)
 #ifdef DEBUG_KEYREMO
 	dPrintf("\n':%02bx Data:%02bx Auto:%02bx ", _RemoSystemCode, _RemoDataCode, *AutoKey);
 #endif
+
 #ifdef DEBUG_REMO
 	PrintRemoCapture();
 #endif
@@ -329,11 +337,12 @@ BYTE IsRemoDataReady(BYTE *DataCode, BYTE *AutoKey)
 */
 BYTE CheckRemo(void)
 {
-	BYTE AutoKey,  _RemoDataCode;
-	BYTE ret=0;
+	BYTE AutoKey, _RemoDataCode;
+	BYTE ret = 0;
 
-	if( IsRemoDataReady(&_RemoDataCode, &AutoKey) )	{
-		ret = ActionRemo( _RemoDataCode, (BYTE)AutoKey) ;
+	if (IsRemoDataReady(&_RemoDataCode, &AutoKey))
+	{
+		ret = ActionRemo(_RemoDataCode, (BYTE)AutoKey);
 
 #ifdef DEBUG_KEYREMO
 		//dPrintf("\n**** Remo: %02bx, %02bx ", _RemoDataCode, (BYTE)AutoKey);
@@ -343,5 +352,4 @@ BYTE CheckRemo(void)
 
 	return ret;
 }
-
 
