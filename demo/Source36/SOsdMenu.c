@@ -4824,11 +4824,13 @@ void MenuStart(void)
 	UseSOsdHwBuff = 0;
 
 	//turn off NoSignal Task if it was ON
-	if(TaskNoSignal_getCmd() != TASK_CMD_DONE) {
+	if (TaskNoSignal_getCmd() != TASK_CMD_DONE)
+	{
 		TaskNoSignal_setCmd(TASK_CMD_DONE); 
 	}
+
 	//turn off Logo if it was ON
-	if(NoSignalLogoShow)
+	if (NoSignalLogoShow)
 		RemoveLogo(); 
 
 	//clean SOsdWinBuff[].
@@ -4862,9 +4864,9 @@ void MenuStart(void)
 	//init SOSD
 	SpiOsdEnable(ON);
 	SpiOsdDisableRlcReg(0);
-	SpiOsdWinImageLocBit(1,0);
-	SpiOsdWinLutOffset( 1, 0 /*SOSD_WIN_BG,  WINBG_LUTLOC*/ );  //old: SpiOsdLoadLUT_ptr
-	SpiOsdWinFillColor( 1, 0 );
+	SpiOsdWinImageLocBit(1, 0);
+	SpiOsdWinLutOffset(1, 0 /*SOSD_WIN_BG,  WINBG_LUTLOC*/ );  //old: SpiOsdLoadLUT_ptr
+	SpiOsdWinFillColor(1, 0);
 
 	//init FOSD
 

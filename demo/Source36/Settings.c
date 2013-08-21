@@ -146,9 +146,12 @@ void Clock27(void)
 void SSPLL_PowerUp(BYTE fOn)
 {
 	WriteTW88Page(PAGE0_SSPLL);
-	if(fOn)	WriteTW88(REG0FC, ReadTW88(REG0FC) & ~0x80);
-	else	WriteTW88(REG0FC, ReadTW88(REG0FC) |  0x80);
+	if (fOn)
+		WriteTW88(REG0FC, ReadTW88(REG0FC) & ~0x80);
+	else
+		WriteTW88(REG0FC, ReadTW88(REG0FC) |  0x80);
 }
+
 //-----------------------------------------------------------------------------
 /**
 * get PPF(PLL Pixel Frequency) value. SSPLL value
@@ -1265,16 +1268,17 @@ void FP_BiasOnOff(BYTE fOn)
 
 	//WriteTW88Page(PAGE0_GENERAL);
 	//WriteTW88(REG084, 0x01);	//disable
-	if(fOn) {
-		WriteI2CByte( I2CID_SX1504, 1, 0 );		// output enable
-		WriteI2CByte( I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) & 0xFD );		// FPBIAS enable.
+	if (fOn)
+	{
+		WriteI2CByte(I2CID_SX1504, 1, 0);		// output enable
+		WriteI2CByte(I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) & 0xFD);		// FPBIAS enable.
 	}
-	else {
-		WriteI2CByte( I2CID_SX1504, 1, 0 );		// output enable
-		WriteI2CByte( I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) | 0x02 );		// FPBIAS disable
+	else
+	{
+		WriteI2CByte(I2CID_SX1504, 1, 0);		// output enable
+		WriteI2CByte(I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) | 0x02);		// FPBIAS disable
 	}
 }
-
 
 //FrontPanel PowerControl ON - GPIO42. or expender GPIO[0]
 //-----------------------------------------------------------------------------
@@ -1284,17 +1288,18 @@ void FP_BiasOnOff(BYTE fOn)
 void FP_PWC_OnOff(BYTE fOn)
 {
 	Printf("\nFP_PWC %s",fOn ? "On" : "Off");
-		I2C_delay_base = 3;									//assume 108/1.5.
+	I2C_delay_base = 3;									//assume 108/1.5.
 
 	WriteTW88Page(PAGE0_GENERAL);
 	WriteTW88(REG084, 0x01);											//disable
-	if(fOn) {
-		WriteI2CByte( I2CID_SX1504, 1, 0 );									// output enable
-		WriteI2CByte( I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) & 0xFE );	// FPPWC enable
+	if (fOn)
+	{
+		WriteI2CByte(I2CID_SX1504, 1, 0);									// output enable
+		WriteI2CByte(I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) & 0xFE);	// FPPWC enable
 	}
 	else {
-		WriteI2CByte( I2CID_SX1504, 1, 0 );									// output enable
-		WriteI2CByte( I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) | 0x01 );	// FPPWC disable
+		WriteI2CByte(I2CID_SX1504, 1, 0);									// output enable
+		WriteI2CByte(I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) | 0x01);	// FPPWC disable
 	}
 }
 
@@ -1388,7 +1393,7 @@ BYTE DCDC_StartUP_sub(void)
 	WaitVBlank(1);
 	//-------------
 	//FP Data Out
-	OutputEnablePin(ON,ON);		//Output enable. FP data: enable
+	OutputEnablePin(ON, ON);		//Output enable. FP data: enable
 
 
 #ifdef TW8835_EVB_10
@@ -1397,7 +1402,7 @@ BYTE DCDC_StartUP_sub(void)
 
 	//DCDC final
 	//ret=DCDC_On(2);
-	ret=ERR_SUCCESS;
+	ret = ERR_SUCCESS;
 
 	//-------------
 	//FPBIAS ON 
@@ -1408,7 +1413,8 @@ BYTE DCDC_StartUP_sub(void)
 	//WriteTW88(REG21E, ReadTW88(REG21E) & ~0x01);
 
 //	PrintSystemClockMsg("DCDC_StartUp END");
-	if(ret!=ERR_SUCCESS) {
+	if (ret != ERR_SUCCESS)
+	{
 		Puts(" FAIL");
 
 		//WriteTW88Page(PAGE0_DCDC);
@@ -1419,6 +1425,7 @@ BYTE DCDC_StartUP_sub(void)
 		//WriteTW88(REG0E8, 0x11);	Printf("\nREG0E8:11[%bd]",ReadTW88(REG0EA)>>4);
 		//WriteTW88(REG0E8, 0x71);	Printf("\nREG0E8:71[%bd]",ReadTW88(REG0EA)>>4);
 	}
+
 	return ret;
 }
 
@@ -1433,15 +1440,15 @@ BYTE DCDC_StartUP(void)
 	BYTE ret;
 	
 //	Puts("\nDCDC_StartUP start");
-	ret=DCDC_StartUP_sub();
-	if(ret == ERR_SUCCESS)
+	ret = DCDC_StartUP_sub();
+	if (ret == ERR_SUCCESS)
 		return ERR_SUCCESS;
 
-	ret=DCDC_StartUP_sub();
-	if(ret == ERR_SUCCESS)
+	ret = DCDC_StartUP_sub();
+	if (ret == ERR_SUCCESS)
 		return ERR_SUCCESS;
 
-	ret=DCDC_StartUP_sub();
+	ret = DCDC_StartUP_sub();
 	return ret;
 }
 

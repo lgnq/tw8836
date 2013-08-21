@@ -302,16 +302,19 @@ void SOsdWinBuffClean(BYTE hw)
 {
 	BYTE i,j;
 
-	if(hw) {
+	if (hw)
+	{
 		SpiOsdWinHWOffAll(1);
-	 	SpiOsdRlcReg(0,0,0);	//disable RLC
+	 	SpiOsdRlcReg(0, 0, 0);	//disable RLC
 	}
 
-	for(i=0; i < 10; i++) {
-		for(j=0; j < 0x0E; j++)
+	for (i=0; i < 10; i++)
+	{
+		for (j=0; j < 0x0E; j++)
 			SpiWinBuff[i*16+j]=0;
 	}
 }
+
 //-----------------------------------------------------------------------------
 /**
 * Description

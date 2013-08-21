@@ -309,19 +309,27 @@ BYTE WriteI2CByte_B0(BYTE i2cid, BYTE index, BYTE val)
 	//if(i2cid==I2CID_SX1504)
 	//	return 0;
 
-
-	SFR_EA=0;
+	SFR_EA = 0;
+	
 	I2C_Start();
-	ret  = I2C_WriteData(i2cid);	ret <<=1;
-	ret |= I2C_WriteData(index);	ret <<= 1;
+
+	ret  = I2C_WriteData(i2cid);
+	ret <<= 1;
+
+	ret |= I2C_WriteData(index);
+	ret <<= 1;
+
 	ret |= I2C_WriteData(val);
+
 	I2C_Stop();
-	SFR_EA=1;
+
+	SFR_EA = 1;
 
 #if defined(DEBUG_I2C)
-	if(ret)
-		Printf("\nWriteI2CByte[%bx:%bx,%bx] FAIL:%bx",i2cid, index,val, ret);
+	if (ret)
+		Printf("\nWriteI2CByte[%bx:%bx,%bx] FAIL:%bx", i2cid, index, val, ret);
 #endif
+
 	return ret;
 }
 

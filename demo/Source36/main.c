@@ -223,10 +223,10 @@ void main(void)
 		//==================================================
 		// MAIN LOOP
 		//==================================================
-		ret=main_loop();		
-		Printf("\nmain_loop() ret %bd",ret);		
-		if(ret==RET_MAIN_LOOP_PSM_BY_REMO || ret==RET_MAIN_LOOP_PSM_BY_PORT) {
-			
+		ret = main_loop();		
+		Printf("\nmain_loop() ret %bd", ret);		
+		if (ret == RET_MAIN_LOOP_PSM_BY_REMO || ret == RET_MAIN_LOOP_PSM_BY_PORT)
+		{
 			SystemPowerSave();		//move to PowerSaveMode	
 			WaitPowerOn();			//wait PowerOn input from keypad, Remo. not Touch
 			SystemPowerResume();	//resume
@@ -236,7 +236,6 @@ void main(void)
 	}	
 	//you can not be here...
 }
-
 
 //=============================================================================
 // MAIN LOOP				                                               
@@ -279,16 +278,19 @@ BYTE main_loop(void)
 	//---------------------------------------------------------------
 	//			             Main Loop 
 	//---------------------------------------------------------------
-	while(1) {
+	while (1)
+	{
 		//-------------- Check Serial Port ---------------------
 		Monitor();				// for new monitor functions
+
 #ifdef SUPPORT_UART1
 		Monitor1();				// for UART1
 #endif
 
 		//-------------- Check Watchdog ------------------------
 #ifdef DEBUG_WATCHDOG
-		if( F_watch ) {
+		if (F_watch)
+		{
 			static DWORD wdt_last=0;
 			DWORD wdt_diff;
 			DWORD curr_clock;
@@ -313,7 +315,8 @@ BYTE main_loop(void)
 #endif
 
 		//-------------- block access routines -----------------
-		if ( access == 0 ) continue;		
+		if (access == 0)
+			continue;		
 		/* NOTE: If you donot have an access, You can not pass */
 
  		//-------------- Check Keypad input --------------------
@@ -321,7 +324,8 @@ BYTE main_loop(void)
 
  		//-------------- Check Remote Controller ---------------
 		ret = CheckRemo();
-		if(ret == REQUEST_POWER_OFF && CurrSystemMode==SYS_MODE_NORMAL) {
+		if (ret == REQUEST_POWER_OFF && CurrSystemMode == SYS_MODE_NORMAL)
+		{
 			ePrintf("\n===POWER SAVE===by Remo");
 			ret = RET_MAIN_LOOP_PSM_BY_REMO;
 			break;
@@ -329,9 +333,11 @@ BYTE main_loop(void)
 
 		//-------------- Check Touch ---------------
 #ifdef SUPPORT_TOUCH
-		if ( TraceAuto ) TraceTouch();
+		if (TraceAuto)
+			TraceTouch();
 		ret = GetTouch2();
-		if(ret) {
+		if (ret)
+		{
 			ActionTouch();		
 		}
 #endif

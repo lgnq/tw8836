@@ -580,7 +580,7 @@ BYTE ActionTouch(void)
 {
 	BYTE TscStatus;
 	BYTE ret;
-	WORD	xpos, ypos;
+	WORD xpos, ypos;
 
 #ifdef DEBUG_TOUCH_SW
 	dPrintf("\n==>Tsc Action");
@@ -592,25 +592,31 @@ BYTE ActionTouch(void)
 	xpos = PosX;
 	ypos = PosY;
 
-	if(MenuGetLevel()==0) {
- 
-		if(TaskGetGrid()) {
-			if(TscStatus == TOUCHCLICK || TscStatus == TOUCHDOUBLECLICK)
+	if (MenuGetLevel() == 0)
+	{
+		if (TaskGetGrid())
+		{
+			if (TscStatus == TOUCHCLICK || TscStatus == TOUCHDOUBLECLICK)
 			{
 				TaskSetGridCmd(NAVI_KEY_ENTER);
+
 				return 0;
 			}
 		}
-		if(TscStatus == TOUCHDOUBLECLICK) {
+		if (TscStatus == TOUCHDOUBLECLICK)
+		{
 			MenuStart();
 			SetTouchStatus(TOUCHEND); //BK111108
 		}
-		else if(TscStatus == TOUCHPRESS || TscStatus >= TOUCHMOVE) {
+		else if (TscStatus == TOUCHPRESS || TscStatus >= TOUCHMOVE)
+		{
 		}
-		else if(TscStatus == TOUCHMOVED) {
+		else if (TscStatus == TOUCHMOVED)
+		{
 			SetTouchStatus(TOUCHEND); //END
 		}
-		else if(TscStatus == TOUCHCLICK) {
+		else if (TscStatus == TOUCHCLICK)
+		{
 			SetTouchStatus(TOUCHEND); //END
 		}
 
@@ -618,10 +624,12 @@ BYTE ActionTouch(void)
 	}
 
 	//in the menu
-	if(TscStatus == TOUCHPRESS || (TscStatus >= TOUCHMOVE)) {
+	if (TscStatus == TOUCHPRESS || (TscStatus >= TOUCHMOVE))
+	{
 		//serial input mode.
 		ret = MenuIsTouchCalibMode();
-		if(ret) {
+		if (ret)
+		{
 			CalibTouch(ret-1);
 
 			MenuKeyInput(NAVI_KEY_ENTER); //goto next "+"
@@ -634,7 +642,8 @@ BYTE ActionTouch(void)
 //			MenuCheckTouchInput(TscStatus, xpos, ypos);
 //			//note: do not call SetTouchStatus(0);
 //		}
-		else {
+		else
+		{
 			//
 			//update focus.
 			//
@@ -646,23 +655,27 @@ BYTE ActionTouch(void)
 	//else if(TscStatus == TOUCHMOVE) {
 	//	//if lost focus, do something.
 	//}
-	else if(TscStatus == TOUCHCLICK || TscStatus == TOUCHDOUBLECLICK || TscStatus == TOUCHLONGCLICK || TscStatus == TOUCHMOVED) {
+	else if (TscStatus == TOUCHCLICK || TscStatus == TOUCHDOUBLECLICK || TscStatus == TOUCHLONGCLICK || TscStatus == TOUCHMOVED)
+	{
 		//action mode
 
-		if(TscStatus == TOUCHLONGCLICK) {
-			if(MenuGetLevel()==1 || MenuIsSystemPage()) {
+		if (TscStatus == TOUCHLONGCLICK)
+		{
+			if (MenuGetLevel()==1 || MenuIsSystemPage())
+			{
 				//special.
 				//use default value.
 				MenuTouchCalibStart();
 				SetTouchStatus(TOUCHEND);
+
 				return 0;
 			}
 		}
 
-		if(TscStatus == TOUCHMOVED)
+		if (TscStatus == TOUCHMOVED)
 			TscStatus = TOUCHCLICK;
 
-		MenuCheckTouchInput(TscStatus,xpos, ypos);
+		MenuCheckTouchInput(TscStatus, xpos, ypos);
 		SetTouchStatus(TOUCHEND);  //BK110601
 		return 0;
 	}
@@ -671,7 +684,6 @@ BYTE ActionTouch(void)
 	return 1;
 }
 #endif
-
 
 /**
 * check Key input

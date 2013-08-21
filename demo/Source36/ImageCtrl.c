@@ -1062,7 +1062,8 @@ BYTE BackLightGet(void)
 BYTE BackLightSetRate(BYTE dat) //0..100
 {
 	BYTE val;
-	if(dat <= 100)
+	
+	if (dat <= 100)
 		BackLightRate = dat;
 
 	val = BackLightGet();
