@@ -172,19 +172,22 @@ void SpiOsdSetDeValue(void)
 void SpiOsdEnable(BYTE en)
 {
 	BYTE dat;
-	WriteTW88Page(PAGE4_SOSD );
+	
+	WriteTW88Page(PAGE4_SOSD);
 	dat = ReadTW88(REG400);
-	if( en ) {
+	if (en)
+	{
 		//
 		//SPIOSD mode uses PCLK or PLL108
 		//
 		McuSpiClkSelect(MCUSPI_CLK_PCLKPLL);				//select MCU/SPI Clock.
 		I2C_delay_base = 3;									//assume 108/1.5.
 
-		WriteTW88Page(PAGE4_SOSD );
+		WriteTW88Page(PAGE4_SOSD);
 		WriteTW88(REG400, dat | 0x04);						//enable SpiOSD
 	}
-	else {
+	else 
+	{
 		//
 		//normal mode uses 27MHz clock.
 		//
@@ -515,7 +518,8 @@ void SpiOsdWinImageLocBit(BYTE winno, BYTE start)
 {
 	DATA BYTE XDATA *data_p;
 
-	if(winno==0) {
+	if (winno == 0)
+	{
 		//wrong. win0 do not have a bit operation.
 		return;
 	}
@@ -527,7 +531,6 @@ void SpiOsdWinImageLocBit(BYTE winno, BYTE start)
 	*data_p &= 0x3F;
 	*data_p |= (start << 6);
 }
-
 
 //-----------------------------------------------------------------------------
 /**
@@ -638,17 +641,16 @@ void SpiOsdWinLutOffset( BYTE winno, WORD table_offset )
 {
 	DATA BYTE XDATA *data_p;
 
-	if(winno) winno++;
+	if (winno)
+		winno++;
 	data_p = &SpiWinBuff[winno << 4];
 	data_p += SPI_OSDWIN_LUT_PTR;
-	if(!winno) data_p += 4;
+	if (!winno)
+		data_p += 4;
 	
 	//LUT offset use 5bit & 16 unit
 	*data_p = table_offset >> 4;
 }
-
-		
-
 
 //=============================================================================
 //		Pixel Width
@@ -698,15 +700,18 @@ void SpiOsdWinFillColor( BYTE winno, BYTE color )
 	index = SpiOsdWinBase[winno];
 	WriteTW88Page(PAGE4_SOSD );
 
-	if ( color ) {
+	if (color)
+	{
 		WriteTW88(index, (ReadTW88(index ) | 0x04));				// en Alpha & Global
 	}
-	else {
+	else
+	{
 		WriteTW88(index, (ReadTW88(index ) & 0xFB ) );				// dis Alpha & Global
 	}
 	index = SpiOsdWinBase[winno] + SPI_OSDWIN_FILLCOLOR;
-	if(!winno)	index += 8;
-	WriteTW88(index, color );
+	if (!winno)
+		index += 8;
+	WriteTW88(index, color);
 }
 
 //-----------------------------------------------------------------------------

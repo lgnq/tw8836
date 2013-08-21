@@ -143,20 +143,23 @@ void SetInputMain(BYTE input)
 */
 void WaitVBlank(BYTE cnt)
 {
-	XDATA	BYTE i;
+	XDATA BYTE i;
 	WORD loop;
 	DECLARE_LOCAL_page
 
 	ReadTW88Page(page);
-	WriteTW88Page(PAGE0_GENERAL );
+	WriteTW88Page(PAGE0_GENERAL);
 
-	for ( i=0; i<cnt; i++ ) {
-		WriteTW88(REG002, 0xff );
+	for (i=0; i<cnt; i++)
+	{
+		WriteTW88(REG002, 0xff);
 		loop = 0;
-		while (!( ReadTW88(REG002 ) & 0x40 ) ) {
+		while (!(ReadTW88(REG002) & 0x40))
+		{
 			// wait VBlank
 			loop++;
-			if(loop > VBLANK_WAIT_VALUE  ) {
+			if (loop > VBLANK_WAIT_VALUE)
+			{
 				wPrintf("\nERR:WaitVBlank");
 				break;
 			}

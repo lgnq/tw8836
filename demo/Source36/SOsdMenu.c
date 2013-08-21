@@ -562,13 +562,14 @@ END_END:
 	SpiOsdWinBuffEnable( WIN_LOGO, OFF ); //disable window.
 	SpiOsdEnable(OFF);
 }
+
 void RemoveLogo(void)
 {
 	eMenuPrintf("\nRemoveLogo()");
 	NoSignalLogoShow = 0;
 
 	WaitVBlank(1);
-	SpiOsdWinBuffEnable( WIN_LOGO, OFF ); //disable window.
+	SpiOsdWinBuffEnable(WIN_LOGO, OFF); //disable window.
 	SpiOsdEnable(OFF);
 }
 

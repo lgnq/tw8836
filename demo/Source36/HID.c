@@ -690,9 +690,9 @@ BYTE ActionTouch(void)
 *
 * keypad: LEFT, RIGHT, DOWN, UP, MENU, MODE
 */
-void CheckKeyIn( void ) 
+void CheckKeyIn(void) 
 {
-	BYTE	key;
+	BYTE key;
 
 //#ifdef SUPPORT_TOUCH
 //	//if we support the touch, we need to init TscAdc again
@@ -701,21 +701,24 @@ void CheckKeyIn( void )
 
 	//key = ReadKeyPad();
 	key = GetKey(1);
-	if(key == 0) {
+	if (key == 0)
+	{
 		//sw key
-		if(SW_key) {
+		if (SW_key)
+		{
 			key = SW_key;
-			SW_key=0;
+			SW_key = 0;
 		}
-		if( key == 0)
+		if (key == 0)
 			return;
 	}
 
 	UpdateOsdTimerClock();
 
 #ifdef DEBUG_KEYREMO
-	dPrintf("\nGetKey(1):%02bx ",key);
-	switch(key) {
+	dPrintf("\nGetKey(1):%02bx ", key);
+	switch (key)
+	{
   	case KEY_RIGHT:	dPuts("Right"); break;
 	case KEY_UP:	dPuts("Up"); break;
 	case KEY_LEFT:	dPuts("Left"); break;
@@ -725,8 +728,11 @@ void CheckKeyIn( void )
 	default:		dPuts("unknown"); break;
 	}
 #endif
-	if(TaskGetGrid()) {
-		switch(key) {
+
+	if (TaskGetGrid())
+	{
+		switch (key)
+		{
 	  	case KEY_RIGHT:
 			TaskSetGridCmd(NAVI_KEY_RIGHT);
 			break;
@@ -747,13 +753,16 @@ void CheckKeyIn( void )
 		return ;
 	}
 
-
-	switch ( key ) {
-	  case 	KEY_RIGHT:
+	switch (key)
+	{
+	  case KEY_RIGHT:
 #ifdef SUPPORT_FOSD_MENU
-		if(  DisplayedOSD & FOSD_MENU  ) {
-			if( OnChangingValue ) 	FOsdMenuValueUpDn(FOSD_UP );
-			else					FOsdMenuProcSelectKey();			
+		if (DisplayedOSD & FOSD_MENU)
+		{
+			if (OnChangingValue)
+				FOsdMenuValueUpDn(FOSD_UP);
+			else
+				FOsdMenuProcSelectKey();			
 		}
 		else 
 		{
@@ -761,27 +770,28 @@ void CheckKeyIn( void )
 			DisplayVol();
 		}
 #else
-		if(MenuGetLevel())
+		if (MenuGetLevel())
 			MenuKeyInput(NAVI_KEY_RIGHT);
 #endif
     	break;
 
-	  case 	KEY_UP:
+	  case KEY_UP:
 #ifdef SUPPORT_FOSD_MENU
-		if(DisplayedOSD & FOSD_MENU)
+		if (DisplayedOSD & FOSD_MENU)
 			FOsdMenuMoveCursor(FOSD_UP);
 #else
-		if(MenuGetLevel())
+		if (MenuGetLevel())
 			MenuKeyInput(NAVI_KEY_UP);
 #endif
     	break;
 
-	  case 	KEY_MENU:
+	  case KEY_MENU:
 #ifdef SUPPORT_FOSD_MENU
-		if(DisplayedOSD & FOSD_MENU)
+		if (DisplayedOSD & FOSD_MENU)
 			FOsdHighMenu();
-		else {
-			if(GetOSDLangEE()==OSDLANG_KR)
+		else 
+		{
+			if (GetOSDLangEE()==OSDLANG_KR)
 				InitFontRamByNum(FONT_NUM_PLUS_RAMFONT, 0);
 			else 
 				InitFontRamByNum(FONT_NUM_DEF12X18, 0);	//FOsdDownloadFont(0);	//12x18 default font
@@ -789,18 +799,21 @@ void CheckKeyIn( void )
 			FOsdMenuOpen();		
 		}
 #else
-		if(MenuGetLevel()==0)
+		if (MenuGetLevel() == 0)
 			MenuStart();	
 		else
 			MenuKeyInput(NAVI_KEY_ENTER);	
 #endif
     	break;
 
-	  case 	KEY_LEFT:
+	  case KEY_LEFT:
 #ifdef SUPPORT_FOSD_MENU
-		if(  DisplayedOSD & FOSD_MENU  ) {
-			if( OnChangingValue ) FOsdMenuValueUpDn(FOSD_DN );
-			else FOsdHighMenu();	
+		if (DisplayedOSD & FOSD_MENU)
+		{
+			if (OnChangingValue)
+				FOsdMenuValueUpDn(FOSD_DN );
+			else
+				FOsdHighMenu();	
 		}
 		else 
 		{
@@ -808,30 +821,29 @@ void CheckKeyIn( void )
 			DisplayVol();
 		}
 #else
-		if(MenuGetLevel())
+		if (MenuGetLevel())
 			MenuKeyInput(NAVI_KEY_LEFT);
 #endif
     	break;
 
-	  case 	KEY_DOWN:
+	  case KEY_DOWN:
 #ifdef SUPPORT_FOSD_MENU
-		if(DisplayedOSD & FOSD_MENU)
+		if (DisplayedOSD & FOSD_MENU)
 			FOsdMenuMoveCursor(FOSD_DN);
 #else
-		if(MenuGetLevel())
+		if (MenuGetLevel())
 			MenuKeyInput(NAVI_KEY_DOWN);
 #endif
     	break;
 
-	  case 	KEY_INPUT:
-		if(MenuGetLevel())
+	  case KEY_INPUT:
+		if (MenuGetLevel())
 			MenuEnd();
 		else
 			InputModeNext();
     	break;
 	}
 }
-
 
 //=============================================================================
 //		BYTE CheckHumanInputs( void )
