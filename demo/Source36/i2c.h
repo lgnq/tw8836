@@ -35,6 +35,7 @@ BYTE WriteI2CI16(BYTE i2cid, WORD index, BYTE *buff, WORD cnt); //Note: cnt uses
 //=================
 #define I2CID_TW9910		0x88
 #define I2CID_SX1504		0x40	//4CH GPIO
+#define I2CID_SX1505		0x40	//8CH GPIO datasheet error ADDR = 0x20
 #define I2CID_BU9969		0xE0	//Digital video encoder
 #define I2CID_ADV7390		0xD6	//Digital video encoder. 12bit
 #define I2CID_ADV7391		0x56	//Digital video encoder. 10bit
