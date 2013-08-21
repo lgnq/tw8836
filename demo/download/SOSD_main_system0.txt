@@ -1,0 +1,76 @@
+;======================
+; SpiOSD System0 ICON on the Main Background
+; 
+; WIN8
+;
+; loc:00440AB7 alpha:FF bpp8 rle0 138x117 alpha:FF luts size:256*4
+;======================
+;
+c 8a
+;
+w ff 4
+;-----------
+; RLC
+;
+;-----------
+; SOSD WIN8
+w B0 81
+w B1 02
+w B2 20
+w B3 54
+w B4 00
+w B5 8A
+w B6 75
+w B7 44
+w B8 0E
+w B9 c7
+w BA 00
+w BB 8A
+w BC 00
+w BD 10
+w BE 55
+
+
+;--------------------------------
+; McuSpiClkToPclk(CLKPLL_DIV_2P0);
+w ff 4
+w e1 01
+w e0 00
+w e1 22
+
+; loc:00440AB7 alpha:FF bpp8 rle0 138x117 alpha:FF luts size:256*4
+;===========
+; LUT
+;===========
+w ff 4
+			; LUT table
+w 10 A0		;enable LUT wirte, BytePtr increase
+w 11 00		;offset 0
+			; DMA
+w C4 00		; stop first.
+w C3 87		; dest:SPIOSD_LUT, cmdbyte:7
+w CA EB		; cmd: QuadRead
+w CB 44		; addr 0x440AC7
+w CC 0A		;
+w CD C7		;
+			;
+W C6 04		; DMA page:0       (0x100) >> 6
+W C7 00		; DMA index:0      (0x100) << 2 
+
+w DA 00		; DMA length 256*4=0x0400
+w C8 04
+w C9 00
+w C4 01		; DMA start.
+delay 10	; check done or make a delay 
+
+;--------------------
+; McuSpiClkRestore();
+w ff 4
+w e1 02
+w e0 01
+w e1 21
+
+;--------------------
+; turn on SpiOSD Enable bit REG400[2]
+w ff 4
+b 8a 00 22 04

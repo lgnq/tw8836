@@ -1,0 +1,16 @@
+;======================
+; Video Goto the Freerun mode
+;======================
+;
+c 8a
+w ff 4
+w e2 69
+w e3 78
+w e4 1
+w e5 e
+w e6 0
+w e7 1b
+w e8 0
+w e9 c
+w ea 0
+w eb 18

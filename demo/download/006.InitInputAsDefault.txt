@@ -1,0 +1,168 @@
+;======================
+; InitInputAsDefault
+;======================
+;
+c 8a
+; Interrupt_enableVideoDetect(OFF);
+
+;----------------------------------------
+; I2CDeviceInitialize( DataInitNTSC, 0 );	
+;----------------------------------------
+;//------------
+;//--- Page 00
+;//------------
+w FF 00		;// //--- Page 00
+w 06 06		;// // TSCP,TRSP
+w 07 00		;// TCON:00, SRGB:01, FPLBS:02
+;			////////0x08 40 // *** Output enable
+w 1F 00		;// // Disable Test mode
+w 40 10		;// // Input=Decoder
+w 41 0C		;// // Color=YCbCr
+w 5F 00		;// // Disable Test pattern
+;
+;//--- SSPLL
+w F6 00		;//PCLK_div_by_1 SPICLK_div_by_1
+w F7 16		;//
+;//SSPLL 108MHz
+w F8 02		;//0xF8, 0x01,	//
+w F9 00		;//0xF9, 0xE0,	//default 0x50,
+w FA 00		;//0xFA, 0x00,	//
+w FB 40		;//
+w FC 23		;// // En. SSPLL
+w FD 34		;//SSPLL Analog Control. POST[7:6]=0 VCO[5:4]=3 IPMP[2:0]=4
+
+w FF 04		;//page4
+w E1 01		;//div1.5
+w E0 01		;//PLL108
+
+;/------------
+;/--- Page 01
+;/------------
+w FF 01		;// 
+;///--- Decoder
+w 1C 0F		;// // *** Disable Shadow
+w 02 40
+w 04 00
+w 05 2F
+w 06 03
+w 07 02
+w 08 12
+w 09 F0
+w 0A 0B		;// HDELAY_LO
+w 0B D0
+w 0C CC
+w 0D 00
+w 10 00
+w 11 5C
+w 12 11
+w 13 80
+w 14 80
+w 15 00
+w 17 80
+w 18 44
+w 1D 7F
+w 1E 00
+w 20 50
+w 21 22
+w 22 F0
+w 23 D8
+w 24 BC
+w 25 B8
+w 26 44
+w 27 38
+w 28 00
+w 29 00
+w 2A 78
+w 2B 44
+w 2C 30
+w 2D 14
+w 2E A5
+w 2F E0
+w 33 05
+w 34 1A
+w 35 00
+;///--- ADC, LLPLL
+w C0 01		;// Clock=27M
+w CB 30		;// PD. LLPLL,SOG
+w E2 D9		;// Bias
+w E3 07
+w E4 33
+w E5 31
+w E6 00
+w E7 2A		;// AAF on
+;/------------
+;/--- Page 02
+;/------------
+w FF 02		;// Page 02
+;///--- scaler
+w 01 00
+w 02 20
+w 03 00
+w 04 1C
+w 05 8A
+w 06 0F
+w 07 80
+w 08 10
+w 09 00
+w 0A 04
+w 0B 01		;//??0x08
+w 0C D0
+w 0D 92		;//PCLKO div3.	default 0x01,
+w 0E 20
+w 0F 00
+w 10 21		;default 0x28
+;//0x11, 0x21,	//scaler output width = 801(0x321)
+;//0x12, 0x03,	//BKFYI.Use value that assigned at InitWithNTSC()
+w 13 00
+w 14 20
+w 15 2E
+;//0x16, 0xE0,	//BKFYI.Use value that assigned at InitWithNTSC()
+;//0x17, 0x01,
+w 18 00
+w 19 10		;//!	VTOTAL	R20D[7:6]R209[7:0]	0x210(528)
+w 1A 00
+w 1B 00
+w 1C 42		;//with AUTO
+w 1D 00		;//!	HTOTAL R21C[7:4]R21D[7;0] 0x400(1024)		
+w 1E 03		;//default 0x00. FW will change R21E[0]. R21E[1] is fixed as "1"
+;///--- TCON
+w 40 10
+w 41 00
+w 42 05
+w 43 01
+w 44 64
+w 45 F4
+w 46 00
+w 47 0A
+w 48 36
+w 49 10
+w 4A 00
+w 4B 00
+w 4C 00
+w 4D 44
+w 4E 04
+;
+w E0 00		;// Disable Gamma
+w E4 21		;// Dither
+
+
+
+; InputSetSource(INPUT_PATH_DECODER,INPUT_FORMAT_YCBCR);
+
+; InMuxSetInput(InputMain);
+
+; DecoderFreerun(DECODER_FREERUN_AUTO);
+
+; VAdcSetDefaultFor();
+
+; BT656OutputEnable(OFF, 1);
+
+; ScalerSetFreerunManual( OFF );
+
+; measure
+;MeasSetWindow( 0, 0, 0xfff, 0xfff );	//set dummy window. 1600x600
+;MeasSetField(2);						// field:Both
+;MeasEnableDeMeasure(OFF);				// Disable DE Measure
+;MeasSetThreshold(0x40);					// Threshold active detection
+
+; SetImage(InputMain);

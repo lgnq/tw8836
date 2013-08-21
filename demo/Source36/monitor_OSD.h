@@ -1,0 +1,1 @@
+void MonitorOSD(BYTE bits);

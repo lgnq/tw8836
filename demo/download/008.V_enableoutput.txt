@@ -1,0 +1,16 @@
+;======================
+; VInput_enableOutput
+;======================
+;
+c 8a
+
+;ScalerSetMuteManual( OFF );		
+;ScalerSetFreerunManual( OFF );	
+;ScalerSetFreerunValue(0);		
+
+;SpiOsdSetDeValue();
+;FOsdSetDeValue();
+
+;LedBackLight(ON);				
+;Interrupt_enableVideoDetect(ON);
+;Interrupt_enableSyncDetect(ON);

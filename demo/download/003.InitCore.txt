@@ -1,0 +1,11 @@
+;======================
+; InitCore
+;======================
+;
+c 8a
+w ff 4
+w c0 5		; QuadIO
+;
+w ff 0
+w 2 ff		; clear eint
+w 3 fe		; disable all except I2C INTR

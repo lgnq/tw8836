@@ -1,0 +1,117 @@
+Release History
+===============
+
+121223	Initial temporary version.
+
+130122	Inital Release vesion.(XMas version)	
+		use TW8835_512K.LIB.
+		Use div3 when update SpiOSD LUT.
+		Update alpah within PCLK domain.
+		increase SOsdHwBuff_win[9*8] to SOsdHwBuff_win[9*9].
+		Do 16byte align on ParkGrid Demo bin file.
+		Use inputcrop value on aRGB(Component & PC).
+		Add 120ms delay when FW changes LLPLL, because to get the correct VPol.
+		Use SFR_EA on ISR.
+		Use invert field at 480i & 576i on Component.
+		Use EVB_10 on project.(Remove EVB_20,EVB_30, EVB_31, EVB_32).
+		Support I2S Audio. Need a HW modification.
+
+130123
+		add DecoderSetVDelay(18); when it changes from PAL to NTSC.
+		Use KL_166 130123 FW.
+		Support RCP.
+		Remove InitLogo1() on HDMI & LVDS. Freerun issue.
+
+130124
+		Move SpiOsdIoLoadLUT() from OsdSpi.c to spi.c to reduce 64 bytes buffer.
+		Move WIN_GRID_IMG form WIN1 to WIN3 and share LUT with WIN_GRID_MSG. It can reduce a noisy when update LUT.
+
+130115
+		Code Release.
+130128
+		Merge InterruptPollingRoutine and InterruptHandlerRoutine.
+		Adjust GPIO handling routine.
+130129
+		Remove CEC_Auto on EP9553E. Use BB_EP9553E-130129.hex.
+130130
+		Increase Scaler Buff Delay. Base 0x10.
+130131	
+		SVideo uses Y2,C0.
+		Addback External BT656 Encoder.
+		Check 4B mode.
+		Check Aspect. Normal,Zoom,Full,Panorama,mirror.
+
+130204
+		Remove timereg read routine on HDMI. -	Meas is enough.
+		Remove CheckAviInfoFrame on HDMI. - use AUTO mode.
+
+130205
+		Change EDID. use BB_EP9553E-130205-TW8836.hex.
+			Support 800x600. 1024x768,1280x720,1280x1024,1400x1050,1920x1080.
+			Failed 1280x800,1400x900,1680x1050.
+		Support "VSync Change ISR" for HDMI.
+		Verify. HPD(HotPlugDetect) has 400mS delay. HDMI spec is a 100mS.
+		See Chap8.5 HotPlugDetect Signal.
+		LVDS 480i - dither noise
+			 480p,720p,1080i, 1080p working.
+		ISR not working on LVDS.
+
+130206
+		working on aRGB.
+		found EEPROM need more size to support PC.
+
+130207
+		Increase EE size from 256 to 512.
+		Connect CEC_ON/CEC_OFF at PIP_ON key.
+
+130207
+		Reduce waittime on MeasStartMeasure.
+		Reduce waittime on CheckAndSetPC and CheckAndSetComp.
+		PCMDATA[] has a wrong hStart, vStart value. we need a Sync and BPorch Value.
+
+130214,15,18,19
+		AN.
+130219	BT656
+
+130225	
+		Support PANEL_AUO_B133EW01.
+
+130226	
+		BugFix Comp 720p@60
+120228
+		Use video table (EIA) on comp.
+
+Known Bugs
+----------
+		On PC 640x480, VPol REG041[3] failed.
+		      1224x768, VPol Reg041[3] has a BUG.
+		If HDMI connecter is connected, TW8836 has a video found flag.(Test it without CEC_Auto).
+		BT656Loop and CVBS use a different crop value.
+		Address LUT DMA does not working.
+		PAL has a noise on left and left-bottom side. - 130128.
+		Freerun Error. Duplicate - At no video, run menu, select HDMI, turn off/on, run menu, select CVBS.
+			HTotal-852, VTotal-551.	 If increase HTotal - Noise Gone.
+		Component 480i has a noisy. 480P,720P,1080i,1080P are OK.
+
+Todo list
+---------
+		Support a input selection routine for BT656Out.
+		Support 1366 SpiOSD Demo.
+		Merge HDMIPC and HDMITV.
+
+
+//-----------------------------------------------------------------------------
+/**
+* Function
+*
+* Description
+* @param
+* @return
+*/
+//-----------------------------------------------------------------------------
+/**
+* Description
+*
+* @param
+* @return
+*/

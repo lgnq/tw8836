@@ -1,0 +1,27 @@
+;======================
+; CheckAndSetCVBS
+;======================
+;
+c 8a
+
+;DecoderSetVActive(240);
+w FF 01
+w 07 02
+w 08 12
+w 09 F0
+w 0A 0B
+w 0B D0
+;ScalerSetLineBufferSize(720);
+;ScalerSetHScale(720);
+;ScalerSetVScale(vPeriod);
+;ScalerWriteVDEReg(vDelay+vDelayAdd);
+
+w FF 02
+w 04 1C
+w 05 8A
+w 06 0F
+
+w 11 21
+w 12 03
+
+w 1E 02
