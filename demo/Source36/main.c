@@ -739,7 +739,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//
 	//draw Logo
 	//
-	if (FirstInitDone ==0)
+	if (FirstInitDone == 0)
 	{
 		if (InputMain == INPUT_HDMIPC || InputMain == INPUT_HDMITV || InputMain == INPUT_LVDS) 
 		{
@@ -754,7 +754,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//
 	// Power Up FP LED.
 	// Now you can see somthing on your panel.
-	LedPowerUp();
+///	LedPowerUp();
 
 	//enable human input. (remocon,Touch, and Keypad).
 	EnableRemoInt();
