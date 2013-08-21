@@ -653,43 +653,55 @@ BYTE SPI_QUADInit(void)
 	BYTE ret;
 	BYTE temp;
 							 
-	ret = SpiFlashChipRegCmd(SPICMD_RDID,0,3, 0);
-	if(ret) {
+	ret = SpiFlashChipRegCmd(SPICMD_RDID, 0, 3, 0);
+	if (ret)
+	{
 		Puts("\nSPICMD_RDID fail");
+		
 		return 0;
 	}
+	
 	vid  = SPI_CmdBuffer[0];
 	dat0 = SPI_CmdBuffer[1];
 	cid  = SPI_CmdBuffer[2];
 
-	Printf("\n\tSPI JEDEC ID: %02bx %02bx %02bx", vid, dat0, cid );
+	Printf("\n\tSPI JEDEC ID: %02bx %02bx %02bx", vid, dat0, cid);
 	//C2 20 19 - MX 256
 
-	if(vid == 0x1C) {
+	if (vid == 0x1C)
+	{
 		SpiFlashVendor = SFLASH_VENDOR_EON;
-		if(dat0==0x70 && cid==0x19)
+		if (dat0==0x70 && cid==0x19)
 			SpiFlashVendor = SFLASH_VENDOR_EON_256;
 	}
-	else if(vid == 0xC2) {
+	else if (vid == 0xC2)
+	{
 	 	SpiFlashVendor = SFLASH_VENDOR_MX;
-		if(dat0==0x20 && cid==0x19)
+		if (dat0==0x20 && cid==0x19)
 			SpiFlashVendor = SFLASH_VENDOR_MX_256;
 	} 
-	else if(vid == 0xEF)	SpiFlashVendor = SFLASH_VENDOR_WB;
-	else if(vid == 0x20) {
-		if(cid != 0x18) {
+	else if (vid == 0xEF)
+		SpiFlashVendor = SFLASH_VENDOR_WB;
+	else if (vid == 0x20)
+	{
+		if (cid != 0x18)
+		{
 			Printf(" UNKNOWN MICRON SPIFLASH !!");			
+
 			return 0;
 		}
 		SpiFlashVendor = SFLASH_VENDOR_MICRON; //numonyx
 	}
 #ifdef SUPPORT_SFLASH_SPANSION
-	else if(vid == 0x01) {
+	else if (vid == 0x01)
+	{
 		SpiFlashVendor = SFLASH_VENDOR_SPANSION;	
 	}
 #endif
-	else {
+	else
+	{
 		Printf(" UNKNOWN SPIFLASH !!");
+
 		return 0;
 	}
 
@@ -697,12 +709,14 @@ BYTE SPI_QUADInit(void)
 	//read status register
 	//----------------------------
 
-	if (vid == 0xC2 || vid == 0x1C) { 							//C2:MX 1C:EON
-		ret=SpiFlashChipRegCmd(SPICMD_RDSR, 0, 1, 0);
+	if (vid == 0xC2 || vid == 0x1C) 							//C2:MX 1C:EON
+	{
+		ret = SpiFlashChipRegCmd(SPICMD_RDSR, 0, 1, 0);
 		temp = SPI_CmdBuffer[0] & 0x40;							
 		//if 0, need to enable quad
 	}
-	else if (vid == 0xEF) {					// WB
+	else if (vid == 0xEF)					// WB
+	{
 		//if(cid == 0x18) {				//Q128 case different status read command
 			ret=SpiFlashChipRegCmd(SPICMD_RDSR2,0, 1, 0);
 			temp = SPI_CmdBuffer[0];							//dat0[1]:QE
@@ -719,29 +733,32 @@ BYTE SPI_QUADInit(void)
 		//	temp = dat1;
 		//}
 	}
-	else if(vid == 0x20 ) {//SFLASH_VENDOR_MICRON
-		ret=SpiFlashChipRegCmd(SPICMD_RDVREG,0, 1, 0);	//cmd, read Volatile register
+	else if (vid == 0x20) //SFLASH_VENDOR_MICRON
+	{
+		ret = SpiFlashChipRegCmd(SPICMD_RDVREG, 0, 1, 0);	//cmd, read Volatile register
 		temp = SPI_CmdBuffer[0];
 		Printf("\nVolatile Register: %02bx", temp );
-		if(temp != 0x6B)
+		if (temp != 0x6B)
 			temp = 0; //need an enable routine
 	}
 #ifdef SUPPORT_SFLASH_SPANSION
-	else if(vid == 0x01 ) {	  //SFLASH_VENDOR_SPANSION
-		ret=SpiFlashChipRegCmd(SPICMD_RDSR,0, 1, 0);	//cmd, read Volatile register
+	else if (vid == 0x01) 	  //SFLASH_VENDOR_SPANSION
+	{
+		ret = SpiFlashChipRegCmd(SPICMD_RDSR, 0, 1, 0);	//cmd, read Volatile register
 		temp = SPI_CmdBuffer[0];
-		Printf("\nVolatile Register: %02bx", temp );
+		Printf("\nVolatile Register: %02bx", temp);
 		temp = SPI_CmdBuffer[0] & 0x02;	//if 0, need an enable routine
 	}
 #endif
-	if(temp)
+	if (temp)
 		return SpiFlashVendor;
 
 	//----------------------------
 	// enable quad
 	//----------------------------
 	Puts("\nEnable quad mode" );
-	if (vid == 0xC2 || vid == 0x1c) {
+	if (vid == 0xC2 || vid == 0x1c) 
+	{
 		SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
 #ifdef DEBUG_SPIFLASH	
 		SpiFlashChipRegCmd(SPICMD_RDSR, 0, 1, 0);
@@ -757,7 +774,8 @@ BYTE SPI_QUADInit(void)
 #endif
 		SpiFlashChipRegCmd(SPICMD_WRDI, 0, 0, 0);
 	}
-	else if(vid == 0xEF) {
+	else if (vid == 0xEF)
+	{
 		SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
 		SPI_CmdBuffer[0] = 0x00;	//cmd, en QAUD mode
 		SPI_CmdBuffer[1] = 0x02;	
@@ -779,7 +797,8 @@ BYTE SPI_QUADInit(void)
 #endif
 		SpiFlashChipRegCmd(SPICMD_WRDI, 0, 0, 0);
 	}
-	else if(vid == 0x20 ) {	 //SFLASH_VENDOR_MICRON
+	else if (vid == 0x20) 	 //SFLASH_VENDOR_MICRON
+	{
 		SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
 
 		SPI_CmdBuffer[0] = 0x6B;						// cmd, write Volatile. set 6 dummy cycles
@@ -806,7 +825,8 @@ BYTE SPI_QUADInit(void)
 #endif
 	}
 #ifdef SUPPORT_SFLASH_SPANSION
-	else if(vid == 0x01) {	//SPANSION
+	else if (vid == 0x01) 	//SPANSION
+	{
 		SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
 		SPI_CmdBuffer[0] = 0x02;	//en QAUD mode
 		SpiFlashChipRegCmd(SPICMD_WRSR, 1, 0, 0);
@@ -814,6 +834,7 @@ BYTE SPI_QUADInit(void)
 		SpiFlashChipRegCmd(SPICMD_WRDI, 0, 0, 0);
 	}
 #endif
+
 	return SpiFlashVendor;
 }
 

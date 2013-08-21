@@ -181,9 +181,10 @@ void main(void)
 	// FW will be a no_init mode.
 	// In this no_init mode, FW will support only the monitor.
 	//  
-	if(access==0) {
+	if (access == 0)
+	{
 		Puts("\n***SKIP_MODE_ON***");
-		DebugLevel=3;
+		DebugLevel = 3;
 		//skip...do nothing
 		Puts("\nneed **init core***ee find***init ntsc***init panel***");
 	}
@@ -197,11 +198,13 @@ void main(void)
 #ifdef SUPPORT_RCD
 	//
 	//If it is a RCD mode, FW will init only minimum routines for RCD.
+	//RCD - Rear Camera Display
 	//
-	if((PORT_BACKDRIVE_MODE==0) && (CurrSystemMode == SYS_MODE_NORMAL)) {
+	if ((PORT_BACKDRIVE_MODE == 0) && (CurrSystemMode == SYS_MODE_NORMAL))
+	{
 		CurrSystemMode = SYS_MODE_RCD; 
-		InputMain = 0;	//dummy
-		InputBT656 = BT656INPUT_PANEL;
+		InputMain      = 0;	//dummy
+		InputBT656     = BT656INPUT_PANEL;
 		InitRCDMode(1);
 	}
 	else
@@ -481,7 +484,8 @@ BYTE main_loop(void)
 */
 void InitCore(BYTE fPowerUpBoot)
 {
-	if(fPowerUpBoot) {
+	if (fPowerUpBoot)
+	{
 		//check port 1.5. if high, it is a skip(NoInit) mode.
 #if 0 //BK130116   def MODEL_TW8836FPGA
 //BK121220. Not working.
@@ -503,14 +507,17 @@ void InitCore(BYTE fPowerUpBoot)
 	Puts("\nInitCore");	
 	//----- Set SPI mode
 	SpiFlashVendor = SPI_QUADInit();
-	if(SpiFlashVendor==0)
+	if (SpiFlashVendor == 0)
 		Puts("\nWarning:System can be corrupted");
 	SPI_SetReadModeByRegister(SPI_READ_MODE);		// Match DMA READ mode with SPI-read
-	if(SpiFlashVendor==SFLASH_VENDOR_EON_256) {
+	if (SpiFlashVendor == SFLASH_VENDOR_EON_256)
+	{
 		SPI_Set4BytesAddress(ON);
-		if(SpiFlash4ByteAddr) Puts(" EN4B");
+		if (SpiFlash4ByteAddr)
+			Puts(" EN4B");
 	}
-	if(SpiFlashVendor==SFLASH_VENDOR_MX_256) {
+	if (SpiFlashVendor == SFLASH_VENDOR_MX_256)
+	{
 #if 1
 		Printf("\n==Found MX_256 need EN4B");
 #else
@@ -520,11 +527,10 @@ void InitCore(BYTE fPowerUpBoot)
 	}
 
 	//----- Enable Chip Interrupt
-	WriteTW88Page(PAGE0_GENERAL );
-	WriteTW88(REG002, 0xFF );	// Clear Pending Interrupts
-	WriteTW88(REG003, 0xEE );	// enable SW. enable SW INTR7FF
+	WriteTW88Page(PAGE0_GENERAL);
+	WriteTW88(REG002, 0xFF);	// Clear Pending Interrupts
+	WriteTW88(REG003, 0xEE);	// enable SW. enable SW INTR7FF
 }
-
 
 /**
 * InitLVDS Tx
@@ -594,7 +600,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	BYTE FirstInitDone;
 	BYTE fPowerUpBoot;	//to solve the compiler bug, use a variable.
 
-	if(access==0)
+	if (access == 0)
 		//do nothing.
 		return 0;
 
@@ -605,7 +611,8 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	E3P_Configure();
 #endif
 	ee_mode = CheckEEPROM();
-	if(ee_mode==1) {
+	if (ee_mode == 1)
+	{
 		//---------- if FW version is not matched, initialize EEPROM data -----------
 		Init8836AsDefault(0, 1);	//input:INPUT_CVBS,fPowerUp:1
 		
@@ -627,13 +634,12 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 
 	//read debug level
 	DebugLevel = GetDebugLevelEE();
-	if((DebugLevel==0) && (fPowerUpBoot))
+	if ((DebugLevel == 0) && (fPowerUpBoot))
 		Printf("\n===> Debugging was OFF (%02bx)", DebugLevel);
 	else 
 		ePrintf("\n===> Debugging is ON (%02bx)", DebugLevel);
 
 	ePrintf("\nInitSystem(%bd)",fPowerUpBoot);
-
 
 	InputMain  = GetInputMainEE();
 	InputBT656 = GetInputBT656EE();
@@ -641,8 +647,8 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//
 	//set default setting.
 	//
-	if(fPowerUpBoot) {
-
+	if (fPowerUpBoot)
+	{
 		//Init HW with default
 		Init8836AsDefault(InputMain, 1);
 		I2C_delay_base = 3;
@@ -654,18 +660,24 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 		*	1: NAK
 		*	2: I2C dead
 		*/
-		value=CheckI2C_B0(I2CID_SX1504);
-		switch(value) {
-		case 0:		Puts("\nI2CID_SX1504:Pass");			break;
-		case 1:		Puts("\nI2CID_SX1504:NAK");				break;
-		case 2:		Puts("\nI2CID_SX1504:Dead");			break;
-		default:	Printf("\nI2CID_SX1504:%bx",value);		break;
+		value = CheckI2C_B0(I2CID_SX1504);
+		switch (value)
+		{
+			case 0:		
+				Puts("\nI2CID_SX1504:Pass");
+				break;
+			case 1:
+				Puts("\nI2CID_SX1504:NAK");
+				break;
+			case 2:
+				Puts("\nI2CID_SX1504:Dead");
+				break;
+			default:
+				Printf("\nI2CID_SX1504:%bx", value);
+				break;
 		}
-		if(value==0)
-			Printf("\nI2CID_SX1504 0:%02bx 1:%bx",
-				ReadI2CByte(I2CID_SX1504, 0), 
-				ReadI2CByte(I2CID_SX1504, 1));
-
+		if (value == 0)
+			Printf("\nI2CID_SX1504 0:%02bx 1:%bx", ReadI2CByte(I2CID_SX1504, 0), ReadI2CByte(I2CID_SX1504, 1));
 #endif
 		//------------------
 		//first GPIO position.
@@ -708,7 +720,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//---------------------
 	// turn on DCDC
 	//---------------------
-	if(fPowerUpBoot)
+	if (fPowerUpBoot)
 		DCDC_StartUP();
 
 	//---------------
@@ -717,7 +729,6 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	FOsdSetDeValue();
 	FOsdIndexMsgPrint(FOSD_STR1_TW8835);
 	FOsdWinEnable(0, OFF);	//win0, disable..
-
 	
 	//------------------------
 	//start with saved input
@@ -728,13 +739,16 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//
 	//draw Logo
 	//
-	if(FirstInitDone ==0) {
-		if(InputMain == INPUT_HDMIPC || InputMain == INPUT_HDMITV || InputMain == INPUT_LVDS) {
+	if (FirstInitDone ==0)
+	{
+		if (InputMain == INPUT_HDMIPC || InputMain == INPUT_HDMITV || InputMain == INPUT_LVDS) 
+		{
 			Printf("\nSkip InitLogo1()");
 		}
-		else {
+		else
+		{
 			InitLogo1();
-			FirstInitDone =1;
+			FirstInitDone = 1;
 		}
 	}
 	//
@@ -745,7 +759,6 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//enable human input. (remocon,Touch, and Keypad).
 	EnableRemoInt();
 	InitAuxADC();	
-
 
 	//
 	//remove Logo
@@ -765,10 +778,11 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 //			ScalerSetFreerunManual(ON);
 //	}
 //#else
-	if(FirstInitDone ==1) {
+	if (FirstInitDone == 1)
+	{
 		FirstInitDone = 2;
 		RemoveLogoWithWait(1);
-		if(Task_NoSignal_cmd == TASK_CMD_DONE)
+		if (Task_NoSignal_cmd == TASK_CMD_DONE)
 			FOsdWinEnable(0, OFF);	//win0, disable..
 	}	
 //#endif
@@ -778,7 +792,8 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//------------------------
 	SetAspectHW(GetAspectModeEE());
 	value = EE_Read(EEP_FLIP);	//mirror
-	if(value) {
+	if (value)
+	{
 		WriteTW88Page(PAGE2_SCALER);
 	    WriteTW88(REG201, ReadTW88(REG201) | 0x80);
 	}
@@ -789,7 +804,6 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 
 	//set the Error Tolerance value for "En Changed Detection"
 	MeasSetErrTolerance(0x04);		//tolerance set to 32. 
-
 
 #ifdef USE_SFLASH_EEPROM
 	//to cleanup E3PROM
@@ -817,9 +831,6 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 
 	return 0;
 }
-
-
-
 
 //=============================================================================
 // Video TASK ROUTINES				                                               
