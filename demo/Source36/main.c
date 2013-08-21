@@ -610,8 +610,9 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 #ifdef USE_SFLASH_EEPROM
 	E3P_Configure();
 #endif
+
 	ee_mode = CheckEEPROM();
-	if (ee_mode == 1)
+	if (ee_mode == 1) //CheckEEPROM() failed
 	{
 		//---------- if FW version is not matched, initialize EEPROM data -----------
 		Init8836AsDefault(0, 1);	//input:INPUT_CVBS,fPowerUp:1
@@ -639,7 +640,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	else 
 		ePrintf("\n===> Debugging is ON (%02bx)", DebugLevel);
 
-	ePrintf("\nInitSystem(%bd)",fPowerUpBoot);
+	ePrintf("\nInitSystem(%bd)", fPowerUpBoot);
 
 	InputMain  = GetInputMainEE();
 	InputBT656 = GetInputBT656EE();

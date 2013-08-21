@@ -248,36 +248,52 @@ BYTE CheckI2C_B0(BYTE i2cid)
 	BYTE value;
 
 	value = i2cid;
-	SFR_EA=0;
+	SFR_EA = 0;
 	I2C_Start();
 
-	for(i=0;i<8;i++) {
-		if(value & 0x80) I2C_SDA = 1;
-		else             I2C_SDA = 0;
-							I2CDelay_6;
-		I2C_SCL = 1; 		I2CDelay_3;
-		I2C_SCL = 0;		I2CDelay_5;
+	for (i=0; i<8; i++)
+	{
+		if (value & 0x80)
+			I2C_SDA = 1;
+		else
+			I2C_SDA = 0;
+
+		I2CDelay_6;
+		I2C_SCL = 1;
+		I2CDelay_3;
+		I2C_SCL = 0;
+		I2CDelay_5;
 
 		value <<=1;
 	}
 	I2C_SDA = 1;			//listen for ACK.                      
-	I2C_SCL=1; 				I2CDelay_ACK;
+	I2C_SCL = 1; 				I2CDelay_ACK;
 	dd(100);
-	if(I2C_SCL==0)	error = 2;	//I2C dead
-	else {
-		if(I2C_SDA)	error=1;	//NAK
-		else        error=0;	//ACK
+	if (I2C_SCL == 0)
+		error = 2;	//I2C dead
+	else
+	{
+		if (I2C_SDA)
+			error = 1;	//NAK
+		else
+			error = 0;	//ACK
 	}                        
-	I2C_SCL=0;				I2CDelay_5;
+	I2C_SCL = 0;
+	I2CDelay_5;
 
 	//stop routine
-	I2C_SDA = 0;		I2CDelay_9;                      
-	I2C_SCL=1; 	 		I2CDelay_7;
-	I2C_SDA = 1;		I2CDelay_8;	
+	I2C_SDA = 0;
+	I2CDelay_9;                      
+	I2C_SCL = 1;
+	I2CDelay_7;
+	I2C_SDA = 1;
+	I2CDelay_8;	
 
-	SFR_EA=1;
+	SFR_EA = 1;
+	
 	return error;
 }
+
 /**
 * write one byte data to I2C slave device
 *

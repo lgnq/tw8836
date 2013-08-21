@@ -43,18 +43,21 @@ void E3P_SectorErase(DWORD spiaddr)
 {
 	SPI_SectorErase(spiaddr);
 }
+
 void E3P_PageProgram(DWORD spiaddr, BYTE * xaddr, WORD cnt)
 {
 	SPI_PageProgram(spiaddr, (WORD)xaddr, cnt);
 }
+
 /* configure and init E3P */
 void E3P_Configure(void)
 {
 	E3P_GetVersion();
 	E3P_SetStartAddr(E3P_SPI_SECTOR0);				//start from 0x080000
-	E3P_SetSize(E3P_INDEX_PER_BLOCK,E3P_BLOCKS);	//512 bytes 64 * 8.
+	E3P_SetSize(E3P_INDEX_PER_BLOCK, E3P_BLOCKS);	//512 bytes 64 * 8.
 	E3P_SetBuffer(SPI_Buffer, SPI_BUFFER_SIZE);		//128
-	if(E3P_Init())
+	
+	if (E3P_Init())
 		E3P_Repair();
 }
 
@@ -114,26 +117,35 @@ void EE_Write(WORD index, BYTE dat)
 /**
 * get FW revision
 */
-WORD GetFWRevEE()
+WORD GetFWRevEE(void)
 {
-	XDATA	WORD	rev;
+	XDATA WORD rev;
 
-	if( EE_Read(0) != 'T' ) return 0;		//TW
-	if( EE_Read(1) != '8' ) return 0;		//88
-	if( EE_Read(2) != '3' ) return 0;		//3
-	if( EE_Read(3) != '6' ) return 0;		//6
+	if (EE_Read(0) != 'T')
+		return 0;		//TW
+	if (EE_Read(1) != '8')
+		return 0;		//88
+	if (EE_Read(2) != '3')
+		return 0;		//3
+	if (EE_Read(3) != '6')
+		return 0;		//6
 
 	rev = (WORD)EE_Read(EEP_FWREV_MAJOR);
+
 #ifdef DEBUG_EEP
 	dPrintf("\nFW rev: %d", rev );
 #endif
+
 	rev <<= 8;
 	rev |= (WORD)EE_Read(EEP_FWREV_MINOR);
+
 #ifdef DEBUG_EEP
 	dPrintf("\.%02d", (rev&0xff) );
 #endif
+
 	return rev;
 }
+
 /**
 * save FW revision
 */
@@ -144,7 +156,7 @@ void SaveFWRevEE(WORD rev)
 	EE_Write(2, '3');	//3
 	EE_Write(3, '6');	//6
 
-	EE_Write(EEP_FWREV_MAJOR, (BYTE)(rev>>8) );
+	EE_Write(EEP_FWREV_MAJOR, (BYTE)(rev>>8));
 	EE_Write(EEP_FWREV_MINOR, (BYTE)rev );
 //	dPrintf(" Save to new FW ver %bd.%02bd", (BYTE)(rev>>8), (BYTE)rev );
 }
@@ -159,6 +171,7 @@ BYTE GetDebugLevelEE(void)
 {
 	return EE_Read(EEP_DEBUGLEVEL);
 }
+
 /**
 * save debug level
 */
@@ -166,7 +179,6 @@ void SaveDebugLevelEE(BYTE dl)
 {
 	EE_Write(EEP_DEBUGLEVEL, dl);
 }
-
 
 //=============================================================================
 //	EE[7]	#define EEP_AUTODETECT			//BYTE	1	Flag for Input Auto Detect	-0:Auto, 1:NTSC,....
@@ -213,15 +225,15 @@ BYTE GetPossibleAutoDetectStdEE(void)
 /**
 * get & save InputBT656 mode
 */
-BYTE GetInputBT656EE( void )
+BYTE GetInputBT656EE(void)
 {
-	return ( EE_Read( EEP_INPUTBT656SELECTION ) );
-}
-void SaveInputBT656EE( BYTE mode )
-{
-	EE_Write( EEP_INPUTBT656SELECTION, mode );
+	return (EE_Read(EEP_INPUTBT656SELECTION));
 }
 
+void SaveInputBT656EE(BYTE mode)
+{
+	EE_Write(EEP_INPUTBT656SELECTION, mode);
+}
 
 //=============================================================================
 // EE[0x0B]	 EEP_VIDEOMODE	 Video Mode
@@ -287,10 +299,11 @@ void SaveOSDPositionModeEE(BYTE ndata)
 /**
 * get Input mode
 */
-BYTE GetInputMainEE( void )
+BYTE GetInputMainEE(void)
 {
-	return ( EE_Read( EEP_INPUTSELECTION ) );
+	return (EE_Read(EEP_INPUTSELECTION));
 }
+
 /**
 * save Input mode
 */
@@ -532,7 +545,6 @@ void ResetAudioValue(void)
 /**
 * set default value
 */
-
 void ClearBasicEE(void)
 {
 	dPuts("\nClearBasicEE........");
@@ -553,9 +565,8 @@ void ClearBasicEE(void)
 	EE_Write(EEP_VCHIPPASSWORD+3, 6);
 	#endif
 
-	EE_Write( EEP_DVI_MODE, 0 );
+	EE_Write(EEP_DVI_MODE, 0);
 	//EE_Write( EEP_HDMI_MODE, 0 );
-
 
 	EE_Write(EEP_VIDEOMODE, 0);			
 	ResetVideoValue();
@@ -590,7 +601,6 @@ void ClearBasicEE(void)
 	Set4WideScreen(WIDESCREEN_WIDE);
 	#endif
 
-
 #ifdef SUPPORT_TOUCH
 	//save default CalibDataX[] and CalibDataY[]
 	SaveCalibDataToEE(0);
@@ -604,8 +614,6 @@ void ClearBasicEE(void)
 #endif
 }
 
-
-
 //=============================================================================
 //
 //=============================================================================
@@ -615,15 +623,12 @@ void ClearBasicEE(void)
 * @see ClearBasicEE
 * @see SaveFWRevEE
 */
-void	InitializeEE( void )
+void InitializeEE(void)
 {
 	dPuts("\nEE initialize........");
 	ClearBasicEE();
-	SaveFWRevEE( FWVER );
+	SaveFWRevEE(FWVER);
 }
-
-
-
 
 /**
 * check EEPROM
@@ -648,7 +653,7 @@ BYTE CheckEEPROM(void)
 #endif
 
 	//eeprom
-	if ( GetFWRevEE() == FWVER )
+	if (GetFWRevEE() == FWVER)
 		return 0;
 
 	DbgMsg_EEP_Corruptted();

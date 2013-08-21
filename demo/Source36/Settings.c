@@ -1310,14 +1310,14 @@ void FP_GpioDefault(void)
 	WriteTW88(REG08C, 0x00);	//GPIO 4x direction		- GPIO40 input
 	WriteTW88(REG094, 0x00);	//GPIO 4x output data	- GPIO40 outdata as 0.
 
-
-	if(access) {
+	if (access)
+	{
 		//turn off FPPWC & FPBias. make default
 		//	0x40 R0 R1 is related with FP_PWC_OnOff
-		WriteI2CByte( I2CID_SX1504, 1, 0/*3*/ );	//RegDir:	input 
-		WriteI2CByte( I2CID_SX1504, 0, 0xFF/*3*/ );	//RegData:	FPBias OFF. FPPWC disable.
+		WriteI2CByte(I2CID_SX1504, 1, 0/*3*/ );	//RegDir:	input 
+		WriteI2CByte(I2CID_SX1504, 0, 0xFF/*3*/ );	//RegData:	FPBias OFF. FPPWC disable.
 		//WriteI2CByte( I2CID_SX1504, 1, 0xFF/*3*/ );	//RegDir:	input 
-		Printf("\nI2CID_SX1504 0:%02bx 1:%bx",ReadI2CByte(I2CID_SX1504, 0), ReadI2CByte(I2CID_SX1504, 1));
+		Printf("\nI2CID_SX1504 0:%02bx 1:%bx", ReadI2CByte(I2CID_SX1504, 0), ReadI2CByte(I2CID_SX1504, 1));
 	}
 }
 
