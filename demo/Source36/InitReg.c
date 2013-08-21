@@ -40,15 +40,17 @@ typedef struct REG_IDX_DATA_s {
 /*
 	Default register value.
 */
-code REG_IDX_DATA_t InitDefault_Table[] = {
-					//-----------------
-					//clock
+code REG_IDX_DATA_t InitDefault_Table[] = 
+{
+	//-----------------
+	//clock
 	{0x4E1, 0x01},
 	{0x4E0, 0x01},
-					//-----------------
-					//SSPLL
+	//-----------------
+	//SSPLL
 	{0x0F6, 0x00},
 	{0x0F7, 0x16},
+
 //#ifdef PANEL_AUO_B133EW01
 //	{0x0F8, 0x02},	//150MHz. PCLKO target 75MHz
 //	{0x0F9, 0xC7},
@@ -61,25 +63,28 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x0F9, 0x00},
 	{0x0FA, 0x00},
 //#endif
+	
 	{0x0FB, 0x40},
 	{0x0FC, 0x23},
 	{0x0FD, 0x34},
-					//-----------------
-					//pclko divider. NOTE: update twice.
+	
+	//-----------------
+	//pclko divider. NOTE: update twice.
 //#ifdef PANEL_AUO_B133EW01
 //	{0x20D, 0x91},	//div2. 150/2=75MHz
 //					//		140/2=70MHz	
 //#else
 	{0x20D, 0x92},	
 //#endif
-					//-----------------
-					//interrupt
+
+	//-----------------
+	//interrupt
 	{0x003, 0xFF},	//mask first.
 	{0x002, 0xFF},  //and than clear.
 
 	{0x006, 0x06},
-					//-----------------
-					//output
+	//-----------------
+	//output
 								//R007[3]:EN656OUT
 								//R007[2:0]:TCONSEL.  TCON pin output
 //#ifdef SUPPORT_BT656
@@ -115,30 +120,28 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x040,	0x10},	//input control I
 	{0x041,	0x0C},	//input control I
 
-					//-----------------
-					//input crop
+	//-----------------
+	//input crop
 	//0x042
 	//0x043
 	//0x044
 	//0x045
 	//0x046
 	{0x047, 0x00},
-					//-----------------
-					//BT656  decoder
+
+	//-----------------
+	//BT656  decoder
 	//{0x048, },
 	//
 
-					//-----------------
-					//DTV
-
-
-
+	//-----------------
+	//DTV
 	{0x057, 0x00},
 					//-----------------
 	{0x05F, 0x00},	// disable test pattern
 
-					//-----------------
-					//GPIO
+	//-----------------
+	//GPIO
 	{0x080, 0x00},
 	{0x081, 0x00},
 	{0x082, 0x00},
@@ -171,23 +174,23 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x09D, 0x00},
 	{0x09E, 0x00},
 	{0x09F, 0x00},
-					//-----------------
-			   		//MBIST
+	//-----------------
+	//MBIST
 	{0x0A0, 0x00},
-					//-----------------
-					//TSC
+	//-----------------
+	//TSC
 	{0x0B0, 0x87},
 	{0x0B1, 0xC0},
 	{0x0B4, 0x0A},
-					//-----------------
-			   		//LOPOR
+	//-----------------
+	//LOPOR
 	{0x0D4, 0x00},
-					//-----------------
-					//PWM
+	//-----------------
+	//PWM
 	{0x0D6, 0x00},
 					
-					//-----------------
-					//decoder
+	//-----------------
+	//decoder
 	{0x102, 0x00},	//depend on input
 	{0x104, 0x00},
 	{0x105, 0x00},
@@ -234,8 +237,8 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x137, 0x28}, //??
 	{0x138, 0xAF}, //??
 
-					//-----------------
-				 	//LLPLL
+	//-----------------
+	//LLPLL
 	{0x1C0, 0x00},	
 	{0x1C2, 0xD2},
 	{0x1C3, 0x03},
@@ -264,7 +267,6 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x1DB, 0x80},
 	{0x1DC, 0x10}, //??0x10
 
-
 	{0x1E0, 0x00}, 
 	{0x1E1, 0x05},	//1E1[5]:GPLL_PD
 
@@ -277,8 +279,9 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x1E8, 0x20},	//DEC:0x0F, aRGB:0x00
 	{0x1E9, 0x00},
 	{0x1EA, 0x03},
-					//-----------------
-					//scaler
+
+	//-----------------
+	//scaler
 	{0x201, 0x00},	
 	{0x202, 0x20},	
 	{0x203, 0x00},
@@ -326,10 +329,10 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x220, 0x00},
 	{0x221, 0x00},
 
-					//-----------------
-					// scaler output timing. for No video at first time.
-					//-----------------
-					//TCON
+	//-----------------
+	// scaler output timing. for No video at first time.
+	//-----------------
+	//TCON
 	{0x240, 0x10},
 	{0x241, 0x00},
 	{0x242, 0x05},
@@ -345,8 +348,9 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x24C, 0x00},
 	{0x24D, 0x44},
 	{0x24E, 0x04},
-					//-----------------
-					//Image Adjustment
+
+	//-----------------
+	//Image Adjustment
 	{0x280, 0x20},
 	{0x281, 0x80},
 	{0x282, 0x80},
@@ -360,21 +364,22 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x28A, 0x80},
 	{0x28B, 0x40},
 	{0x28C, 0x00},
-					//-----------------
-					//Test Pattern
+
+	//-----------------
+	//Test Pattern
 	{0x2BF, 0x00},
-					//-----------------
-					//Gamma
+	//-----------------
+	//Gamma
 	{0x2E0, 0x00}, 
-					//-----------------
-					//Dither option
+	//-----------------
+	//Dither option
 	{0x2E4, 0x21},
-					//-----------------
-					//8bit PANEL Interface
+	//-----------------
+	//8bit PANEL Interface
 	{0x2F8, 0x00},
 	{0x2F9, 0x80},
-					//-----------------
-					//FOSD
+	//-----------------
+	//FOSD
 // Font download have to be exec when 
 //	{0x30C, 0x40},
 	{0x30C, 0x00},	//turn on FOSD
@@ -386,16 +391,16 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x360, 0x00},
 	{0x370, 0x00},
 	{0x380, 0x00},
-					//-----------------
-					//SOSD
+	//-----------------
+	//SOSD
 	{0x400, 0x00},
-					//-----------------
-					//LVDS Tx
+	//-----------------
+	//LVDS Tx
 	{0x640, 0x00},
 	{0x641, 0x00},
 	{0x642, 0x00},
-					//-----------------
-					//LVDS Rx
+	//-----------------
+	//LVDS Rx
 	{0x644, 0x00},
 	{0x645, 0x00},
 	{0x646, 0x00},
@@ -404,11 +409,13 @@ code REG_IDX_DATA_t InitDefault_Table[] = {
 	{0x649, 0x17},
 	{0x64A, 0x00},
 	{0x64B, 0x00},
-					//-----------------
+
+	//-----------------
 	{0xFFF, 0xFF}	//EOF
 };
 
-code REG_IDX_DATA_t Recover_Decoder[] = {
+code REG_IDX_DATA_t Recover_Decoder[] = 
+{
 	{0x10C, 0xCC},	//DEC:0xDC,	aRGB:0xCC
 	{0x1E3, 0x07},	//DEC:0x07, aREG:0x37
 	{0x1E4, 0x33},	//DEC:0x33, aREG:0x55
@@ -453,27 +460,26 @@ static void Init8836Register(REG_IDX_DATA_t *pTbl)
 void Init8836AsDefault(BYTE _InputMain, BYTE _fPowerOn)
 {
 	Printf("\nInit8836AsDefault(");
-	PrintfInput(_InputMain,0);
-	Printf(",%bx)",_fPowerOn);
+	PrintfInput(_InputMain, 0);
+	Printf(",%bx)", _fPowerOn);
 
-
-	WriteTW88(REG21E,0x03);		//mute scler output.
+	WriteTW88(REG21E, 0x03);		//mute scler output.
  
-	if(_fPowerOn) {
+	if (_fPowerOn)
+	{
 		Init8836Register(InitDefault_Table);
 		I2C_delay_base = 1; //assume 27MHz. see REG4E1[5:4].
+
 		return;
 	}
 
 	//Recover only the selected input.
 
-	if(_InputMain == INPUT_CVBS || _InputMain == INPUT_SVIDEO || _InputMain == INPUT_BT656)
+	if (_InputMain == INPUT_CVBS || _InputMain == INPUT_SVIDEO || _InputMain == INPUT_BT656)
 		Init8836Register(Recover_Decoder);
-	else if(_InputMain == INPUT_COMP || _InputMain == INPUT_PC)
+	else if (_InputMain == INPUT_COMP || _InputMain == INPUT_PC)
 		Init8836Register(Recover_aRGB);
-			
 }
-
 
 /*
 	BT656 External Encoder table.
