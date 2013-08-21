@@ -1354,9 +1354,11 @@ BYTE InitRCDMode(BYTE fPowerUpBoot)
 {
 	BYTE ret;
 
-	Printf("\nInitRCDMode(%bd)",fPowerUpBoot);
-	if(fPowerUpBoot==0) {
-		if(MenuGetLevel()) {
+	Printf("\nInitRCDMode(%bd)", fPowerUpBoot);
+	if (fPowerUpBoot == 0)
+	{
+		if (MenuGetLevel())
+		{
 			MenuQuitMenu();
 			SpiOsdWinHWOffAll(1);	//with WaitVBlank
 		}
@@ -1375,7 +1377,6 @@ BYTE InitRCDMode(BYTE fPowerUpBoot)
 	//PrintSystemClockMsg("SSPLL_PowerUp");
 	//DCDC needs 100ms, but we have enough delay on...
 
-
 	WriteTW88Page(PAGE0_GENERAL);
 	WriteTW88(REG040, ReadTW88(REG040) & ~0x10);
 
@@ -1392,18 +1393,22 @@ BYTE InitRCDMode(BYTE fPowerUpBoot)
 	WriteTW88(REG11D, 0x01);
 
 	//wait until we have a stable signal
-	ret=DecoderCheckVDLOSS(100);
-	if(ret) {
+	ret = DecoderCheckVDLOSS(100);
+	if (ret)
+	{
 		ePuts("\nCheckAndSetDecoderScaler VDLOSS");
 	}
-	else {
+	else
+	{
 		//get standard
 		ret = DecoderCheckSTD(100);
-		if ( ret == 0x80 ) {
+		if (ret == 0x80)
+		{
 		    ePrintf("\nCheckAndSetDecoderScaler NoSTD");
 			//return( 2 );
 		}
-		else {
+		else
+		{
 			ret >>= 4;
 			//InputSubMode = mode;
 			ePrintf("\nMode:%bx",ret);
@@ -1412,8 +1417,8 @@ BYTE InitRCDMode(BYTE fPowerUpBoot)
 	PrintSystemClockMsg("after DecoderCheck");
 
 	//disable interrupt.
-	WriteTW88Page(PAGE0_GENERAL );
-	WriteTW88(REG003, 0xFE );	// enable only SW interrupt
+	WriteTW88Page(PAGE0_GENERAL);
+	WriteTW88(REG003, 0xFE);	// enable only SW interrupt
 
 	LedBackLight(ON);
 	ScalerSetMuteManual(OFF);
@@ -1426,9 +1431,6 @@ BYTE InitRCDMode(BYTE fPowerUpBoot)
 	return ret;
 }
 #endif
-
-
-
 
 //-----------------------------------------------------------------------------
 /**

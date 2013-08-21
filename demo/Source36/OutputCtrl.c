@@ -105,6 +105,7 @@ BYTE LEDCOn(BYTE step)
 void LedPowerUp(void)
 {
 	volatile BYTE bTemp;
+	
 #ifdef SUPPORT_E1H_PANEL
 	BYTE speed;
 #endif
@@ -114,17 +115,20 @@ void LedPowerUp(void)
 #ifdef SUPPORT_E1H_PANEL
 	WriteI2CByte(0x58, 0x01, 0x05);
 #endif
+
 	//WaitVBlank(1);
 
 	//Printf("\nI2CID_ISL97671A INDEX:1 DATA:0x5");
 	WriteI2CByte(I2CID_ISL97671A, 0x01, 0x05);
-	bTemp = ReadI2CByte(I2CID_ISL97671A,0x01);
-	if ((bTemp & 0x05) != 0x05)	{
+	bTemp = ReadI2CByte(I2CID_ISL97671A, 0x01);
+	if ((bTemp & 0x05) != 0x05)
+	{
 		Printf(" ID:58 Idx:1 W:0x05 R:%bx", bTemp);
 
 		WriteI2CByte(I2CID_ISL97671A, 0x01, 0x05);
-		bTemp = ReadI2CByte(I2CID_ISL97671A,0x01);
-		if ((bTemp & 0x05) != 0x05)	{
+		bTemp = ReadI2CByte(I2CID_ISL97671A, 0x01);
+		if ((bTemp & 0x05) != 0x05)
+		{
 			Printf(" W:0x05 R:%bx", bTemp);
 		}
 	}
