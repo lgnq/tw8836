@@ -355,16 +355,20 @@ BYTE main_loop(void)
 
  		//-------------- Check special port for RCD mode------
 #ifdef SUPPORT_RCD
-		if(IsBackDrivePortOn()) {
-			if(CurrSystemMode==SYS_MODE_NORMAL) {
+		if (IsBackDrivePortOn())
+		{
+			if (CurrSystemMode == SYS_MODE_NORMAL)
+			{
 				//move to RCD mode.
 				CurrSystemMode = SYS_MODE_RCD;
 				InputMain = 0;	//dummy
 				InitRCDMode(0);
 			}
 		}
-		else {
-			if(CurrSystemMode==SYS_MODE_RCD) {
+		else
+		{
+			if (CurrSystemMode == SYS_MODE_RCD)
+			{
 				DWORD BootTime;
 				
 				BootTime = SystemClock;
@@ -372,8 +376,8 @@ BYTE main_loop(void)
 				CurrSystemMode = SYS_MODE_NORMAL;
 				//turn off a parkgrid task first
 				TaskSetGrid(OFF);
-				SpiOsdWinHWEnable(0,OFF);
-				SpiOsdWinHWEnable(1,OFF);
+				SpiOsdWinHWEnable(0, OFF);
+				SpiOsdWinHWEnable(1, OFF);
 				SpiOsdEnable(OFF);
 
 				InitSystem(0);
@@ -385,31 +389,36 @@ BYTE main_loop(void)
 #endif	
 		
 		//============== Task Section ==========================
-		if(Task_Grid_on)
+		if (Task_Grid_on)
 			MovingGridTask();
 
 		//skip VideoISR on RCD.
-		if(CurrSystemMode==SYS_MODE_RCD)
+		if (CurrSystemMode == SYS_MODE_RCD)
 			continue;					
 
 		//-------------LVDS--------------------------------
 #if 0 //BK130103
-		if(InputMain==INPUT_LVDS) {
-			if(LVDS_timer < SystemClock) {
-
+		if (InputMain==INPUT_LVDS)
+		{
+			if (LVDS_timer < SystemClock)
+			{
 				ret = ReadI2CI16Byte(I2CID_EP907M, 0x201);
 				Printf("\nLVDS_Video_Status:%bx $201:%bx", LVDS_Video_Status, ret);
-				if((ret & 0xC0) == 0xC0) {
+				if ((ret & 0xC0) == 0xC0)
+				{
 					//LinkON. Valid DE
-					if(LVDS_Video_Status==0) {
+					if (LVDS_Video_Status == 0)
+					{
 						Printf("\nLVDS Video OFF=>ON..I will call CheckAndSetInput");
 						//TaskNoSignal_setCmd(TASK_CMD_RUN_FORCE);
 						CheckAndSetInput();
 					}
 				}
-				else if((ret & 0xC0) == 0) {
+				else if ((ret & 0xC0) == 0)
+				{
 					//LinkOFF, InvalidDE.
-					if(LVDS_Video_Status) {
+					if (LVDS_Video_Status)
+					{
 						Printf("\nLVDS Video ON=>OFF");
 						LVDS_Video_Status = 0;
 					}
@@ -417,26 +426,26 @@ BYTE main_loop(void)
 
 				//It does n't care overflow. Please do it later.
 				LVDS_timer =  SystemClock + 200;
-				if(LVDS_timer < SystemClock)
+				if (LVDS_timer < SystemClock)
 					LVDS_timer = 200;
-
 			}
 		}
 #endif
 		//-------------- Check TW8835 Chip Interrupt -------------
-		if(INT_STATUS || VH_Loss_Changed ) {
+		if (INT_STATUS || VH_Loss_Changed)
+		{
 			InterruptPollingHandlerRoutine();
 		}
 
 #ifdef MODEL_TW8835
 #else
-		if(INT_STATUS3) {
+		if (INT_STATUS3)
+		{
 			extern DWORD ExtIntCount;
 			Printf("\nINT_STATUS3:%bx  count: %ld",INT_STATUS3, ExtIntCount );
 			INT_STATUS3 = 0;
 		}
 #endif
-
 
 		//-------------- Check OSD timer -----------------------
 		CheckAndClearOSD();
@@ -450,7 +459,8 @@ BYTE main_loop(void)
 
 		//-------------- I2CCMD -------------------------------
 #if defined(SUPPORT_I2CCMD_SLAVE_V1)
-		if(F_i2ccmd_exec) {
+		if (F_i2ccmd_exec)
+		{
 			F_i2ccmd_exec = 0;
 			I2CCMD_exec_main();
 		}
@@ -458,12 +468,13 @@ BYTE main_loop(void)
 
 		//-------------- ext_i2c_timer ------------------------
 #if defined(SUPPORT_I2CCMD_TEST_SLAVE)
-		if(ext_i2c_cmd) {
-			if(ext_i2c_timer)
+		if (ext_i2c_cmd)
+		{
+			if (ext_i2c_timer)
 				continue;
 
 			//if timeover
-			WriteTW88(REG009,0);	// ? clear
+			WriteTW88(REG009, 0);	// ? clear
 			
 			ext_i2c_cmd = 0;		//clear
 			InitISR(0);	

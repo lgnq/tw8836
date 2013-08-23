@@ -197,28 +197,33 @@ BYTE	KeyPadMap[] = { 0, KEY_INPUT, KEY_MENU, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LE
 /**
 * read keypad value
 */
-BYTE ReadKeyPad( void ) 
+BYTE ReadKeyPad(void) 
 {
-	WORD	i, j;
-	WORD	min, max;
-	BYTE	temp;
-	WORD	key_in;
+	WORD i, j;
+	WORD min, max;
+	BYTE temp;
+	WORD key_in;
 
 	i = CpuAUX3;
 	temp = CpuAUX3_Changed;
-	if ( i<100 ) return (0);
+	if (i < 100)
+		return (0);
 
 	key_in = i;
 
 	min = i; max = i;
-	for ( j=0; j<9; j++ ) {
+	for (j=0; j<9; j++)
+	{
 		while ( temp == CpuAUX3_Changed ) ;				// wait new measurement
 		temp = CpuAUX3_Changed;
 		i = CpuAUX3;
-		if ( i<100 ) return (0);
+		if (i < 100)
+			return (0);
 		key_in += i;
-		if ( i < min ) min = i;
-		else if ( i > max ) max = i;
+		if (i < min)
+			min = i;
+		else if (i > max)
+			max = i;
 	}
 	key_in -= min;
 	key_in -= max;
@@ -226,10 +231,10 @@ BYTE ReadKeyPad( void )
 	key_in /= 8;			// divided by 8 for averaging
 	temp = (key_in >> 8);
 
-
 //	dPrintf("\r\nKeyIn ADC Value is: 0x%4x, last: 0x%04x", (WORD)key_in, i );
 	temp++;
 	temp /= 2;
+
 	return (KeyPadMap[temp]);
 }
 //#endif
@@ -245,37 +250,46 @@ BYTE ReadKeyPad( void )
 */
 BYTE GetKey(BYTE repeat)
 {
-BYTE	i;
+	BYTE i;
+
 //#ifdef SUPPORT_ANALOG_SENSOR
 	i = repeat;
 	i = ReadKeyPad();
-	if ( i == 0 ) {
+
+	if (i == 0)
+	{
 		RepeatKey = 0;
-		Key = 0;
-		KeyReady = 0;
-		keytic = 0;
+		Key       = 0;
+		KeyReady  = 0;
+		keytic    = 0;
 		return (0);
 	}
-	if ( Key == 0 ) {			// first pressed?
+
+	if (Key == 0)			// first pressed?
+	{
 		Key = i;
 		keytic++;
 		return (i);
 	}
-	else if ( i != Key) {		//diff key value when Key has a value. 		
+	else if (i != Key)		//diff key value when Key has a value. 		
+	{
 		RepeatKey = 0;
-		KeyReady = 0;
-		keytic = 0;
+		KeyReady  = 0;
+		keytic    = 0;
 		return (0);
 	}
-	else {						// same key pressed check for repeat function
+	else						// same key pressed check for repeat function
+	{
 		keytic++;
-		if ( keytic < 20 ) {
+		if (keytic < 20)
+		{
 			return (0);
 		}
-		else {
+		else
+		{
 			RepeatKey = 1;
-			KeyReady = 1;
-			keytic = 18;
+			KeyReady  = 1;
+			keytic    = 18;
 			return (i);
 		}
 	}
@@ -285,7 +299,6 @@ BYTE	i;
 //	return 0;
 //#endif
 }
-
 
 //===========================================
 // TOUCH
