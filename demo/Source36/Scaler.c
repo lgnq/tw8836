@@ -1079,13 +1079,15 @@ void ScalerSetMuteAutoManual(BYTE fAuto, BYTE fManual)
 /**
 * set MuteManual
 */
-void ScalerSetMuteManual( BYTE on )
+void ScalerSetMuteManual(BYTE on)
 {
 	WaitOneVBlank();
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
 
-	if(on)	WriteTW88(REG21E, (ReadTW88(REG21E) | 0x01) );			//on manual mute
-	else 	WriteTW88(REG21E, (ReadTW88(REG21E) & ~0x01) );		//off manual mute
+	if (on)
+		WriteTW88(REG21E, (ReadTW88(REG21E) | 0x01));			//on manual mute
+	else
+		WriteTW88(REG21E, (ReadTW88(REG21E) & ~0x01));		//off manual mute
 }
 
 

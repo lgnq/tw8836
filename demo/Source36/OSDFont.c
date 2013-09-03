@@ -173,7 +173,7 @@ struct FontOsdInfo_s {
 
 #ifdef MODEL_TW8835
 code	WORD	FOSDWinBase[] = { FONTWIN1_ST, FONTWIN2_ST, FONTWIN3_ST, FONTWIN4_ST };
-#else
+#else	//TW8836
 code	WORD	FOSDWinBase[] = { FONTWIN1_ST, FONTWIN2_ST, FONTWIN3_ST, FONTWIN4_ST, FONTWIN5_ST, FONTWIN6_ST, FONTWIN7_ST, FONTWIN8_ST };
 #endif
 
@@ -223,12 +223,14 @@ void DumpFontInfo(void)
 */
 void FOsdRamSetFifo(BYTE fOn, BYTE vdelay)
 {
-	if(vdelay)
+	if (vdelay)
 		WaitVBlank(vdelay);
 
 	WriteTW88Page(PAGE3_FOSD);
-	if(fOn)	WriteTW88(REG300, ReadTW88(REG300) & ~0x01);	//turn off bypass, so FIFO will be ON.
-	else	WriteTW88(REG300, ReadTW88(REG300) | 0x01);		//turn on bypass, so FIFO will be OFF.
+	if (fOn)
+		WriteTW88(REG300, ReadTW88(REG300) & ~0x01);	//turn off bypass, so FIFO will be ON.
+	else
+		WriteTW88(REG300, ReadTW88(REG300) | 0x01);		//turn on bypass, so FIFO will be OFF.
 }
 
 
@@ -273,7 +275,6 @@ void FOsdSetFontWidthHeight(BYTE width, BYTE height)
 	WriteTW88(REG_FOSD_MUL_CON, (width >> 2) * (height >> 1));	//sub-font total count.
 }
 
-
 //-------------------------------------------------------------------
 /**
 * calculate and set FontOSD DE value
@@ -297,26 +298,27 @@ void FOsdSetDeValue(void)
 {
 #if 1 //NEW, But NG
 	XDATA BYTE temp;
-	BYTE HDE,PCLKO,Mixing;
+	BYTE HDE, PCLKO, Mixing;
 
-	WriteTW88Page(PAGE2_SCALER );
-	HDE = ReadTW88(REG210 );				// HDE
+	WriteTW88Page(PAGE2_SCALER);
+	HDE = ReadTW88(REG210);				// HDE
 	PCLKO = ReadTW88(REG20D) & 0x03;
 	//if(PCLKO == 3)
 		PCLKO = 1;
 
-	WriteTW88Page(PAGE4_SOSD );
+	WriteTW88Page(PAGE4_SOSD);
 	Mixing = ReadTW88(REG400) & 0x02 ? 1 : 0;
 
-	if((HDE + PCLKO) < (Mixing*2 + 36) ) { //I don't want a negative value.
+	if ((HDE + PCLKO) < (Mixing*2 + 36)) //I don't want a negative value.
+	{
 		//temp = 0;
 		temp = (Mixing*2 + 36) - HDE - PCLKO + 1;
 	}
 	else
 		temp = HDE + PCLKO - (Mixing*2 + 36);
 
-	WriteTW88Page(PAGE3_FOSD );
-	WriteTW88(REG303, temp );   				// write FONT OSD DE value
+	WriteTW88Page(PAGE3_FOSD);
+	WriteTW88(REG303, temp);   				// write FONT OSD DE value
 #else //Old, But Working
 	XDATA	WORD temp;
 
@@ -334,12 +336,11 @@ void FOsdSetDeValue(void)
 	WriteTW88Page(PAGE3_FOSD );
 	WriteTW88(REG303, temp );   				// write FONT OSD DE value
 #endif
+
 #ifdef DEBUG_FOSD
-	dPrintf("\nFontOsdDE:%02bx",temp);
+	dPrintf("\nFontOsdDE:%02bx", temp);
 #endif
 }
-
-
 
 //=============================================================================
 //=============================================================================
@@ -474,6 +475,7 @@ void FOsdRamSetAttr(BYTE attr)
 	WriteTW88Page(PAGE3_FOSD);
 	WriteTW88(REG308, attr);
 }
+
 #if 0
 /**
 *	FontRam Serial write
@@ -522,22 +524,27 @@ BYTE FOsdOnOff(BYTE fOnOff, BYTE vdelay)
 	
 	WriteTW88Page(PAGE3_FOSD);
 	value = ReadTW88(REG30C);
-	if(fOnOff) {
-		if(value & 0x40) {
-			if(vdelay)
+	if (fOnOff)
+	{
+		if (value & 0x40)
+		{
+			if (vdelay)
 				WaitVBlank(vdelay);
 			WriteTW88(REG30C, value & ~0x40);
 			return 1;
 		}
 	}
-	else {
-		if((value & 0x40) == 0) {
-			if(vdelay)
+	else
+	{
+		if ((value & 0x40) == 0)
+		{
+			if (vdelay)
 				WaitVBlank(vdelay);
 			WriteTW88(REG30C, value | 0x40);
 			return 1;
 		}
 	}
+	
 	return 0;
 }
 
@@ -693,15 +700,17 @@ void FOsdRamWriteByteStrBypassFifo(BYTE *str, BYTE len)
 */
 void FOsdWinEnable(BYTE winno, BYTE en)
 {
-	XDATA 	WORD index;
-	XDATA	BYTE dat;
+	XDATA WORD index;
+	XDATA BYTE dat;
 
 	index = FOSDWinBase[winno] + FONTWIN_ENABLE;
 
 	WriteTW88Page(PAGE3_FOSD);
 	dat = ReadTW88(index);
-	if( en ) dat |= 0x80;
-	else     dat &= 0x7F;
+	if (en)
+		dat |= 0x80;
+	else
+		dat &= 0x7F;
 	WriteTW88(index, dat);
 }
 
@@ -729,7 +738,8 @@ void FOsdWinToggleEnable(BYTE winno)
 void FOsdWinOffAll(void)
 {
 	BYTE i;
-	for(i=0; i< FOSD_MAX_OSDWIN; i++)
+
+	for (i=0; i< FOSD_MAX_OSDWIN; i++)
 		FOsdWinEnable(i, OFF);
 }
 
@@ -1019,16 +1029,17 @@ void FOsdWinSetOsdRamStartAddr(BYTE winno, WORD addr)
 {
 	WORD index;
 
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
 	index = FOSDWinBase[winno];
 
-	if(addr >=0x100)	WriteTW88(index+0x07, ReadTW88(index+0x07) |  0x10);
-	else 				WriteTW88(index+0x07, ReadTW88(index+0x07) & ~0x10);
+	if (addr >= 0x100)
+		WriteTW88(index+0x07, ReadTW88(index+0x07) |  0x10);
+	else
+		WriteTW88(index+0x07, ReadTW88(index+0x07) & ~0x10);
 	WriteTW88(index+0x0F, (BYTE)addr);
 
 	FontOsdInfo.win[winno].osdram = addr;
 }
-
 
 //=============================================================================
 // HAL END
@@ -1049,7 +1060,7 @@ void FOsdWinSetOsdRamStartAddr(BYTE winno, WORD addr)
 void FontOsdInit(void)
 {
 	BYTE winno;
-	BYTE columns=40;
+	BYTE columns = 40;
 	BYTE lines = 1;
 
 #ifdef MODEL_TW8835
@@ -1063,13 +1074,14 @@ void FontOsdInit(void)
 	InitFontRamByNum(FONT_NUM_CONGRAY16X28, 0);	// set consolas & graynum and calculate 3BPP alpha
 
 	//init all fontosd windows attributes
-	for(winno = 0; winno < FOSD_MAX_OSDWIN; winno++) {
+	for (winno = 0; winno < FOSD_MAX_OSDWIN; winno++)
+	{
 		FOsdWinInit(winno);
 
 		FontOsdInfo.win[winno].bpp1_attr = 0x1A;					//BG|FG
 		FOsdWinAlphaPixel(winno, FOSD_COLOR_IDX_BLANK, 0x0F);		//BG color alpha
 
-		FOsdWinScreenXY(winno, 0,30*winno);
+		FOsdWinScreenXY(winno, 0, 30*winno);
 		FOsdWinScreenWH(winno, columns, 1/*lines*/);		//0x20, 0x10);		//max 512 = 32x16
  		FOsdWinZoom(winno, 0, 0);				
 		FOsdWinSetOsdRamStartAddr(winno, columns*winno /*text_info->osdram*/);
@@ -1191,27 +1203,25 @@ void FOsdWinInit(BYTE winno)
 {
 	WORD index;
 
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
 
 	index = FOSDWinBase[winno];
 	//init all fontosd attributes
-	WriteTW88(index, (ReadTW88(index) & 0x7F) | 0x40 );		//FOsdWinEnable(winno, OFF) & Enable Multi-Color
+	WriteTW88(index, (ReadTW88(index) & 0x7F) | 0x40);		//FOsdWinEnable(winno, OFF) & Enable Multi-Color
 
-	WriteTW88(index+0x07, 0x00 );
-	WriteTW88(index+0x08, 0x00 );
-	WriteTW88(index+0x09, 0x00 );
-	WriteTW88(index+0x0A, 0x00 );
-	WriteTW88(index+0x0B, 0x00 );
-	WriteTW88(index+0x0C, 0x00 );
-	WriteTW88(index+0x0D, 0x00 );
-	WriteTW88(index+0x0E, 0x00 );
-	WriteTW88(index+0x0F, 0x00 );
+	WriteTW88(index+0x07, 0x00);
+	WriteTW88(index+0x08, 0x00);
+	WriteTW88(index+0x09, 0x00);
+	WriteTW88(index+0x0A, 0x00);
+	WriteTW88(index+0x0B, 0x00);
+	WriteTW88(index+0x0C, 0x00);
+	WriteTW88(index+0x0D, 0x00);
+	WriteTW88(index+0x0E, 0x00);
+	WriteTW88(index+0x0F, 0x00);
 
 	//clear alpha
-	FOsdWinAlphaPixel(winno,FOSD_COLOR_IDX_BLANK,0);
+	FOsdWinAlphaPixel(winno, FOSD_COLOR_IDX_BLANK, 0);
 }
-
-
 
 //=======================================
 // Palette Functions
@@ -1508,10 +1518,11 @@ void FOsdCopyMsgBuff2Osdram(BYTE fOn)
 */
 void FOsdIndexMsgPrint(BYTE index)
 {
-	if(MenuGetLevel())
+	if (MenuGetLevel())
 		return;
 
-	switch(index) {
+	switch (index)
+	{
 	case FOSD_STR0_GOOD:	
 		FOsdSetInputMainString2FOsdMsgBuff();	//GetInputMainString(FOsdMsgBuff);
 		TWstrcat(FOsdMsgBuff,"..Good!");		
@@ -1784,17 +1795,25 @@ void FOsdRamMemset(WORD addr, WORD dat, BYTE attr, BYTE len)
 void FOsdRamClearAll(WORD dat, BYTE attr)
 {
 	WORD i;
-	FOsdRamSetFifo(OFF,0);
+
+	FOsdRamSetFifo(OFF, 0);
+
 	FOsdRamSetAddrAttr(0, attr);
+
 	WriteTW88Page(PAGE3_FOSD);
-	if(dat&0x100)	WriteTW88(REG304,ReadTW88(REG304) |  0x20); 
-	else			WriteTW88(REG304,ReadTW88(REG304) & ~0x20);
-	for(i=0; i < FOSD_MAX_OSDRAM_SIZE; i++) {
+
+	if (dat & 0x100)
+		WriteTW88(REG304, ReadTW88(REG304) |  0x20); 
+	else
+		WriteTW88(REG304, ReadTW88(REG304) & ~0x20);
+
+	for (i=0; i < FOSD_MAX_OSDRAM_SIZE; i++)
+	{
 		WriteTW88(REG307, dat);
 	}
-	FOsdRamSetFifo(ON,1);		//with vdelay 1
-}
 
+	FOsdRamSetFifo(ON, 1);		//with vdelay 1
+}
 
 //=============================================================================
 //			Init Menu Window Data initialize 
@@ -1863,9 +1882,6 @@ void FOsdDefaultLUT( void )
 }
 #endif
 
-
-
-
 //=============================================================================
 //=============================================================================
 /**
@@ -1875,38 +1891,40 @@ void FOsdDefaultLUT( void )
 */
 void InitFontRamByNum(BYTE FontMode, WORD start)
 {
-	switch ( FontMode ) {
-		case 0:
-			InitFontRam(start, &default_font,"def");
-			//FOsdSetDefPaletteColor(0);
-			break;
-		case 1:
-			//InitFontRam(0, &SPI_FONT1_TEMP, "FONT1");
-			//FOsdSetPaletteColorArray(16, SPI_FONT1, 40 , 1);
-			InitFontRam(start, &consolas16x26_606C90, "con");
-			break;
-		case 2:
-			//InitFontRam(0, &SPI_LOGO_TEMP, "LOGO");
-			InitFontRam(start, &consolas16x26_graynum,"con+gray");
-			FOsdInitBpp3AlphaTable(0);
-			break;
-		case 3:
-			InitFontRam(start, &consolas16x26_606C90, "con");
-			InitFontRam(start+0x80, &consolas16x26_graynum,"con+gray");
-			FOsdInitBpp3AlphaTable(0);
-			//FOsdSetDefPaletteColor(1);
-			break;
-		case 4:
-			InitFontRam(start, &default_font,"def");
-			ReplaceFontRam(start+0xA0, &kor_font,"def+kor");
-			break;
-		default:
-			//dPuts("\nDOWNLOAD SPI_FONT0");
-			//InitFontRam(0, &SPI_FONT0_TEMP,"FONT0");
-			InitFontRam(start, &default_font,"def");
-			break;
+	switch (FontMode)
+	{
+	case 0:
+		InitFontRam(start, &default_font, "def");
+		//FOsdSetDefPaletteColor(0);
+		break;
+	case 1:
+		//InitFontRam(0, &SPI_FONT1_TEMP, "FONT1");
+		//FOsdSetPaletteColorArray(16, SPI_FONT1, 40 , 1);
+		InitFontRam(start, &consolas16x26_606C90, "con");
+		break;
+	case 2:
+		//InitFontRam(0, &SPI_LOGO_TEMP, "LOGO");
+		InitFontRam(start, &consolas16x26_graynum, "con+gray");
+		FOsdInitBpp3AlphaTable(0);
+		break;
+	case 3:
+		InitFontRam(start, &consolas16x26_606C90, "con");
+		InitFontRam(start+0x80, &consolas16x26_graynum, "con+gray");
+		FOsdInitBpp3AlphaTable(0);
+		//FOsdSetDefPaletteColor(1);
+		break;
+	case 4:
+		InitFontRam(start, &default_font, "def");
+		ReplaceFontRam(start+0xA0, &kor_font, "def+kor");
+		break;
+	default:
+		//dPuts("\nDOWNLOAD SPI_FONT0");
+		//InitFontRam(0, &SPI_FONT0_TEMP,"FONT0");
+		InitFontRam(start, &default_font, "def");
+		break;
 	}
 }
+
 /**
 * print Font Info
 */
@@ -1915,29 +1933,32 @@ static void FontInfo(WORD start, FONT_SPI_INFO_t *font)
 	BYTE i;
 	WORD *wptr;
 
-	Printf("\nLoc:%lx",font->loc );
-	Printf(" size:%x",font->size);
-	Printf(" %bdx%bd",font->width, font->height);
+	Printf("\nLoc:%lx", font->loc );
+	Printf(" size:%x", font->size);
+	Printf(" %bdx%bd", font->width, font->height);
 	Printf(" 2BPP:%x 3BPP:%x 4BPP:%x MAX:%x",font->bpp2+start,font->bpp3+start,font->bpp4+start,font->max+start);
-	if(font->palette_bpp2 != NULL) {
+	if (font->palette_bpp2 != NULL)
+	{
 		Printf("\n\t2BPP:");
 		wptr = (WORD *)font->palette_bpp2;
-		for(i=0; i < 4; i++)
-			Printf("%04x ",*wptr++);
+		for (i=0; i < 4; i++)
+			Printf("%04x ", *wptr++);
 	}
-	if(font->palette_bpp3 != NULL) {
+	if (font->palette_bpp3 != NULL)
+	{
 		Printf("\n\t3BPP:");
 		wptr = (WORD *)font->palette_bpp3;
-		for(i=0; i < 8; i++)
+		for (i=0; i < 8; i++)
 			Printf("%04x ",*wptr++);
 	}
-	if(font->palette_bpp4 != NULL) {
+	if (font->palette_bpp4 != NULL)
+	{
 		Printf("\n\t4BPP:");
 		wptr = (WORD *)font->palette_bpp4;
-		for(i=0; i < 8; i++)
+		for (i=0; i < 8; i++)
 			Printf("%04x ",*wptr++);
 		Printf("\n\t    :");
-		for(i=0; i < 8; i++)
+		for (i=0; i < 8; i++)
 			Printf("%04x ",*wptr++);
 	}
 }

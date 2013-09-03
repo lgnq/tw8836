@@ -858,7 +858,7 @@ BYTE ChangeHdmiPhase(void) { return 0; }
 */
 void SetImage(BYTE type)
 {
-	if(type==INPUT_CVBS || type==INPUT_SVIDEO) { //CVBS & SVIDEO
+	if (type==INPUT_CVBS || type==INPUT_SVIDEO) { //CVBS & SVIDEO
 		//reset default internal decoder value.
 		//FW uses a default front value, and control the backend image control.
 		WriteTW88Page(PAGE1_DECODER );
@@ -871,7 +871,8 @@ void SetImage(BYTE type)
 		WriteTW88(REG117, 0x30);
 	}
 
-	if(type == INPUT_PC ||type == INPUT_DVI || type == INPUT_HDMIPC || type == INPUT_LVDS) {
+	if (type == INPUT_PC || type == INPUT_DVI || type == INPUT_HDMIPC || type == INPUT_LVDS)
+	{
 		//PC, DVI24,DVI16,HDMI_PC
 
 		ImgAdjSetContrastY( 		GetVideoDatafromEE( EEP_IA_CONTRASE_Y ) );
@@ -890,7 +891,8 @@ void SetImage(BYTE type)
 		WriteTW88(REG289_IA_BRIGHTNESS_B, IA_BRIGHTNESS_B_DEFAULT);
 		WriteTW88(REG28B_IA_SHARPNESS,    (ReadTW88(REG28B_IA_SHARPNESS ) & 0xf0) | IA_SHARP_DEFAULT);
 	}
-	else {
+	else
+	{
 		ImgAdjSetContrastY( 		GetVideoDatafromEE( EEP_IA_CONTRASE_Y ) );
 		ImgAdjSetBrightnessY( 		GetVideoDatafromEE( EEP_IA_BRIGHTNESS_Y ) );
 		ImgAdjSetSaturation( 		GetVideoDatafromEE( EEP_IA_SATURATION ) );
@@ -906,7 +908,6 @@ void SetImage(BYTE type)
 		WriteTW88(REG289_IA_BRIGHTNESS_B, IA_BRIGHTNESS_B_DEFAULT);
 	}
 }
-
 
 //-----------------------------------------------------------------------------
 //BKTODO:110518
@@ -925,7 +926,6 @@ BYTE SetAspectHW(BYTE mode)
 	return 0;
 }
 
-
 BYTE OsdTime;
 //-----------------------------------------------------------------------------
 /**
@@ -936,6 +936,7 @@ BYTE OsdGetTime(void)
 //	dPrintf("\nOsdGetTime:%bd",OsdTime);
 	return OsdTime;
 }
+
 //-----------------------------------------------------------------------------
 /**
 * increase/decrease OsdChangeTime value

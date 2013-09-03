@@ -328,9 +328,11 @@ WORD DecoderGetHActive(void)
 BYTE DecoderReadDetectedMode(void)
 {
 	BYTE mode;
+
 	WriteTW88Page(PAGE1_DECODER);
 	mode = ReadTW88(REG11C);
 	mode >>= 4;
+
 	return mode;
 }
 
@@ -408,7 +410,7 @@ BYTE DecoderCheckSTD( BYTE n )
 */
 void DecoderFreerun(BYTE mode)
 {
-	WriteTW88Page(PAGE1_DECODER );
+	WriteTW88Page(PAGE1_DECODER);
 	WriteTW88(REG133, (ReadTW88(REG133) & 0x3F) | (mode<<6));
 }
 
@@ -720,8 +722,10 @@ BYTE ChangeDecoder(BYTE fSVIDEO)
 {
 	BYTE ret;
 
-	if(fSVIDEO) {
-		if ( InputMain == INPUT_SVIDEO ) {
+	if (fSVIDEO)
+	{
+		if (InputMain == INPUT_SVIDEO)
+		{
 #ifdef DEBUG_DEC
 			dPrintf("\nSkip ChangeSVIDEO");
 #endif
@@ -729,8 +733,10 @@ BYTE ChangeDecoder(BYTE fSVIDEO)
 		}
 		InputMain = INPUT_SVIDEO;
 	}
-	else {
-		if ( InputMain == INPUT_CVBS ) {
+	else
+	{
+		if (InputMain == INPUT_CVBS)
+		{
 #ifdef DEBUG_DEC
 			dPrintf("\nSkip ChangeCVBS");
 #endif
@@ -740,13 +746,12 @@ BYTE ChangeDecoder(BYTE fSVIDEO)
 	}
 	InputSubMode = 7; //N/A
 
-	if(GetInputMainEE() != InputMain) 	
-		SaveInputMainEE( InputMain );
+	if (GetInputMainEE() != InputMain) 	
+		SaveInputMainEE(InputMain);
 
 	//----------------
 	// initialize video input
 	InitInputAsDefault();
-
 
 	//BKFYI: We need a delay before call DecoderCheckVDLOSS() on CheckAndSetDecoderScaler()
 	//But, if fRCDMode, InputMode comes from others, not CVBS, not SVIDEO. We don't need a delay 
@@ -756,7 +761,8 @@ BYTE ChangeDecoder(BYTE fSVIDEO)
 	// Check and Set 
 	//
 	ret = CheckAndSetDecoderScaler();	//same as CheckAndSetInput()
-	if(ret==ERR_SUCCESS) {
+	if (ret == ERR_SUCCESS)
+	{
 		//success
 		VInput_enableOutput(0);
 		return 0;
@@ -779,7 +785,7 @@ BYTE ChangeDecoder(BYTE fSVIDEO)
 *	- 3: NO STD
 * @see ChangeDecoder
 */
-BYTE ChangeCVBS( void )
+BYTE ChangeCVBS(void)
 {
 	return ChangeDecoder(0);
 }

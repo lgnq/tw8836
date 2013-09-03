@@ -467,6 +467,7 @@ void SPI_SetReadModeByRegister( BYTE mode )
 			break;
  	}
 }
+
 /**
 *	set 4Bytes address mode to support more than 128Mbit.
 *	call after SPI_SetReadModeByRegister()
@@ -481,21 +482,26 @@ void SPI_Set4BytesAddress(BYTE fOn)
 	BYTE cmd;
 	
 	cmd = 0;	
-	if(fOn) {
-		if(SpiFlash4ByteAddr==0) {
+	if (fOn)
+	{
+		if (SpiFlash4ByteAddr == 0)
+		{
 			SpiFlash4ByteAddr = 1;
 			cmd = SPICMD_EN4B;
 		}	
 	}
-	else {
-		if(SpiFlash4ByteAddr) {
+	else
+	{
+		if (SpiFlash4ByteAddr)
+		{
 			SpiFlash4ByteAddr = 0;
 			cmd = SPICMD_EX4B;
 		}	
 	}
-	if(cmd) {	
+	if (cmd)
+	{	
 		//BKTODO: skip the done flag check.
-		SpiFlashChipRegCmd(cmd,0,0,0);
+		SpiFlashChipRegCmd(cmd, 0, 0, 0);
 	}
 }
 
@@ -870,6 +876,7 @@ void SpiOsdIoLoadLUT(BYTE _winno, BYTE type, WORD LutOffset, WORD size, DWORD sp
 {
 	BYTE i,j,k;
 	BYTE R410_data;
+	
 #ifdef DEBUG_OSD
 	dPrintf("\nSpiOsdIoLoadLUT%s win:%bd, LutLoc:%d size:%d 0x%06lx", type ? "S":" ", _winno, LutOffset, size, spiaddr);
 #endif
@@ -882,45 +889,54 @@ void SpiOsdIoLoadLUT(BYTE _winno, BYTE type, WORD LutOffset, WORD size, DWORD sp
 	WriteTW88Page(PAGE4_SOSD );
 
 	//--- SPI-OSD config
-	if(type==SOSD_LUTTYPE_ADDR)	R410_data = 0xC0;			// LUT Write Mode, En & address ptr inc.
-	else						R410_data = 0xA0;			// LUT Write Mode, En & byte ptr inc.
-	if(LutOffset >> 8)
+	if (type == SOSD_LUTTYPE_ADDR)
+		R410_data = 0xC0;			// LUT Write Mode, En & address ptr inc.
+	else
+		R410_data = 0xA0;			// LUT Write Mode, En & byte ptr inc.
+	if (LutOffset >> 8)
 		R410_data |= 0x08;   //BK130121 bugfix
-	if(_winno==1 || _winno==2)
+	if (_winno==1 || _winno==2)
 		R410_data |= 0x04;		
 
-	if(type==SOSD_LUTTYPE_ADDR) {
+	if (type == SOSD_LUTTYPE_ADDR)
+	{
 		//
 		//ignore size. it is always 0x400.(256*4)
 		//BKTODO130124. If it is a LUTB,...
 		//		
-		for(i=0; i < 4; i++) {	 
+		for (i=0; i < 4; i++)
+		{	 
 			WriteTW88(REG410, R410_data | i );	//assign byte ptr	
 			WriteTW88(REG411, (BYTE)LutOffset);	//reset address ptr.
-			for(j=0; j<(256/64);j++) {
+			for (j=0; j<(256/64); j++)
+			{
 				SpiFlashDmaRead2XMem(SPI_Buffer,spiaddr + i*256 + j*64,64);	 //BUGBUG120606 BANK issue
-				for(k=0; k < 64; k++) {
+				for (k=0; k < 64; k++)
+				{
 					WriteTW88(REG412, SPI_Buffer[k]);		//write data
 				}
 			}
 		}
 	}
-	else {
+	else 
+	{
 		WriteTW88(REG410, R410_data);			//assign byte ptr. always start from 0.
 		WriteTW88(REG411, (BYTE)LutOffset);		//reset address ptr.
 
-		for(i=0; i < (size / 64); i++ ) {		//min size is a 64(16*4)
-			SpiFlashDmaRead2XMem(SPI_Buffer,spiaddr + i*64,64);
-			for(k=0; k < 64; k++) {
+		for (i=0; i < (size / 64); i++)		//min size is a 64(16*4)
+		{
+			SpiFlashDmaRead2XMem(SPI_Buffer, spiaddr + i*64, 64);
+			for (k=0; k < 64; k++)
+			{
 				WriteTW88(REG412, SPI_Buffer[k]);		//write data
 			}
 		}
 	}
 	//pixel alpha
-	if(alpha!=0xFF) {
-		SpiOsdPixelAlphaAttr(_winno,LutOffset+alpha, 0x7F);	
+	if (alpha != 0xFF)
+	{
+		SpiOsdPixelAlphaAttr(_winno, LutOffset+alpha, 0x7F);	
 	}
-
 
 #if defined(TW8836_CHIPDEBUG)
 #else

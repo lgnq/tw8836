@@ -640,9 +640,8 @@ void i2ccmd_test(BYTE mode, WORD duration)
 		return;
 	}
 }
-
-
 #endif
+
 //=============================================================================
 //
 //=============================================================================
@@ -652,23 +651,24 @@ void i2ccmd_test(BYTE mode, WORD duration)
 void Prompt(void)
 {
 #ifdef BANKING
-	if ( MonAddress == TW88I2CAddress )
+	if (MonAddress == TW88I2CAddress)
 		Printf("\n[B%02bx]MCU_I2C[%02bx]>", BANKREG, MonAddress);
 	else
 #else
-	if ( MonAddress == TW88I2CAddress )
+	if (MonAddress == TW88I2CAddress)
 		Printf("\nMCU_I2C[%02bx]>", MonAddress);
 	else
 #endif
 		Printf("\nI2C[%02bx]>", MonAddress);
 }
+
 #ifdef SUPPORT_UART1
 void Prompt1(void)
 {
-	if ( MonAddress == TW88I2CAddress )
+	if (MonAddress == TW88I2CAddress)
 		Printf1("\niAP>");
 	else
-	Printf1("\nRS1_I2C[%02bx]>", MonAddress);
+		Printf1("\nRS1_I2C[%02bx]>", MonAddress);
 }
 #endif
 

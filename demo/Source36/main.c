@@ -551,7 +551,6 @@ void InitCore(BYTE fPowerUpBoot)
 
 /**
 * InitLVDS Tx
-*
 */
 #ifdef PANEL_AUO_B133EW01
 void InitLVDSTx(void)
@@ -868,16 +867,17 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 */
 void TaskNoSignal_setCmd(BYTE cmd) 
 { 	
-	if(cmd == TASK_CMD_WAIT_VIDEO && MenuGetLevel())	
+	if (cmd == TASK_CMD_WAIT_VIDEO && MenuGetLevel())	
 		Task_NoSignal_cmd = TASK_CMD_DONE;	
 	else
 		Task_NoSignal_cmd = cmd;
 
-	if(cmd == TASK_CMD_RUN_FORCE)
+	if (cmd == TASK_CMD_RUN_FORCE)
 		tic_task = NOSIGNAL_TIME_INTERVAL;	//right now
 
 	Task_NoSignal_count = 0;
-}																				
+}							
+
 //-----------------------------------------------------------------------------
 /**
 * get NoSignalTask status
@@ -1051,20 +1051,21 @@ void CheckAndClearOSD(void)
 {
 	DECLARE_LOCAL_page
 
-	if(OsdGetTime()==0)
+	if (OsdGetTime() == 0)
 		return;
 
-	if(OsdTimerClock==0) {
+	if (OsdTimerClock == 0)
+	{
 		ReadTW88Page(page);
 
-		if(MenuGetLevel())	
+		if (MenuGetLevel())	
 			MenuEnd();	
 		
 		//Turn OFF Font OSD
-		if(FOsdOnOff(OFF, 0))	//with vdelay 0
+		if (FOsdOnOff(OFF, 0))	//with vdelay 0
 			dPuts("\nCheckAndClearOSD disable FOSD");
 			
-		if(getNoSignalLogoStatus())
+		if (getNoSignalLogoStatus())
 			RemoveLogo();
 					
 		WriteTW88Page(page);
@@ -1461,13 +1462,15 @@ BYTE InitRCDMode(BYTE fPowerUpBoot)
 */
 static void PrintModelVersionInfo(void)
 {
-	//-------------------------------------
 	Printf("\n********************************************************");
+
 #if defined(MODEL_TW8836)
 	Puts("\n TW8836 ");
+
 	#ifdef MODEL_TW8835
 		Puts("on TW8835 ");
 	#endif
+
 	#if defined(CHIP_MANUAL_TEST) 
 		Puts(" CHIPTEST ");
 	#endif
@@ -1480,12 +1483,14 @@ static void PrintModelVersionInfo(void)
 #else
 	Puts("EVB ");
 #endif
+
 	//board revision
 #ifdef EVB_10
 	Puts("1.0 - ");
 #else
 	Puts("0.0 - ");
 #endif
+
 	//FW revision
 	Printf(" FW %bx.%bx -", (BYTE)(FWVER >> 8), (BYTE)FWVER);
 
@@ -1496,11 +1501,9 @@ static void PrintModelVersionInfo(void)
 #ifdef MODEL_TW8835_SLAVE
 	Puts(" Server");
 #endif
+
 	Printf("\n********************************************************");
 }
-
-
-
 
 //=============================================================================
 // INIT ROUTINES
@@ -1560,13 +1563,11 @@ void StartVideoInput(void)
 				
 	ePrintf("\nStart with Saved Input: ");
 	InputMainEE = GetInputMainEE();
-	PrintfInput(InputMainEE,1);
+	PrintfInput(InputMainEE, 1);
 
 	InputMain = 0xff;			// start with saved input						
-	ChangeInput( InputMainEE );	
+	ChangeInput(InputMainEE);	
 }
-
-
 
 //--------------------------------------------------
 // Description  : Video initialize
@@ -1593,22 +1594,23 @@ void NoSignalTask(void)
 	BYTE ret;
 	BYTE r004;
 
-	if(Task_Grid_on)
+	if (Task_Grid_on)
 		// MovingGridTask uses tic_task. It can not coexist with NoSignalTask.
 		return;
 
-	if(Task_NoSignal_cmd==TASK_CMD_DONE)
+	if (Task_NoSignal_cmd == TASK_CMD_DONE)
 		return;
 
-	if(tic_task < NOSIGNAL_TIME_INTERVAL) 
+	if (tic_task < NOSIGNAL_TIME_INTERVAL) 
 		return;
 
-	if(Task_NoSignal_cmd==TASK_CMD_WAIT_VIDEO) {
-
+	if (Task_NoSignal_cmd == TASK_CMD_WAIT_VIDEO)
+	{
 		ReadTW88Page(page);
 
 		FOsdWinToggleEnable(TASK_FOSD_WIN); //WIN0-toggle
-		if(Task_NoSignal_count < 3) {
+		if (Task_NoSignal_count < 3)
+		{
 			dPuts("\nTask NoSignal TASK_CMD_WAIT_VIDEO");
 			Task_NoSignal_count++;
 		}
@@ -1617,7 +1619,7 @@ void NoSignalTask(void)
 		WriteTW88Page(page);
 		return;
 	}
-	if(Task_NoSignal_cmd==TASK_CMD_WAIT_MODE)
+	if (Task_NoSignal_cmd == TASK_CMD_WAIT_MODE)
 		return;
  
 	//--------------------------------------------
@@ -1625,13 +1627,14 @@ void NoSignalTask(void)
 	//--------------------------------------------
 
 	dPuts("\n***Task NoSignal TASK_CMD_RUN");
-	if(Task_NoSignal_cmd == TASK_CMD_RUN_FORCE)
+	if (Task_NoSignal_cmd == TASK_CMD_RUN_FORCE)
 		dPuts("_FORCE");
 
 	ReadTW88Page(page);
  	WriteTW88Page(PAGE0_GENERAL);
 	r004 = ReadTW88(REG004);
-	if(r004 & 0x01) {						
+	if (r004 & 0x01)
+	{						
 		ePrintf("..Wait...Video");
 
 		tic_task = 0;
@@ -1649,27 +1652,29 @@ void NoSignalTask(void)
 	//if success, VInput_enableOutput() will be executed.
 	Interrupt_enableVideoDetect(ON);
 
-	if(ret==ERR_SUCCESS) {
+	if (ret == ERR_SUCCESS)
+	{
 		dPuts("\n***Task NoSignal***SUCCESS");
 		VInput_enableOutput(VH_Loss_Changed);
-		FOsdWinEnable(TASK_FOSD_WIN,OFF); 	//WIN0, Disable
+		FOsdWinEnable(TASK_FOSD_WIN, OFF); 	//WIN0, Disable
 
-
-		if(getNoSignalLogoStatus()) {
+		if (getNoSignalLogoStatus())
+		{
 			ScalerSetFreerunManual(OFF);	//BK120803
 			RemoveLogo();
 		}
 
 		//need SetBT656Output() with proper mode.....
 		//SetBT656Output(GetInputBT656EE());
-
 	}
 #ifdef SUPPORT_PC
-	else {
+	else
+	{
 		//fail 
-		if(InputMain==INPUT_PC) {
+		if (InputMain == INPUT_PC)
+		{
 			WriteTW88Page(PAGE0_GENERAL);
-			if(ReadTW88(REG004) & 0x01)
+			if (ReadTW88(REG004) & 0x01)
 				FOsdIndexMsgPrint(FOSD_STR2_NOSIGNAL);	//over write
 			else
 				FOsdIndexMsgPrint(FOSD_STR3_OUTRANGE);	//replace 
@@ -1677,12 +1682,12 @@ void NoSignalTask(void)
 	}
 #endif
 
-
 	//update tic_task.
 	tic_task = 0;
 
 	WriteTW88Page(page);
 }
+
 //-----------------------------------------------------------------------------
 /**
 *  Check each input status
@@ -1694,17 +1699,21 @@ void NoSignalTask(void)
 void NoSignalTaskOnWaitMode(void)
 {
 	BYTE ret;
+	
 	DECLARE_LOCAL_page
-	if((Task_NoSignal_cmd != TASK_CMD_WAIT_MODE))
+	if ((Task_NoSignal_cmd != TASK_CMD_WAIT_MODE))
 		return;
 	
 	ReadTW88Page(page); 
-	if(InputMain==INPUT_CVBS || InputMain==INPUT_SVIDEO) {
-		ret=DecoderReadDetectedMode();
+	if (InputMain==INPUT_CVBS || InputMain==INPUT_SVIDEO)
+	{
+		ret = DecoderReadDetectedMode();
 		//only consider NTSC & PAL with an idle mode.
-		if(ret == 0 || ret == 1) {
-			if(InputSubMode != ret) {
-				ScalerSetMuteManual( ON );
+		if (ret == 0 || ret == 1)
+		{
+			if (InputSubMode != ret)
+			{
+				ScalerSetMuteManual(ON);
 
 				SW_INTR_cmd = SW_INTR_VIDEO_CHANGED;
 				dPrintf("\nRequest SW Interrupt cmd:%bd InputSubMode:%bd->%bd",SW_INTR_cmd, InputSubMode,ret);
@@ -1715,12 +1724,15 @@ void NoSignalTaskOnWaitMode(void)
 		}
 	}
 #ifdef SUPPORT_COMPONENT
-	else if(InputMain==INPUT_COMP) {
+	else if (InputMain == INPUT_COMP)
+	{
 		ret = aRGB_GetInputStatus();	//detected input.
-		if(ret & 0x08) {			//check the compoiste detect status first.
+		if (ret & 0x08) 			//check the compoiste detect status first.
+		{
 			ret &= 0x07;
-			if( (ret!=7) && (InputSubMode != ret) ) {
-				ScalerSetMuteManual( ON );
+			if ((ret!=7) && (InputSubMode != ret))
+			{
+				ScalerSetMuteManual(ON);
 
 				SW_INTR_cmd = SW_INTR_VIDEO_CHANGED;
 				dPrintf("\nRequest SW Interrupt cmd:%bd InputSubMode:%bd->%bd",SW_INTR_cmd, InputSubMode,ret);
@@ -2161,8 +2173,4 @@ void InterruptPollingHandlerRoutine(void)
 	}
 	WriteTW88Page(page);
 }
-
-
-
-
 

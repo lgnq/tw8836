@@ -822,12 +822,14 @@ OLD R105 moved to R1E8.
 void AMuxSetInput(BYTE InputMode)
 {
 	BYTE r102, r106, r1E8;
-	WriteTW88Page(PAGE1_DECODER );
+	
+	WriteTW88Page(PAGE1_DECODER);
 
 	r1E8 = ReadTW88(REG1E8) & 0xF0;
 	r106 = ReadTW88(REG106) & ~0x03;	//Do not change Y.
 
-	switch(InputMode) {
+	switch (InputMode)
+	{
 	case INPUT_CVBS:
 		r102 = 0x40;		// 0x40 - FC27:27MHz, IFSEL:Composite, YSEL:YIN0 
 		r1E8 |= 0x0F;		//decoder mode
@@ -881,13 +883,16 @@ void AMuxSetInput(BYTE InputMode)
 		r106 |= 0x03;		// C,V adc in Power Down.
 		break;
 	}
-	if(r102) {	//need update?
-		WriteTW88(REG102, r102 );
-		WriteTW88(REG1E8, r1E8 );
-		WriteTW88(REG106, r106 );
+	
+	if (r102) 	//need update?
+	{
+		WriteTW88(REG102, r102);
+		WriteTW88(REG1E8, r1E8);
+		WriteTW88(REG106, r106);
 	}
 }
 #endif
+
 //=========================================
 // MCPSPI
 //=========================================
@@ -926,6 +931,7 @@ BYTE McuSpiClkToPclk(BYTE divider)
 #if defined(PANEL_AUO_B133EW01)
 	BYTE temp = divider;
 #endif
+
 	WriteTW88Page(PAGE4_CLOCK);
 	shadow_r4e0 = ReadTW88(REG4E0);
 	shadow_r4e1 = ReadTW88(REG4E1);
@@ -944,6 +950,7 @@ BYTE McuSpiClkToPclk(BYTE divider)
 	WriteTW88(REG4E0, shadow_r4e0 & 0xFE);	//select PCLK.
 	WriteTW88(REG4E1, 0x20 | divider);		//CLKPLL + divider.
 #endif
+
 	return 0;
 }
 
@@ -975,8 +982,10 @@ void McuSpiClkRestore(void)
 BYTE McuSpiClkReadSelectReg(void)
 {
 	BYTE value;
+	
 	WriteTW88Page(PAGE4_CLOCK);
 	value = ReadTW88(REG4E1) & 0x30;
+	
 	return (value >> 4);
 }
 
@@ -1028,13 +1037,15 @@ DWORD McuGetClkFreq(void)
 	temp8 = ReadTW88(REG4E1) >> 4;
 	temp8 &= 0x03;
 
-	switch(temp8) {
+	switch (temp8)
+	{
 	case 0: temp32 = 27000000L;				break;
 	case 1:	temp32 = 32000L;				break;
 	case 2:	temp32 = ClkPllGetFreq();		break;
 	default: //unknown
 			temp32 = 27000000L;				break;
 	}
+	
 	return temp32;
 }
 
@@ -1066,8 +1077,10 @@ DWORD SpiClkGetFreq(DWORD mcu_clk)
 void LLPLLSetClockSource(BYTE use_27M)
 {
 	WriteTW88Page(PAGE1_LLPLL);
-	if(use_27M)	WriteTW88(REG1C0, ReadTW88(REG1C0) | 0x01); 
-	else		WriteTW88(REG1C0, ReadTW88(REG1C0) & ~0x01);
+	if (use_27M)
+		WriteTW88(REG1C0, ReadTW88(REG1C0) | 0x01); 
+	else
+		WriteTW88(REG1C0, ReadTW88(REG1C0) & ~0x01);
 }
 
 /*
@@ -1120,28 +1133,27 @@ void DumpClock(void)
 {
 	DWORD ppf, FPLL;
 	BYTE  i;
-	DWORD pclk,pclko;
-	DWORD clkpll, mcu_clk,spi_clk;
+	DWORD pclk, pclko;
+	DWORD clkpll, mcu_clk, spi_clk;
 
 	//read PLL center frequency
 	FPLL = SspllGetFreqReg();
-	i= SspllGetPost();
-	ppf = SspllFPLL2FREQ(FPLL, i);
+	i    = SspllGetPost();
+	ppf  = SspllFPLL2FREQ(FPLL, i);
 
-	pclk = PclkGetFreq(ppf);
+	pclk  = PclkGetFreq(ppf);
 	pclko = PclkoGetFreq(pclk);
 
-	clkpll =ClkPllGetFreq();
+	clkpll = ClkPllGetFreq();
 
-	mcu_clk=McuGetClkFreq();
-	spi_clk=SpiClkGetFreq(mcu_clk);
+	mcu_clk = McuGetClkFreq();
+	spi_clk = SpiClkGetFreq(mcu_clk);
 
-	dPrintf("\nCLOCK SSPLL:%lx POST:%bx FREQ:%ld", FPLL,i,ppf);
-	dPrintf("\n      PCLK:%ld PCLKO:%ld",	pclk, pclko);
-	dPrintf("\n      CLKPLL:%ld",clkpll);
-	dPrintf("\n      MCU:%ld SPI:%ld",mcu_clk,spi_clk);
+	dPrintf("\nCLOCK SSPLL:%lx POST:%bx FREQ:%ld", FPLL, i, ppf);
+	dPrintf("\n      PCLK:%ld PCLKO:%ld", pclk, pclko);
+	dPrintf("\n      CLKPLL:%ld", clkpll);
+	dPrintf("\n      MCU:%ld SPI:%ld", mcu_clk, spi_clk);
 }
-
 
 //=============================================================================
 //				                                               
@@ -1297,7 +1309,8 @@ void FP_PWC_OnOff(BYTE fOn)
 		WriteI2CByte(I2CID_SX1504, 1, 0);									// output enable
 		WriteI2CByte(I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) & 0xFE);	// FPPWC enable
 	}
-	else {
+	else
+	{
 		WriteI2CByte(I2CID_SX1504, 1, 0);									// output enable
 		WriteI2CByte(I2CID_SX1504, 0, ReadI2CByte(I2CID_SX1504, 0) | 0x01);	// FPPWC disable
 	}
@@ -1367,6 +1380,7 @@ void EnableExtLvdsTxChip(BYTE fOn)
 BYTE DCDC_StartUP_sub(void)
 {
 	BYTE ret;
+
 #if 0
 		ret = ReadTW88(REG008);
 		Printf("\nREG008:%bx FPData:%bd Output:%bx",ret, ret&0x20?0:1, ret&0x10?0:1 );
@@ -1394,7 +1408,6 @@ BYTE DCDC_StartUP_sub(void)
 	//-------------
 	//FP Data Out
 	OutputEnablePin(ON, ON);		//Output enable. FP data: enable
-
 
 #ifdef TW8835_EVB_10
 	delay1ms(15);

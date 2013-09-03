@@ -36,14 +36,15 @@
 /**
 * control LEDC digital block
 */
-void LedBackLight( BYTE on )
+void LedBackLight(BYTE on)
 {
 	WaitVBlank(1);
 	WriteTW88Page(PAGE0_LEDC);
-	if ( on )	WriteTW88(REG0E0, ReadTW88(REG0E0 ) | 1 );
-	else		WriteTW88(REG0E0, ReadTW88(REG0E0 ) & ~0x01 );
+	if (on)
+		WriteTW88(REG0E0, ReadTW88(REG0E0 ) | 1 );
+	else
+		WriteTW88(REG0E0, ReadTW88(REG0E0 ) & ~0x01 );
 }
-
 
 //=============================================================================
 //	void	BlackScrren( BYTE on )
@@ -144,24 +145,26 @@ void BT656OutputEnable(BYTE fOn, BYTE clear_port)
 
 	ReadTW88Page(page);
 	WriteTW88Page(PAGE0_INPUT);
-	if(fOn) {
+	if (fOn)
+	{
 #ifdef SUPPORT_UART1
 		Printf("\nBUGBUG:BT656 and UART1..");
 #else
 		WriteTW88(REG007, ReadTW88(REG007) | 0x08);	 
 #endif
 	}
-	else {
+	else
+	{
 		WriteTW88(REG007, ReadTW88(REG007) & ~0x08);	//DataInitNTSC clear it. 
 		//clear port
-		if(clear_port) {
-			if(P1_6 == 0)
+		if (clear_port)
+		{
+			if (P1_6 == 0)
 				P1_6 = 1;
 		}
 	}
 	WriteTW88Page(page);
 }
-
 
 //-----------------------------------------------------------------------------
 /**
@@ -174,12 +177,15 @@ void OutputEnablePin(BYTE fFPDataPin, BYTE fOutputPin)
 {
 	BYTE value;
 
-	Printf("\nFP_Data:%s OutputPin:%s",fFPDataPin ? "On" : "Off",fOutputPin ? "On" : "Off");
+	Printf("\nFP_Data:%s OutputPin:%s", fFPDataPin ? "On" : "Off", fOutputPin ? "On" : "Off");
 
 	WriteTW88Page(PAGE0_GENERAL);
 //	WriteTW88(REG008, 0x80 | (ReadTW88(REG008) & 0x0F));	//Output enable......BUGBUG
 	value = ReadTW88(REG008) & ~0x30;
-	if(fFPDataPin==0) 		value |= 0x20;
-	if(fOutputPin==0)		value |= 0x10;
-	WriteTW88(REG008,  value);
+	if (fFPDataPin == 0)
+		value |= 0x20;
+	if (fOutputPin == 0)
+		value |= 0x10;
+	WriteTW88(REG008, value);
 }
+

@@ -1480,7 +1480,8 @@ void aRGB_SetDefaultFor(void)
 		aRGB_setSignalPath(1); //add 130207
 #endif
 	}
-	else {
+	else
+	{
 		//power down SOG,PLL,Coast
 		//same as aRGB_SetPowerDown();	
 		WriteTW88(REG1CB, (ReadTW88(REG1CB) & 0x1F));

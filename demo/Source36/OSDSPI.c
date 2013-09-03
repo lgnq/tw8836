@@ -89,12 +89,19 @@ BYTE SOsdHwBuff_rle_B_bpp;
 BYTE SOsdHwBuff_rle_B_count;
 #endif
 
-
 //TW8836 has 9 windows
-code WORD	SpiOsdWinBase[9] = { SPI_WIN0_ST, 
-		SPI_WIN1_ST, SPI_WIN2_ST, SPI_WIN3_ST, SPI_WIN4_ST,
-		SPI_WIN5_ST, SPI_WIN6_ST, SPI_WIN7_ST, SPI_WIN8_ST
-		};
+code WORD SpiOsdWinBase[9] =
+{ 
+	SPI_WIN0_ST, 
+	SPI_WIN1_ST,
+	SPI_WIN2_ST,
+	SPI_WIN3_ST,
+	SPI_WIN4_ST,
+	SPI_WIN5_ST,
+	SPI_WIN6_ST,
+	SPI_WIN7_ST,
+	SPI_WIN8_ST
+};
 
 //=============================================================================
 //		OSD Window Functions
@@ -126,11 +133,11 @@ code WORD	SpiOsdWinBase[9] = { SPI_WIN0_ST,
 */
 void SpiOsdSetDeValue(void)
 {
-	XDATA	WORD wTemp;
-	BYTE hDE,pclko;
+	XDATA WORD wTemp;
+	BYTE hDE, pclko;
 
 	WriteTW88Page(PAGE2_SCALER);
-	hDE = ReadTW88(REG210);
+	hDE   = ReadTW88(REG210);
 	pclko = ReadTW88(REG20D) & 0x03;
 	//if(pclko == 3)
 	//	pclko = 2;
@@ -140,13 +147,13 @@ void SpiOsdSetDeValue(void)
 	wTemp = (WORD)hDE + pclko - 18;
 
 	WriteTW88Page(PAGE4_SOSD);
-	WriteTW88(REG40E, (BYTE)(wTemp>>8) );	// write SPI OSD DE value(high nibble)
-	WriteTW88(REG40F, (BYTE)wTemp );   		// write SPI OSD DE value(low byte)
+	WriteTW88(REG40E, (BYTE)(wTemp>>8));	// write SPI OSD DE value(high nibble)
+	WriteTW88(REG40F, (BYTE)wTemp);   		// write SPI OSD DE value(low byte)
+
 #ifdef DEBUG_OSD
-	dPrintf("\nSpiOsdDe:%04x",wTemp);		
+	dPrintf("\nSpiOsdDe:%04x", wTemp);		
 #endif
 }
-
 
 //-----------------------------------------------------------------------------
 /**
@@ -212,20 +219,19 @@ void SpiOsdEnable(BYTE en)
 *	1:Enable 0:disable
 * @return	void
 */
-/**
-* 
-*/
 void SpiOsdWinHWEnable(BYTE winno, BYTE en)
 {
 	XDATA WORD index;
-	XDATA	BYTE dat;
+	XDATA BYTE dat;
 
 	index = SpiOsdWinBase[winno] + SPI_OSDWIN_ENABLE;
 
-	WriteTW88Page(PAGE4_SOSD );
+	WriteTW88Page(PAGE4_SOSD);
 	dat = ReadTW88(index);
-	if( en ) WriteTW88(index, dat | 0x01);
-	else     WriteTW88(index, dat & 0xfe);
+	if (en)
+		WriteTW88(index, dat | 0x01);
+	else
+		WriteTW88(index, dat & 0xfe);
 }
 
 #ifdef MODEL_TW8836____TEST
@@ -451,10 +457,11 @@ void SpiOsdWinHWOffAll(BYTE wait)
 {
 	BYTE i;
 
-	if(wait)
+	if (wait)
 		WaitVBlank(wait);
+	
 	SpiOsdDisableRlcReg(0);
-	for(i=0; i<= 8; i++)
+	for (i=0; i<= 8; i++)
 		SpiOsdWinHWEnable(i, 0);
 }
 
@@ -910,13 +917,15 @@ void SOsdHwBuffSetLut(BYTE win, /*BYTE type,*/  WORD LutOffset, WORD size, DWORD
 	SOsdHwBuff_win[win*9+3] = (BYTE)(LutOffset >> 6);
 	SOsdHwBuff_win[win*9+4] = (BYTE)(LutOffset << 2);
 
-	if(SpiFlash4ByteAddr) {
+	if (SpiFlash4ByteAddr)
+	{
 		SOsdHwBuff_win[win*9+5] = (BYTE)(address >> 24);
 		SOsdHwBuff_win[win*9+6] = (BYTE)(address >> 16);
 		SOsdHwBuff_win[win*9+7] = (BYTE)(address >> 8);
 		SOsdHwBuff_win[win*9+8] = (BYTE)(address);
 	}
-	else {
+	else
+	{
 		SOsdHwBuff_win[win*9+5] = (BYTE)(address >> 16);
 		SOsdHwBuff_win[win*9+6] = (BYTE)(address >> 8);
 		SOsdHwBuff_win[win*9+7] = (BYTE)(address) ;
@@ -932,17 +941,20 @@ void SOsdHwBuffSetLut(BYTE win, /*BYTE type,*/  WORD LutOffset, WORD size, DWORD
 */
 void SOsdHwBuffSetRle(BYTE win, BYTE bpp, BYTE count)
 {
-	if(win==1 || win==2) {
+	if (win==1 || win==2)
+	{
 		SOsdHwBuff_rle_B_win = win;
 		SOsdHwBuff_rle_B_bpp = bpp;
 		SOsdHwBuff_rle_B_count = count;
 	}
-	else {
+	else
+	{
 		SOsdHwBuff_rle_A_win = win;
 		SOsdHwBuff_rle_A_bpp = bpp;
 		SOsdHwBuff_rle_A_count = count;
 	}
 }
+
 //-----------------------------------------------------------------------------
 /**
 * Description
@@ -1378,7 +1390,6 @@ void SpiOsdRlcReg(BYTE winno,BYTE dcnt, BYTE ccnt)
 	}
 }
 
-
 //-----------------------------------------------------------------------------
 /**
 * Description
@@ -1389,12 +1400,13 @@ void SpiOsdRlcReg(BYTE winno,BYTE dcnt, BYTE ccnt)
 */
 void SpiOsdDisableRlcReg(BYTE winno)
 {
-	WriteTW88Page(PAGE4_SOSD );
-	if(winno==0) {
+	WriteTW88Page(PAGE4_SOSD);
+	if (winno == 0)
+	{
 		WriteTW88(REG404, (ReadTW88(REG404) & 0x0F));
 		WriteTW88(REG406, (ReadTW88(REG406) & 0x0F));
 	}
-	else if(winno==1 || winno==2)
+	else if (winno == 1 || winno == 2)
 		WriteTW88(REG406, (ReadTW88(REG406) & 0x0F));
 	else
 		WriteTW88(REG404, (ReadTW88(REG404) & 0x0F));

@@ -169,13 +169,15 @@ code FONT_SPI_INFO_t ram_font		 		= { 0x40B000, 0x2080, 16, 18, 0x060, 0x06C, 0x
 
 //===================================
 // for TEST
-FAR CONST MY_SLIDEIMAGE test_IMG[] = {
+FAR CONST MY_SLIDEIMAGE test_IMG[] = 
+{
     { MAP0_START+0x0EF71A, 0x0100, 0x002B1D },    // Test_PBARPTR100_64
 };
-FAR CONST MY_RLE_INFO test_INFO[] = {
+
+FAR CONST MY_RLE_INFO test_INFO[] =
+{
 	{ 0x60, 327,45  },		//Test_PBARPTR100_64
 };
-
 
 //====================================================
 // MENU IMAGE MAP
@@ -214,11 +216,6 @@ code image_info_t img_input_ext0_header 	= {1, 0x80, 0x3D, 0x3D };
 code image_info_t img_input_ext1_header 	= {1, 0x80, 0x3D, 0x3D };
 code image_info_t img_input_return0_header 	= {1, 0x70, 0x22, 0x22 };
 code image_info_t img_input_return1_header 	= {1, 0x70, 0x22, 0x22 };
-
-
-
-
-
 
 
 //code image_item_info_t img_ = {+0x000000, 0x0010F0 },    // FontAll 
@@ -591,14 +588,15 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 	struct image_item_info_s *image;
 	menu_image_header_t *header = &header_table;	//link header buffer.
 //	BYTE i;
-	WORD sx,sy;
+	WORD sx, sy;
 
 	Printf("\nMonOsdImgLoad(%bd,%bd,%d)",img_n,sosd_win,item_lut);
 
 #if 0
 	UseSOsdHwBuff=1;
 #endif
-	sx=sy=0;
+
+	sx = sy = 0;
 //	SOsdWinBuffClean(0);
 
 	image = MonSOsdImgTable[img_n].image;
@@ -606,19 +604,20 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 	//prepare header
 	MenuPrepareImageHeader(image);
 
-
 	//see MenuDrawCurrImage
 	//fill out sosd_buff
-	SpiOsdWinImageLoc( sosd_win, header->image_loc); 
-	SpiOsdWinImageSizeWH( sosd_win, header->dx, header->dy );
-	SpiOsdWinScreen( sosd_win, sx, sy, header->dx, header->dy );
-	if(sosd_win==0) {
+	SpiOsdWinImageLoc(sosd_win, header->image_loc); 
+	SpiOsdWinImageSizeWH(sosd_win, header->dx, header->dy);
+	SpiOsdWinScreen(sosd_win, sx, sy, header->dx, header->dy);
+	if (sosd_win == 0)
+	{
 		SpiOsdWin0ImageOffsetXY( 0, 0 );
 		SpiOsdWin0Animation( 1, 0, 0, 0);
 	}
-	if(image->alpha != 0xFF)
+	if (image->alpha != 0xFF)
 		SpiOsdWinPixelAlpha( sosd_win, ON );
-	else {
+	else
+	{
 		SpiOsdWinGlobalAlpha( sosd_win, 0 /*EE_Read(EEP_OSD_TRANSPARENCY)*/);
 	}
 	SpiOsdWinPixelWidth(sosd_win, header->bpp);
@@ -629,32 +628,36 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 	//write to HW
 	//
 #if 1
-	if(UseSOsdHwBuff) 
+	if (UseSOsdHwBuff) 
 	{
-		if(header->rle)
+		if (header->rle)
 			SOsdHwBuffSetRle(sosd_win,header->bpp,header->rle);
 		SOsdHwBuffSetLut(sosd_win, /*header->lut_type,*/ item_lut, header->lut_size, header->lut_loc);
 	
 		//pixel alpha blending. after load Palette
-		if(image->alpha != 0xFF)
+		if (image->alpha != 0xFF)
 			SOsdHwBuffSetAlpha(sosd_win, item_lut+image->alpha);
 
 		SOsdWinBuffWrite2Hw(sosd_win, sosd_win); //SOsdHwBuffWrite2Hw();
 		UseSOsdHwBuff = 0;
 
 		//update ALPHA
-		if(SOsdHwBuff_alpha_A != 0xFFFF) {
+		if (SOsdHwBuff_alpha_A != 0xFFFF)
+		{
 			WriteTW88Page(4);
 			WriteTW88(REG410, 0xc3 );    		// LUT Write Mode, En & byte ptr inc.
 
-			if(SOsdHwBuff_alpha_A >> 8)	WriteTW88(REG410, ReadTW88(REG410) | 0x08);	//support 512 palette
-			else            			WriteTW88(REG410, ReadTW88(REG410) & 0xF7);
+			if (SOsdHwBuff_alpha_A >> 8)
+				WriteTW88(REG410, ReadTW88(REG410) | 0x08);	//support 512 palette
+			else
+				WriteTW88(REG410, ReadTW88(REG410) & 0xF7);
 			WriteTW88(REG411, (BYTE)SOsdHwBuff_alpha_A ); 	// alpha index
 			WriteTW88(REG412, 0x7F/*value*/ ); 			// alpha value
 
 			SOsdHwBuff_alpha_A = 0xFFFF;
 		}
-		if(SOsdHwBuff_alpha_B != 0xFFFF) {
+		if (SOsdHwBuff_alpha_B != 0xFFFF)
+		{
 			WriteTW88Page(4);
 			WriteTW88(REG410, 0xc3 | 0x04);    		// LUT Write Mode, En & byte ptr inc.
 
@@ -670,10 +673,11 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 #if 1
 	{
 		//WaitVBlank(1);
-		if(header->rle) {	//need RLE ?
+		if (header->rle) {	//need RLE ?
 			SpiOsdRlcReg( sosd_win, header->bpp,header->rle);
 		}	
-		else {
+		else
+		{
 			//We using RLE only on the background.
 			//if(item == 0) {
 			//	SpiOsdDisableRlcReg(??winno)
@@ -689,10 +693,8 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 		//WaitVBlank(1);
 		//update HW
 		SOsdWinBuffWrite2Hw(sosd_win, sosd_win);
-	
 	}
 #endif
 }
-
 
 #endif //..SUPPORT_SPIOSD

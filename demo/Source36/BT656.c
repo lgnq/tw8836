@@ -204,10 +204,13 @@ void BT656_SyncWidth(BYTE h, BYTE v)
 void BT656_A_SelectOutput(BYTE mode,BYTE hPol,BYTE vPol, BYTE hv_sel)
 {
 	BYTE bTemp;
+	
 	WriteTW88Page(1);
 	bTemp = mode << 4;
-	if(hPol==0) bTemp |= 0x08;
-	if(vPol==0) bTemp |= 0x04;
+	if (hPol==0)
+		bTemp |= 0x08;
+	if (vPol==0)
+		bTemp |= 0x04;
 	bTemp |= hv_sel;
 	WriteTW88(REG105,bTemp);
 }
@@ -255,15 +258,18 @@ void BT656_A_SetLLCLK_Pol(BYTE pol)
 	bTemp |= pol << 1;
 	WriteTW88(REG1E9,bTemp);
 }
+
 void BT656_A_SelectCLKO(BYTE mode, BYTE YOut)
 {
 	BYTE bTemp;
+	
 	WriteTW88Page(1);
 	bTemp = ReadTW88(REG1E9) & 0x1F;
 	bTemp = mode << 6;
 	bTemp |= YOut << 5;
 	WriteTW88(REG1E9,bTemp);
 }
+
 void BT656_A_Set_CK54(BYTE fOn)
 {
 	BYTE bTemp;

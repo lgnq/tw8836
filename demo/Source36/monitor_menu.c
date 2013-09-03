@@ -438,16 +438,19 @@ void MonitorSOsd(void)
 		}	
 	}
 	//-------<<img0 win# lut#>>-----------------------------
-	else if(!stricmp( argv[1], "img")) {
+	else if(!stricmp( argv[1], "img"))
+	{
 		BYTE img_n,winno;
 		WORD lut;
-		if(argc < 5)
+
+		if (argc < 5)
 			Printf("\nInvalid command...");		 
-		else {
-			img_n=a2i(argv[2]);
-			lut  =a2i(argv[3]);
+		else
+		{
+			img_n = a2i(argv[2]);
+			lut   = a2i(argv[3]);
 			winno = a2i(argv[4]);
-			MonOsdImgLoad(img_n,winno,lut);
+			MonOsdImgLoad(img_n, winno, lut);
 		}	
 	}
 	//-------<<img1 win# lut#>>-----------------------------

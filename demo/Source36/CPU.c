@@ -26,11 +26,11 @@
 #ifdef DEBUG_ISR
 XDATA WORD INTR_counter[21];
 #endif
+
 #ifdef DEBUG_UART
 XDATA BYTE UART0_OVERFLOW_counter;
 XDATA BYTE UART0_MAX_counter;
 #endif
-
 
 //===== Timer =======
 //NOTE: To read ISR related value, use SFR_EA.
@@ -522,11 +522,13 @@ void uart0_int(void) interrupt 4 using 1
 //*      Timer 2 Interrupt 								: <<Remo Timer>>
 //****************************************************************************
 #ifdef REMO_RC5
+
 #ifdef DEBUG_REMO
 BYTE RemoCapture0[14+1];
 BYTE RemoCapture1[14+1];
 BYTE RemoCapture2[14+1];
 #endif
+
 /**
 * timer2 interrupt service routine
 *
@@ -538,17 +540,20 @@ BYTE RemoCapture2[14+1];
 */
 void timer2_int(void) interrupt 5 using 1			// using register block 3
 {
-	BYTE	i;
+	BYTE i;
 	bit sample;
 
-	SFR_EA=0;	//NOTE:I am using EA, Do NOT USE SFR_ET2.
+	SFR_EA = 0;	//NOTE:I am using EA, Do NOT USE SFR_ET2.
+
 #ifdef DEBUG_ISR
 	MCU_INT_STATUS |= 0x0020;
 	INTR_counter[5]++;
 #endif
-	if(access==0) {
+
+	if (access == 0)
+	{
 		SFR_T2IF &= 0xfc;			// Clear Interrupt Flag
-		SFR_EA=1;
+		SFR_EA = 1;
 		return;
 	}
 
@@ -559,23 +564,26 @@ void timer2_int(void) interrupt 5 using 1			// using register block 3
 	RemoTic++;
 
 #ifdef DEBUG_REMO
-	if(RemoTic==5) {
-		if(RemoCaptureDisable==0)
+	if (RemoTic == 5)
+	{
+		if (RemoCaptureDisable == 0)
 			RemoCapture0[0] = 0x0F; //valid 0..4	
-		if(RemoCaptureDisable==1)
+		if (RemoCaptureDisable == 1)
 			RemoCapture1[0] = 0x0F;	
-		if(RemoCaptureDisable==2)
+		if (RemoCaptureDisable == 2)
 			RemoCapture2[0] = 0x0F;	
 	}
 
 	i = (RemoTic & 0x07);
-	if(RemoTic <= 8*14) {
-		if(sample) {
-			if(RemoCaptureDisable==0)
+	if (RemoTic <= 8*14)
+	{
+		if (sample)
+		{
+			if (RemoCaptureDisable == 0)
 				RemoCapture0[RemoTic >> 3] |= (1 << i);	
-			if(RemoCaptureDisable==1)
+			if (RemoCaptureDisable == 1)
 				RemoCapture1[RemoTic >> 3] |= (1 << i);	
-			if(RemoCaptureDisable==2)
+			if (RemoCaptureDisable == 2)
 				RemoCapture2[RemoTic >> 3] |= (1 << i);	
 		}
 	}
@@ -586,11 +594,15 @@ void timer2_int(void) interrupt 5 using 1			// using register block 3
 	//       At frist time, The RemoTic will be 5, and RemoPhase2 has to be 1.
 	//---------------------------
 	i = RemoTic & 0x07;
-	if     ( i==1 ) RemoPhase1 = sample; //REMO_IN;
-	else if( i==5 )	RemoPhase2 = sample; //REMO_IN;
+	if (i == 1)
+		RemoPhase1 = sample; //REMO_IN;
+	else if (i == 5)
+		RemoPhase2 = sample; //REMO_IN;
 	//----- Received 1 Bit -----
-	else if( i==0 ) {	//every 8 RemoTic
-		if( RemoPhase1==RemoPhase2 ) {	// error
+	else if (i == 0)
+	{	//every 8 RemoTic
+		if (RemoPhase1 == RemoPhase2)
+		{	// error
 			SFR_ET2=0;
 
 			ClearRemoTimer();			
@@ -599,23 +611,30 @@ void timer2_int(void) interrupt 5 using 1			// using register block 3
 			SFR_EA=1;
 			return;
 		}
-		if( RemoTic<=(8*8) ) {				// SystemCode. Start1+Start2 + Toggle + 5 BIT ADDRESS
-			RemoSystemCode <<=1;
-			if( RemoPhase1==1 && RemoPhase2==0 )
+		if (RemoTic <= (8*8))
+		{				// SystemCode. Start1+Start2 + Toggle + 5 BIT ADDRESS
+			RemoSystemCode <<= 1;
+			if (RemoPhase1==1 && RemoPhase2==0)
 				RemoSystemCode |=1;
 		}
-		else {								// DataCode.  6 BIT COMMAND
+		else
+		{								// DataCode.  6 BIT COMMAND
 			RemoDataCode <<=1;
-			if( RemoPhase1==1 && RemoPhase2==0 )
-				RemoDataCode |=1;
+			if (RemoPhase1==1 && RemoPhase2==0)
+				RemoDataCode |= 1;
 		}
 		//----- Received 1 Packet -----
-		if( RemoTic >= (8*14) ) {
+		if (RemoTic >= (8*14))
+		{
 			RemoDataReady++;	// RemoDataReady = 1;				// new key
+
 #ifdef DEBUG_REMO
-			if(RemoCaptureDisable==0) {  RemoSystemCode0 = RemoSystemCode; RemoDataCode0 = RemoDataCode; }
-			if(RemoCaptureDisable==1) {  RemoSystemCode1 = RemoSystemCode; RemoDataCode1 = RemoDataCode; }
-			if(RemoCaptureDisable==2) {  RemoSystemCode2 = RemoSystemCode; RemoDataCode2 = RemoDataCode; }
+			if (RemoCaptureDisable==0)
+				{  RemoSystemCode0 = RemoSystemCode; RemoDataCode0 = RemoDataCode; }
+			if (RemoCaptureDisable==1)
+				{  RemoSystemCode1 = RemoSystemCode; RemoDataCode1 = RemoDataCode; }
+			if (RemoCaptureDisable==2)
+				{  RemoSystemCode2 = RemoSystemCode; RemoDataCode2 = RemoDataCode; }
 			RemoCaptureDisable++;
 #endif
 			RemoReceivedTime = SystemClock;
@@ -625,9 +644,10 @@ void timer2_int(void) interrupt 5 using 1			// using register block 3
 			ClearRemoTimer();				
 		}
 	}
-	SFR_EA=1;
+	SFR_EA = 1;
 }
 #endif //..REMO_RC5
+
 #ifdef REMO_NEC
 void timer2_int(void) interrupt 5 using 1			// using register block 3
 {
@@ -1468,7 +1488,7 @@ void InitCPU(void)
 	WriteTW88Page(PAGE4_CLOCK);
 
 	WriteTW88(REG4E2, 0x69);		// Timer0 Divider : system tic 0. 
-	WriteTW88(REG4E3, 0x78);		// 27M/27000 = 1msec
+	WriteTW88(REG4E3, 0x78);		// 27M/27000(0x6978) = 1msec
 
 	WriteTW88(REG4E4, 0x01);		// Timer1 Divider : for Touch
 	WriteTW88(REG4E5, 0x0e);		// 27M/270 = 10usec	
@@ -1477,16 +1497,15 @@ void InitCPU(void)
 	WriteTW88(REG4E7, 0x1b);		// 27M/27 = 1usec
 
 	WriteTW88(REG4E8, 0);			// Timer3 Divider : baudrate for UART0
-	WriteTW88(REG4E9, 0x0c);		// (22.1184M/16) / 12 = 115200bps on SM0=1	
+	WriteTW88(REG4E9, 0x0c);		// (22.1184M / 16) / 12 = 115200bps on SM0=1	
 
 	WriteTW88(REG4EA, 0);			// Timer4 Divider : baudrate for UART1
 	WriteTW88(REG4EB, 0x0c);		// (22.1184M/16) / 12 = 115200bps on SM1=1	
 
 #ifdef DEBUG_ISR
-	for(i=0; i < 21; i++)
-		INTR_counter[i]=0;
+	for (i=0; i < 21; i++)
+		INTR_counter[i] = 0;
 #endif
-
 
 	//---------- Initialize interrupt -------------
 	SFR_CKCON = 0x00;		// Clock control register			
@@ -1572,12 +1591,14 @@ void InitCPU(void)
 	SFR_ET2  = 0;			// Timer2	: Remote
 	SFR_ES   = 1;			// UART0  	: Debug port
 	SFR_UART0FIFO = 0x80;	//          : UART0 FIFO
+	
 #ifdef SUPPORT_UART1
 	SFR_ES1  = 1;			// UART1  	: External MCU
 	SFR_UART1FIFO = 0x80;	//          : UART1 FIFO
 #else
 	SFR_ES1  = 0;			// UART1  	: External MCU
 #endif
+
 	SFR_EA   = 1;			// Global Interrupt
 
 	//---------- Extended Interrupt -------------------
@@ -1621,9 +1642,10 @@ void InitCPU(void)
 //#else
 	Puts(" SFR EX0 ET0 EA EINT4");
 //#endif
+
 #ifdef MODEL_TW8836FPGA
 	//TW8836 don't have PORT_NOINIT_MODE. FW starts as NOINIT
-	SFR_EX0=0;
+	SFR_EX0 = 0;
 	Printf("\nSKIP EX0");
 #endif
 }

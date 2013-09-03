@@ -8,7 +8,7 @@
 // manifast
 //---------------------------------
 #define FOSD_MAX_OSDRAM_SIZE	512
-#define FOSD_MAX_OSDWIN		8
+#define FOSD_MAX_OSDWIN			8
 #define	FOSD_MAX_LUT			64
 #define FOSD_MAX_FONTRAMSIZE	(10*1024)	//bytes
 

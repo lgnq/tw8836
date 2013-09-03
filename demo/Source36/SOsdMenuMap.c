@@ -50,21 +50,18 @@
 #include "Settings.h"
 #include "Demo.h"
 
-
 //for PANEL_AUO_B133EW01
-#if (PANEL_H==1280)
+#if (PANEL_H == 1280)
 #define X_START		240
 #else
 #define X_START		0
 #endif
 
-#if (PANEL_V==800)
+#if (PANEL_V == 800)
 #define Y_START		160
 #else
 #define Y_START		0
 #endif
-
-
 
 #ifdef SUPPORT_SPIOSD																			  
 //==========================
@@ -90,21 +87,31 @@
 //focused(pressed): use SOSD_WIN8
 //				
 
-code struct menu_sitem_info_s menu_main_page_items[]= {												            //  ^ < V > 
-{ TYPE_BG, proc_main_bg,	X_START+0,Y_START+0, 	  ALIGN_TOPLEFT,	&img_main_bg,NULL,     					0,SOSD_WIN1,0x000,  0,0,0,0 },	//0
+code struct menu_sitem_info_s menu_main_page_items[]=
+{	//OsdType linked func       startX       startY       align          focused image      pressed image  image t win        lut    U  L  D  R 
+	{TYPE_BG, proc_main_bg,	    X_START+0,   Y_START+0,   ALIGN_TOPLEFT, &img_main_bg,      NULL,               0, SOSD_WIN1, 0x000, 0, 0, 0, 0},	//0
 
-{ 0, proc_demo_icon,  		X_START+697, Y_START+424, ALIGN_CENTER,  	&img_navi_demo,&img_navi_demo1,  		0,SOSD_WIN8,0x100,  6,2,3,2 },	//1	
-{ 0, proc_exit_icon,  		X_START+750, Y_START+424, ALIGN_CENTER,  	&img_navi_close,&img_navi_close1,  		0,SOSD_WIN8,0x100,  6,1,3,1 },	//2	
+	{0,       proc_demo_icon,  	X_START+697, Y_START+424, ALIGN_CENTER,  &img_navi_demo,    &img_navi_demo1,    0, SOSD_WIN8, 0x100, 6, 2, 3, 2},	//1	
+	{0,       proc_exit_icon,  	X_START+750, Y_START+424, ALIGN_CENTER,  &img_navi_close,   &img_navi_close1,   0, SOSD_WIN8, 0x100, 6, 1, 3, 1},	//2	
 
-{ 0, proc_main_input, 		X_START+149, Y_START+89,  ALIGN_CENTER, 	&img_main_input,&img_main_input1,  		0,SOSD_WIN8,0x100,  6,5,6,4 },	//3	
-{ 0, proc_main_audio, 		X_START+350, Y_START+84,  ALIGN_CENTER, 	&img_main_audio,&img_main_audio1,  		0,SOSD_WIN8,0x100,  7,3,7,5 },	//4
-{ 0, proc_main_system,		X_START+544, Y_START+84,  ALIGN_CENTER, 	&img_main_system,&img_main_system1, 	0,SOSD_WIN8,0x100,  8,4,8,3 },	//5
-{ 0, proc_main_gps, 		X_START+147, Y_START+242, ALIGN_CENTER, 	&img_main_gps,&img_main_gps1,    		0,SOSD_WIN8,0x100,  3,8,2,7 },	//6   
-{ 0, proc_main_phone, 		X_START+351, Y_START+243, ALIGN_CENTER, 	&img_main_phone,&img_main_phone1,  		0,SOSD_WIN8,0x100,  4,6,2,8 },	//7
-{ 0, proc_main_info,  		X_START+551, Y_START+246, ALIGN_CENTER, 	&img_main_carinfo,&img_main_carinfo1,  	0,SOSD_WIN8,0x100,  5,7,2,6 }	//8
-
+	{0,       proc_main_input, 	X_START+149, Y_START+89,  ALIGN_CENTER,  &img_main_input,   &img_main_input1,   0, SOSD_WIN8, 0x100, 6, 5, 6, 4},	//3	
+	{0,       proc_main_audio, 	X_START+350, Y_START+84,  ALIGN_CENTER,  &img_main_audio,   &img_main_audio1,   0, SOSD_WIN8, 0x100, 7, 3, 7, 5},	//4
+	{0,       proc_main_system,	X_START+544, Y_START+84,  ALIGN_CENTER,  &img_main_system,  &img_main_system1,  0, SOSD_WIN8, 0x100, 8, 4, 8, 3},	//5
+	{0,       proc_main_gps, 	X_START+147, Y_START+242, ALIGN_CENTER,  &img_main_gps,     &img_main_gps1,     0, SOSD_WIN8, 0x100, 3, 8, 2, 7},	//6   
+	{0,       proc_main_phone, 	X_START+351, Y_START+243, ALIGN_CENTER,  &img_main_phone,   &img_main_phone1,   0, SOSD_WIN8, 0x100, 4, 6, 2, 8},	//7
+	{0,       proc_main_info,  	X_START+551, Y_START+246, ALIGN_CENTER,  &img_main_carinfo, &img_main_carinfo1, 0, SOSD_WIN8, 0x100, 5, 7, 2, 6}	//8
 };
-struct menu_page_info_s menu_main_page = {	MENU_TYPE_NORMAL, 3,3, 3,6,	menu_main_page_items, NULL };			
+
+struct menu_page_info_s menu_main_page = 
+{
+	MENU_TYPE_NORMAL,		//type
+	3,						//focus
+	3,						//select
+	3,						//item start
+	6,						//item total
+	menu_main_page_items,	//sosd items
+	NULL					//fosd items
+};			
 
 
 //==========================
@@ -185,10 +192,11 @@ struct menu_page_info_s menu_input_page = {	MENU_TYPE_SCRLDN | MENU_TYPE_NOTE, 5
 //main->audio
 //------------------------------------------
 //description
-code struct menu_sitem_info_s menu_audio_page_items[] = {
-{ TYPE_BG,proc_audio_bg,	X_START+0,Y_START+0,	ALIGN_TOPLEFT,	&img_audio_bg,NULL,						0,SOSD_WIN1,0x000,  0,0,0,0},
-{ 0,proc_return_icon,		X_START+697,Y_START+423,ALIGN_TOPLEFT,	&img_navi_return,&img_navi_return1,		0,SOSD_WIN8,0x100,  2,2,2,2},
-{ 0,proc_exit_icon,			X_START+750,Y_START+423,ALIGN_TOPLEFT,	&img_navi_close,&img_navi_close1,		0,SOSD_WIN8,0x100,  1,1,1,1}
+code struct menu_sitem_info_s menu_audio_page_items[] = 
+{
+	{ TYPE_BG,proc_audio_bg,	X_START+0,Y_START+0,	ALIGN_TOPLEFT,	&img_audio_bg,NULL,						0,SOSD_WIN1,0x000,  0,0,0,0},
+	{ 0,proc_return_icon,		X_START+697,Y_START+423,ALIGN_TOPLEFT,	&img_navi_return,&img_navi_return1,		0,SOSD_WIN8,0x100,  2,2,2,2},
+	{ 0,proc_exit_icon,			X_START+750,Y_START+423,ALIGN_TOPLEFT,	&img_navi_close,&img_navi_close1,		0,SOSD_WIN8,0x100,  1,1,1,1}
 };	  
 struct menu_page_info_s menu_audio_page = { MENU_TYPE_NORMAL,1,1, 3,0,	menu_audio_page_items, NULL };		
 

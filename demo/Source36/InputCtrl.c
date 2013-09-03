@@ -216,46 +216,54 @@ void InputSetSource(BYTE path, BYTE format)
 {
 	BYTE r040, r041;
 
-	WriteTW88Page( PAGE0_GENERAL );
+	WriteTW88Page(PAGE0_GENERAL);
 	r040 = ReadTW88(REG040_INPUT_CTRL_I) & ~0x17;	//clear [2] also.
 	r041 = ReadTW88(REG041_INPUT_CTRL_II) & ~0x3F;
 	r040 |= path;
 	r041 |= format;
 
-	if(path==INPUT_PATH_DECODER) {		//InternalDecoder
+	if (path == INPUT_PATH_DECODER)		//InternalDecoder
+	{
 		r041 |= 0x0C;					//input sync detion edge control. falling edge
 	}
-	else if(path==INPUT_PATH_VADC) {	//ARGB(PC or Component)
+	else if (path == INPUT_PATH_VADC) 	//ARGB(PC or Component)
+	{
 		r040 |= 0x10;					//invert clock
-		if(InputMain==INPUT_COMP) {
+		if (InputMain == INPUT_COMP)
+		{
 			r041 |= 0x20;				//progressive
 			r041 |= 0x10;				//implicit DE mode.(Component, don't care)
 			r041 |= 0x0C;				//input sync detion edge control. falling edge
 			r041 |= 0x02;				//input field inversion
 		}
-		else {
+		else
+		{
 			//??r041 |= 0x20;			//progressive
 			r041 |= 0x10;				//implicit DE mode.(Component, don't care)
 			r041 |= 0x0C;				//input sync detion edge control. falling edge
 		}
 	}
-	else if(path==INPUT_PATH_DTV) {		//DTV
+	else if (path == INPUT_PATH_DTV)	//DTV
+	{
 										//clock normal
 		r040 |= 0x08;					//INT_4 pin is turn into dtvde pin
 		//r041 |= 0x20;					// progressive
 		r041 |= 0x10;					//implicit DE mode
 		//r041 |= 0x0C;					//input sync detion edge control. falling edge
 	}
-	else if(path==INPUT_PATH_LVDS) {	//LVDS_RX
+	else if (path == INPUT_PATH_LVDS) 	//LVDS_RX
+	{
 		r040 |= 0x08;					//INT_4 pin is turn into dtvde pin
 		r041 |= 0x10;					//implicit DE mode
 	}
-	else if(path==INPUT_PATH_BT656) {
+	else if (path == INPUT_PATH_BT656)
+	{
 		//target r040:0x06 r041:0x00
 	}
+	
 	dPrintf("\nInputSetSource r040:%bx r041:%bx",r040,r041);
-	WriteTW88(REG040_INPUT_CTRL_I,r040);
-	WriteTW88(REG041_INPUT_CTRL_II,r041);
+	WriteTW88(REG040_INPUT_CTRL_I, r040);
+	WriteTW88(REG041_INPUT_CTRL_II, r041);
 }
 
 #ifdef UNCALLED_SEGMENT
@@ -508,7 +516,6 @@ void BT656InputFreerunClk(BYTE fFreerun, BYTE fInvClk)
 	WriteTW88(REG047, value);
 }
 
-
 //-----------------------------------------------------------------------------
 /**
 * Change Video Input.
@@ -524,16 +531,16 @@ void BT656InputFreerunClk(BYTE fFreerun, BYTE fInvClk)
 *	- INPUT_BT656: ChangeBT656
 * @see ChangeCVBS
 */
-void ChangeInput( BYTE mode )
+void ChangeInput(BYTE mode)
 {
 	Printf("\nChangeInput:");
-	PrintfInput(mode,0);
+	PrintfInput(mode, 0);
 
-	if(getNoSignalLogoStatus())
+	if (getNoSignalLogoStatus())
 		RemoveLogo();
 
-
-	switch ( mode ) {
+	switch (mode)
+	{
 #ifdef SUPPORT_CVBS
 		case INPUT_CVBS:
 			ChangeCVBS();
@@ -580,6 +587,7 @@ void ChangeInput( BYTE mode )
 			break;
 	}
 }
+
 //-----------------------------------------------------------------------------
 /**
 * move to next video input
@@ -685,10 +693,10 @@ void InitInputAsDefault(void)
  	//dPuts("\nI2CDownload DataInitNTSC");
 	//I2CDeviceInitialize( DataInitNTSC, 0 );	 //Pls, do not use this ....
 
-	Init8836AsDefault(InputMain,0);
+	Init8836AsDefault(InputMain, 0);
 
-
-	if(SpiFlashVendor==SFLASH_VENDOR_MX) {
+	if (SpiFlashVendor == SFLASH_VENDOR_MX)
+	{
 		WriteTW88Page(PAGE4_CLOCK);
 		WriteTW88(REG4E1, (ReadTW88(REG4E1) & 0xF8) | 0x02);	//if Macronix SPI Flash, SPI_CK_DIV[2:0]=2
 	}		
@@ -703,29 +711,30 @@ void InitInputAsDefault(void)
 	//-------------------
 
 	//InputSource  (InMux)
-	switch(InputMain) {
+	switch (InputMain)
+	{
 	case INPUT_CVBS:
 	case INPUT_SVIDEO:
-		InputSetSource(INPUT_PATH_DECODER,INPUT_FORMAT_YCBCR);
+		InputSetSource(INPUT_PATH_DECODER, INPUT_FORMAT_YCBCR);
 		break;
 	case INPUT_COMP:	//target R040:31 R041:3E
-		InputSetSource(INPUT_PATH_VADC,INPUT_FORMAT_YCBCR);		
+		InputSetSource(INPUT_PATH_VADC, INPUT_FORMAT_YCBCR);		
 		break;
 	case INPUT_PC:		//target R040:31 R041:1D
-		InputSetSource(INPUT_PATH_VADC,INPUT_FORMAT_RGB);		
+		InputSetSource(INPUT_PATH_VADC, INPUT_FORMAT_RGB);		
 		break;
 	case INPUT_DVI:		//target R040:2A R041:11. Note:DtvInitDVI() overwite R040.
-		InputSetSource(INPUT_PATH_DTV,INPUT_FORMAT_RGB);		
+		InputSetSource(INPUT_PATH_DTV, INPUT_FORMAT_RGB);		
 		break;
 	case INPUT_HDMIPC:
 	case INPUT_HDMITV:	//target R040: R041:
-		InputSetSource(INPUT_PATH_DTV,INPUT_FORMAT_RGB);		
+		InputSetSource(INPUT_PATH_DTV, INPUT_FORMAT_RGB);		
 		break;
 	case INPUT_BT656:	//target R040:2A R041:00
-		InputSetSource(INPUT_PATH_BT656,INPUT_FORMAT_YCBCR);	 
+		InputSetSource(INPUT_PATH_BT656, INPUT_FORMAT_YCBCR);	 
 		break;
 	case INPUT_LVDS:	//target R040:2A R041:00
-		InputSetSource(INPUT_PATH_LVDS,INPUT_FORMAT_RGB);	 
+		InputSetSource(INPUT_PATH_LVDS, INPUT_FORMAT_RGB);	 
 //		InputSetSource(INPUT_PATH_DTV,INPUT_FORMAT_RGB);	 
 		break;
 	}
@@ -739,16 +748,16 @@ void InitInputAsDefault(void)
 	//aRGB(VAdc)
 	aRGB_SetDefaultFor();
 
-
 //	if(InputMain==INPUT_BT656)
-		BT656OutputEnable(ON,0);			//R007[3]=1.DataInitNTSC clear it.
-		BT656_A_SelectOutput(0, 0,0, 1);
-		BT656_A_SelectCLKO(0,0);
+		BT656OutputEnable(ON, 0);			//R007[3]=1.DataInitNTSC clear it.
+		BT656_A_SelectOutput(0, 0, 0, 1);
+		BT656_A_SelectCLKO(0, 0);
 //	else
 //		BT656OutputEnable(OFF, 1);
 
 	//BT656Input
-	switch(InputMain) {
+	switch (InputMain)
+	{
 	case INPUT_CVBS:
 	case INPUT_SVIDEO:
 	case INPUT_COMP:
@@ -772,7 +781,8 @@ void InitInputAsDefault(void)
 	}
 
 	//DTV
-	switch(InputMain) {
+	switch (InputMain)
+	{
 	case INPUT_CVBS:
 	case INPUT_SVIDEO:
 	case INPUT_COMP:
@@ -836,7 +846,8 @@ void InitInputAsDefault(void)
 
 
 	//LVDSRx
-	switch(InputMain) {
+	switch (InputMain)
+	{
 	case INPUT_CVBS:
 	case INPUT_SVIDEO:
 	case INPUT_COMP:
@@ -865,7 +876,8 @@ void InitInputAsDefault(void)
 	ScalerSetFreerunManual( OFF );		//component,pc,dvi removed
 
 	//measure
-	switch(InputMain) {
+	switch (InputMain)
+	{
 	case INPUT_CVBS:
 	case INPUT_SVIDEO:
 	case INPUT_COMP:
@@ -908,9 +920,7 @@ void InitInputAsDefault(void)
 	//---------------------------
 	//BT656 Output
 	//---------------------------
-
 }
-
 
 //-----------------------------------------------------------------------------
 /**

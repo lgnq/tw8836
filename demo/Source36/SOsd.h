@@ -11,7 +11,8 @@
 //		RLE Type Definition
 //=============================================================================
 
-struct _RLE_HEADER {
+struct _RLE_HEADER 
+{
     BYTE id[2];     			// id='TW' 
     BYTE c;  					// LUT | bits/pixel
     BYTE cp; 					// compression info = data bits | count bits      
@@ -20,13 +21,15 @@ struct _RLE_HEADER {
     DWORD size;					// size (little endian)
     CODE_P BYTE *bmp;   		//
 } ;
+
 //=============================================================================
 //		Animation Structure
 //=============================================================================
 
 #define MAX_ANIMATION	4
 
-struct st_animation {
+struct st_animation 
+{
 	BYTE active;
 	BYTE current;
 	BYTE speed;					// fixable
@@ -37,10 +40,8 @@ struct st_animation {
 	WORD srcx[10], srcy[10];	// fixable
 };
 
-
 extern BYTE string_zoom_x;
 extern BYTE string_zoom_y;
-
 
 //=============================================================================
 //		OSD Register Definition
@@ -95,7 +96,6 @@ extern BYTE string_zoom_y;
 #define SPI_WIN7_ST				REG4A0
 #define SPI_WIN8_ST				REG4B0
 
-
 #define SPI_OSDWIN_SCREEN				0x01
 #define	SPI_OSDWIN_BUFFERSTART			0x07
 #define SPI_OSDWIN_BUFFERSTART_BIT		0x0A
@@ -106,11 +106,6 @@ extern BYTE string_zoom_y;
 #define SPI_OSDWIN_FILLCOLOR			0x0E	//436(42E+8), 44E
 #define	SPI_OSDWIN_ANIMATION			0x12    //432
 //---------------------------------------------
-
-
-
-
-
 
 //---------- Window Definition -------------
 #define OSDWIN_ENABLE		0x00
@@ -159,8 +154,6 @@ extern BYTE string_zoom_y;
 #define OSD16_RGB4444		0x04
 #define OSD16_RGB1555		0x06
 
-
-
 void OsdWinDisplay			(BYTE mode);
 
 BYTE OsdWinBase 			(BYTE winno);
@@ -200,14 +193,6 @@ void OsdNoWriteColor		( BYTE index, WORD color);
 #define OSD_WMODE_BLOCKTRANSFER		0x40
 #define OSD_WMODE_BLOCKFILL			0x80
 #define OSD_WMODE_BLOCKTRANSFERL	0xc0
-
-
-
-
-
-
-
-
 
 //void OsdWriteMode(BYTE mode);
 void OsdStart(BYTE en);
@@ -308,6 +293,5 @@ void SOsdHwBuffSetLut(BYTE win, /*BYTE type,*/  WORD LutOffset, WORD size, DWORD
 void SOsdHwBuffSetRle(BYTE win, BYTE bpp, BYTE count);
 void SOsdHwBuffSetAlpha(BYTE win, WORD alpha);
 void SOsdHwBuffWrite2Hw(void);
-
 
 #endif // __OSD_H__

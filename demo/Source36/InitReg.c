@@ -31,8 +31,8 @@
 #endif
 #include "BT656.h"
 
-
-typedef struct REG_IDX_DATA_s {
+typedef struct REG_IDX_DATA_s
+{
 	WORD idx;
 	BYTE value;
 } REG_IDX_DATA_t;
@@ -302,16 +302,19 @@ code REG_IDX_DATA_t InitDefault_Table[] =
 	{0x20E, 0x30},
 	{0x20F, 0x02},	//0x00
 	{0x210, 0x30},	//0x21  BK130122
-#if (PANEL_H==1280)
+
+#if (PANEL_H == 1280)
 	{0x211, 0x01},	//1280+1
 	{0x212, 0x05},
 #else
 	{0x211, 0x21},
 	{0x212, 0x03},
 #endif
+
 	{0x213, 0x00},	 //0x10
 	{0x214, 0x0A},	 //0x20
 	{0x215, 0x20},
+
 #if (PANEL_V==800)
 	{0x216, 0x20},	//800
 	{0x217, 0x03},
@@ -319,6 +322,7 @@ code REG_IDX_DATA_t InitDefault_Table[] =
 	{0x216, 0xE0},
 	{0x217, 0x01},
 #endif
+
 	{0x218, 0x00},
 	{0x219, 0x27},
 	{0x21A, 0x00},
@@ -378,6 +382,7 @@ code REG_IDX_DATA_t InitDefault_Table[] =
 	//8bit PANEL Interface
 	{0x2F8, 0x00},
 	{0x2F9, 0x80},
+
 	//-----------------
 	//FOSD
 // Font download have to be exec when 
@@ -425,8 +430,8 @@ code REG_IDX_DATA_t Recover_Decoder[] =
 	{0xFFF, 0xFF}	//EOF
 };
 
-
-code REG_IDX_DATA_t Recover_aRGB[] = {
+code REG_IDX_DATA_t Recover_aRGB[] =
+{
 	{0x10C, 0xCC},	//DEC:0xCC,	aRGB:0xCC
 	{0x1E3, 0x37},	//DEC:0x07, aREG:0x37
 	{0x1E4, 0x55},	//DEC:0x33, aREG:0x55
@@ -443,10 +448,11 @@ code REG_IDX_DATA_t Recover_aRGB[] = {
 */
 static void Init8836Register(REG_IDX_DATA_t *pTbl)
 {
-	while(1) {
-		if(pTbl->idx==0xFFF /*&& pTbl->value==0xFF*/)
+	while (1)
+	{
+		if (pTbl->idx == 0xFFF /*&& pTbl->value==0xFF*/)
 			break;
-		WriteTW88(pTbl->idx,pTbl->value);
+		WriteTW88(pTbl->idx, pTbl->value);
 		pTbl++;
 	}
 }
@@ -660,8 +666,10 @@ void InitComponentReg(BYTE mode)
 */
 void PrintfInput(BYTE Input, BYTE debug)
 {
-	if(debug <= DebugLevel) {
-		switch(Input) {
+	if (debug <= DebugLevel)
+	{
+		switch (Input)
+		{
 		case INPUT_CVBS: 	Printf("CVBS"); 				break;
 		case INPUT_SVIDEO: 	Printf("SVIDEO"); 				break;
 		case INPUT_COMP: 	Printf("Component"); 			break;
@@ -671,7 +679,7 @@ void PrintfInput(BYTE Input, BYTE debug)
 		case INPUT_HDMITV: 	Printf("HDMITV"); 				break;
 		case INPUT_BT656: 	Printf("BT656");				break;
 		case INPUT_LVDS: 	Printf("LVDSRx");				break;
-		default: 			Printf("unknown:%02bd",Input); 	break;
+		default: 			Printf("unknown:%02bd", Input);	break;
 		}
 	}
 }

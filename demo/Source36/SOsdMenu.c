@@ -395,14 +395,16 @@ void MenuPrepareImageHeader(struct image_item_info_s *image)
 {
 	menu_image_header_t *header = &header_table;
 
-	if(image->type==IMAGE_ITEM_TYPE_1) {
+	if (image->type == IMAGE_ITEM_TYPE_1)
+	{
 		//if we are using MREL, we need to skip 0x10 size.  
-		MenuReadRleHeader(image->loc,&rle_header);
+		MenuReadRleHeader(image->loc, &rle_header);
 		rle2_to_header(&rle_header);
 		header->lut_loc = image->loc + MRLE_INFO_SIZE;
 		header->image_loc = image->loc + header->lut_size + MRLE_INFO_SIZE;
 	}
-	else if(image->type==IMAGE_ITEM_TYPE_2){
+	else if (image->type == IMAGE_ITEM_TYPE_2)
+	{
 		//if we are using MREL, we need to skip 0x10 size.  
 		info_to_header(image->info);
 		header->lut_loc = image->loc;
@@ -410,7 +412,8 @@ void MenuPrepareImageHeader(struct image_item_info_s *image)
 		header->lut_loc += MRLE_INFO_SIZE;
 		header->image_loc += MRLE_INFO_SIZE;
 	}
-	else {
+	else
+	{
 		//old stype
 		info_to_header(image->info);
 		header->lut_loc = image->loc;
@@ -442,7 +445,6 @@ void InitLogo1(void)
 	WORD lut_loc;
 	BYTE FreeRunManual;
 
-
 //for PANEL_AUO_B133EW01
 #if (PANEL_H==1280)
 	WORD sx = 240;
@@ -454,7 +456,6 @@ void InitLogo1(void)
 #else
 	WORD sy = 0;
 #endif
-
 
 	eMenuPrintf("\nInitLog1");
 	NoSignalLogoShow = 1;
@@ -483,7 +484,8 @@ void InitLogo1(void)
 	SpiOsdWinImageLoc(WIN_LOGO, header->image_loc); 
 	SpiOsdWinImageSizeWH( WIN_LOGO, header->dx, header->dy );
 	SpiOsdWinScreen( WIN_LOGO, sx, sy, header->dx, header->dy );
-	if(WIN_LOGO==0) {
+	if (WIN_LOGO == 0)
+	{
 		SpiOsdWin0ImageOffsetXY( 0, 0 );
 		SpiOsdWin0Animation( 1, 0, 0, 0);
 	}
@@ -497,10 +499,11 @@ void InitLogo1(void)
 
 	//write to HW
 	WaitVBlank(1);
-	if(header->rle) {	//need RLE ?
+	if (header->rle) {	//need RLE ?
 		SpiOsdRlcReg( WIN_LOGO, header->bpp,header->rle);
 	}	
-	else {
+	else
+	{
 		//BK110203
 		//We using RLE only on the background.
 		//if(item == 0) 
@@ -510,6 +513,7 @@ void InitLogo1(void)
 	}
 	//update HW
 	SOsdWinBuffWrite2Hw(WIN_LOGO, WIN_LOGO);
+
 	//Load Palette
 	SpiOsdLoadLUT(WIN_LOGO, header->lut_type, lut_loc, header->lut_size, header->lut_loc, image->alpha);
 
@@ -836,22 +840,27 @@ void MenuDrawCurrString(BYTE itemno, BYTE *str)
 */
 void MenuDrawCurrImage(BYTE use1, BYTE item)
 {
-	WORD sx,sy;
+	WORD sx, sy;
 	menu_sitem_info_t *menu_item;
 	struct image_item_info_s *image;
 	BYTE sosd_win;
 	menu_image_header_t *header = &header_table;
 
 	menu_item = &curr_menu->items[item];
-	if(use1)	image = menu_item->image1;
-	else		image = menu_item->image;
-	if(image==NULL) {
+	if (use1)
+		image = menu_item->image1;
+	else
+		image = menu_item->image;
+	if (image == NULL)
+	{
 		eMenuPrintf("\nimage%bd NULL @ item:%bd",use1,item); 
 		return;
 	}
 
-	if(curr_menu == &menu_slider_page || curr_menu == &menu_slider3_page) {
-		if(item == 1) {
+	if (curr_menu == &menu_slider_page || curr_menu == &menu_slider3_page)
+	{
+		if (item == 1)
+		{
 			//slide title
 			image = slide_title_img;
 		}
@@ -870,52 +879,60 @@ void MenuDrawCurrImage(BYTE use1, BYTE item)
 	sosd_win = menu_item->win;   
 
 	//adjust sx,sy
-	if(menu_item->align != ALIGN_TOPLEFT) {
+	if (menu_item->align != ALIGN_TOPLEFT)
+	{
 		//please adjust new sx,sy
 	}
 
 	//fill out sosd_buff
-	SpiOsdWinImageLoc( sosd_win, header->image_loc); 
-	SpiOsdWinImageSizeWH( sosd_win, header->dx, header->dy );
-	SpiOsdWinScreen( sosd_win, sx, sy, header->dx, header->dy );
-	if(sosd_win==0) {
-		SpiOsdWin0ImageOffsetXY( 0, 0 );
-		SpiOsdWin0Animation( 1, 0, 0, 0);
+	SpiOsdWinImageLoc(sosd_win, header->image_loc); 
+	SpiOsdWinImageSizeWH(sosd_win, header->dx, header->dy);
+	SpiOsdWinScreen(sosd_win, sx, sy, header->dx, header->dy);
+	if (sosd_win == 0)
+	{
+		SpiOsdWin0ImageOffsetXY(0, 0);
+		SpiOsdWin0Animation(1, 0, 0, 0);
 	}
-	if(image->alpha != 0xFF)
-		SpiOsdWinPixelAlpha( sosd_win, ON );
-	else {
-		SpiOsdWinGlobalAlpha( sosd_win, 0 /*EE_Read(EEP_OSD_TRANSPARENCY)*/);
+	if (image->alpha != 0xFF)
+		SpiOsdWinPixelAlpha(sosd_win, ON);
+	else
+	{
+		SpiOsdWinGlobalAlpha(sosd_win, 0 /*EE_Read(EEP_OSD_TRANSPARENCY)*/);
 	}
 	SpiOsdWinPixelWidth(sosd_win, header->bpp);
-	SpiOsdWinLutOffset(sosd_win,menu_item->lut);
+	SpiOsdWinLutOffset(sosd_win, menu_item->lut);
 
-	SpiOsdWinBuffEnable( sosd_win, ON );
+	SpiOsdWinBuffEnable(sosd_win, ON);
 
-	if(UseSOsdHwBuff) {
+	if (UseSOsdHwBuff)
+	{
 		//
 		//write to buffer
 		//
-		if(header->rle)
+		if (header->rle)
 			SOsdHwBuffSetRle(sosd_win,header->bpp,header->rle);
 		SOsdHwBuffSetLut(sosd_win, /*header->lut_type,*/ menu_item->lut, header->lut_size, header->lut_loc);
 	
 		//pixel alpha blending. after load Palette
-		if(image->alpha != 0xFF)
+		if (image->alpha != 0xFF)
 			SOsdHwBuffSetAlpha(sosd_win, menu_item->lut+image->alpha);
 	}
-	else {
+	else
+	{
 		//
 		//write to HW
 		//
 
 		//WaitVBlank(1);
-		if(header->rle) {	//need RLE ?
-			SpiOsdRlcReg( sosd_win, header->bpp,header->rle);
+		if (header->rle) 	//need RLE ?
+		{
+			SpiOsdRlcReg(sosd_win, header->bpp, header->rle);
 		}	
-		else {
+		else
+		{
 			//We using RLE only on the background.
-			if(item == 0) {
+			if (item == 0)
+			{
 				SpiOsdDisableRlcReg(0);
 			}
 		}
@@ -1186,6 +1203,7 @@ void MenuFontOsdItemString(BYTE index, BYTE *str)
 void proc_menu_bg(void)
 {
 	BYTE curr_menu_type;
+
 	curr_menu_type = curr_menu->type & 0x0F;
 
 	CpuTouchSkipCount = 1*500*2;	//0.5 sec
@@ -1195,39 +1213,40 @@ void proc_menu_bg(void)
 	//SOsdWinBuffClean(0);
 	SOsdWinBuffClean(1);		//BK130104
 
-	MenuDrawCurrImage(0,0);									//draw background
-	if(curr_menu_type==MENU_TYPE_LIST 
-	|| curr_menu_type==MENU_TYPE_SCRLDN) {
+	MenuDrawCurrImage(0, 0);									//draw background
+	if (curr_menu_type==MENU_TYPE_LIST || curr_menu_type==MENU_TYPE_SCRLDN)
+	{
 		//update HW and clear UseSOsdHwBuff mode.
 		SOsdHwBuffWrite2Hw();
 		UseSOsdHwBuff = 0;
 
-		if(menu_lock_scroll==0) {
-			if(curr_menu_type == MENU_TYPE_LIST)
+		if (menu_lock_scroll == 0)
+		{
+			if (curr_menu_type == MENU_TYPE_LIST)
 				MenuDrawScrollImage(1, NAVI_KEY_RIGHT);		//left side
-			else if(curr_menu_type == MENU_TYPE_SCRLDN)
+			else if (curr_menu_type == MENU_TYPE_SCRLDN)
 				MenuDrawScrollImage(1, NAVI_KEY_DOWN);		//top topdown moving
-			else {
+			else
+			{
 				dMenuPrintf("\ninvalid curr_menu->type:%bx",curr_menu->type);
 				MenuDrawCurrImage(0,1);
 			}
-			menu_lock_scroll=1;
+			menu_lock_scroll = 1;
 		}
 		else
-			MenuDrawCurrImage(0,1);
-
+			MenuDrawCurrImage(0, 1);
 	}
-	MenuDrawCurrImage(0,curr_menu->focus);			//draw focused item
+	MenuDrawCurrImage(0, curr_menu->focus);			//draw focused item
 
-	if(curr_menu->type & MENU_TYPE_NOTE ) 			//draw selected note symbol(bar or point)
-		MenuDrawCurrImage(0,curr_menu->select+curr_menu->item_total);	//select
+	if (curr_menu->type & MENU_TYPE_NOTE) 			//draw selected note symbol(bar or point)
+		MenuDrawCurrImage(0, curr_menu->select+curr_menu->item_total);	//select
 
-	if(UseSOsdHwBuff) {
+	if (UseSOsdHwBuff)
+	{
 		SOsdHwBuffWrite2Hw();
 		UseSOsdHwBuff = 0;
 	}
 }
-
 
 //=========================
 // KEY & TOUCH
@@ -4852,7 +4871,6 @@ void MenuStart(void)
 
 	//init SOSD_WIN0 here
 
-
 	//Read EE values
 	//example:
 	//	MenuInputMain = GetInputMainEE();	//do not use, InputMain = GetInputEE(); in menu.c
@@ -4916,12 +4934,12 @@ void MenuEnd(void)
 
 	//prepare video info
 
-
 	//turn On NoSignal Task if it is NoSignal
 	//Pls, link with Task_Enable
 	WriteTW88Page(PAGE0_GENERAL);
 	value = ReadTW88(REG004);
-	if(value & 0x01) {		//BKTODO110714 if outofrange,...
+	if (value & 0x01) 		//BKTODO110714 if outofrange,...
+	{
 		FOsdIndexMsgPrint(FOSD_STR2_NOSIGNAL);
 		TaskNoSignal_setCmd(TASK_CMD_WAIT_VIDEO);
 
@@ -4929,8 +4947,10 @@ void MenuEnd(void)
 //		InitLogo1();
 //#endif
 	}
-	else {
-		if(MenuInputMain==INPUT_PC) {
+	else
+	{
+		if (MenuInputMain == INPUT_PC)
+		{
 			//if()	it is a out of range
 			//	FOsdIndexMsgPrint(FOSD_STR3_OUTRANGE);
 		}
@@ -4964,7 +4984,6 @@ void MenuEnd(void)
 	}	
 #endif
 }
-
 
 //reset menu_level & menu_on.
 //caller has to clear SOSD

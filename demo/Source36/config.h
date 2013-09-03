@@ -150,7 +150,7 @@
 //#define NOSIGNAL_LOGO
 
 //uncomment the SUPPORT_FOSD_MENU to start the OSD menu. eamon.fang 
-#define SUPPORT_FOSD_MENU	//FontOSD MENU
+///#define SUPPORT_FOSD_MENU	//FontOSD MENU
 
 //-----------------------------------------------------------------------------
 // I2CCMD PROTOCOL

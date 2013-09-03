@@ -139,7 +139,8 @@ typedef struct image_item_info_s {
 
 //menu spi osd item information
 //26
-typedef struct menu_sitem_info_s {
+typedef struct menu_sitem_info_s
+{
 	BYTE osd_type;						//0:SpiOSD 1:FontOSD..failed. not using
 
 	void (*p)(void);					//linked function
