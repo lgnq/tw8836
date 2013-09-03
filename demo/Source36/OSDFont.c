@@ -492,16 +492,20 @@ void FOsdRamSetAttr(BYTE attr)
 */
 void FOsdFontWrite(WORD start, BYTE *dat, BYTE bytesperfont, BYTE size)
 {
-	BYTE i,j;
+	BYTE i, j;
 	WORD addr;
 
 	WriteTW88Page(PAGE3_FOSD);
 	addr = start;
-	for(i=0; i < size; i++) {
-		if(addr & 0x100)	WriteTW88(REG304, ReadTW88(REG304) |  0x20); 	//Upper256
-		else 				WriteTW88(REG304, ReadTW88(REG304) & ~0x20);
+	for (i = 0; i < size; i++)
+	{
+		if (addr & 0x100)
+			WriteTW88(REG304, ReadTW88(REG304) |  0x20); 	//Upper256
+		else
+			WriteTW88(REG304, ReadTW88(REG304) & ~0x20);
+
 		WriteTW88(REG309, (BYTE)addr);
-		for(j=0; j < bytesperfont; j++)
+		for (j=0; j < bytesperfont; j++)
 			WriteTW88(REG30A, *dat++);
 		addr++;		
 	}
