@@ -236,7 +236,7 @@ void TestUpper256Char(void)
 {
 //	WORD OsdRamAddr;	
 	struct fosd_menu_item_s *fosd;
-	BYTE i,j;
+	BYTE i, j;
 //	BYTE value;
 	WORD index;
 
@@ -256,7 +256,7 @@ void TestUpper256Char(void)
 	FOsdWinInit(fosd->win);
 
 	WaitVBlank(1);
-	FOsdWinEnable(fosd->win,OFF);	// disable
+	FOsdWinEnable(fosd->win, OFF);	// disable
 
 	InitFontRamByNum(FONT_NUM_DEF12X18, 0);	//InitFontRam(0, &default_font,"def");
     //DownloadExtFont(0xA0, default_font.loc, default_font.size, 320,320,320);	//now, we have 160+160 fonts.
@@ -264,24 +264,27 @@ void TestUpper256Char(void)
 	//FOsdInitBpp3AlphaTable();
 	//FOsdInitBpp3AlphaTable();
 	//FOsdWinAlphaPixel(winno,1,0);		//bgcolor 1 alpha 0
+	
 #ifdef SUPPORT_UDFONT
-FOsdDownloadUDFontBySerial();
+	FOsdDownloadUDFontBySerial();
 #endif
 
-	FOsdWinAlphaPixel(fosd->win,bgColor,4);		//bgcolor 1 alpha 0
+	FOsdWinAlphaPixel(fosd->win, bgColor, 4);		//bgcolor 1 alpha 0
 
-	FOsdWinScreenXY(fosd->win, 0,0);		//0x20, 0x10);		//max 512 = 32x16
+	FOsdWinScreenXY(fosd->win, 0, 0);		//0x20, 0x10);		//max 512 = 32x16
 	FOsdWinScreenWH(fosd->win, columns, lines);		//0x20, 0x10);		//max 512 = 32x16
  	FOsdWinZoom(fosd->win, 1, 0);						//fosd->zoom>>4, fosd->zoom & 0x0F);
 
 	//set OsdRam.
-	WriteTW88Page(PAGE3_FOSD );
-	WriteTW88(REG304, 0x0c ); // Auto Inc.
+	WriteTW88Page(PAGE3_FOSD);
+	WriteTW88(REG304, 0x0c); // Auto Inc.
 
 	FOsdRamSetAddrAttr(0, (bgColor << 4) | fgColor);
 
-	for(i=0; i < 0x10 /*lines */; i++) {
-		for(j=0; j < columns; j++) {
+	for (i = 0; i < 0x10 /*lines */; i++)
+	{
+		for (j = 0; j < columns; j++)
+		{
 			index = i*columns+j;
 
 			WriteTW88(REG307, (BYTE)index);
@@ -289,8 +292,8 @@ FOsdDownloadUDFontBySerial();
 	}
 	//RTL BUG: If auto inc from 0 to 0xFF, 0xFE and 0xFF position not working.
 	//WaitVBlank(1);
-	bgColor=4;	//red
-	WriteTW88(REG304, 0x0c ); // Auto Inc.
+	bgColor = 4;	//red
+	WriteTW88(REG304, 0x0c); // Auto Inc.
 	FOsdRamSetAddrAttr(0xFD, (bgColor << 4) | fgColor);
 
 	//BKFYI. RTL had problem on 0xFE and 0xFF index. Now it is fixed.
@@ -299,39 +302,40 @@ FOsdDownloadUDFontBySerial();
 	WriteTW88(REG307, 0xFE);
 	WriteTW88(REG307, 0xFF);
 
-	bgColor=2;	//lime
+	bgColor = 2;	//lime
 
 	//working 
 	WriteTW88(REG304, ReadTW88(REG304) | 0x20);	//set UP256 before update attr.
 
 	FOsdRamSetAddrAttr(0x100, (bgColor << 4) | fgColor);
-	for(i=0x10; i < lines; i++) {
-		for(j=0; j < columns; j++) {
+	for (i = 0x10; i < lines; i++)
+	{
+		for(j = 0; j < columns; j++)
+		{
 			index = i*columns+j + start_offset;
 
 			//if(index >= (max+start_offset)) break;
-			if(index >= max)
+			if (index >= max)
 				break;
 			//if(index >= 256)
 			//	WriteTW88(REG304, ReadTW88(REG304) | 0x20);	 
 			WriteTW88(REG307, (BYTE)index);
 		}
 	}
-
-
 	
 	WriteTW88(REG304, ReadTW88(REG304) & 0xDF);		//default: lower 256 char.		
 	WriteTW88(REG304, ReadTW88(REG304) & 0xFE);		//OsdRam access mode
 	
-	FOsdWinEnable(fosd->win,ON);	//win0 enable}
+	FOsdWinEnable(fosd->win, ON);	//win0 enable
 }
 
 //description
 //	the max font size is a 16x32.
 //	If we use 16x32x1x160, it will use whole FontRam size, 10240 Byte.
 //	110118. R350[6:0] is for char height and the value*2 is a char height.
-code WORD test_16161616[16] = {
-0xFFFF,0xF800,0x8410,0x001F,0xC618,0x07E0,0x0000,0x0010,0xFFE0,0x0410,0x07FF,0x8010,0x8400,0x0400,0x8000,0xF81F
+code WORD test_16161616[16] =
+{
+	0xFFFF,0xF800,0x8410,0x001F,0xC618,0x07E0,0x0000,0x0010,0xFFE0,0x0410,0x07FF,0x8010,0x8400,0x0400,0x8000,0xF81F
 };
 void TestMultiBPP4(void)
 {

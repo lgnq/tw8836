@@ -1333,37 +1333,49 @@ void FOsdDownloadFontBySerial(WORD dest_font_index, BYTE *dat, BYTE unit_size, B
 {
 	BYTE value;
 	BYTE w_cnt;
-	BYTE i,j;
+	BYTE i, j;
 	WORD addr;
 
 	//assume FontRam FIFO ON.
 	FOsdSetAccessMode(FOSD_ACCESS_FONTRAM);		//Select FontRam Access
 
-	addr = 	dest_font_index;
-	w_cnt=0;
+	addr = dest_font_index;
+	w_cnt = 0;
+	
 	WriteTW88Page(PAGE3_FOSD);
-	for(i=0; i < unit_num; i++) {
-		if(w_cnt>=(8-2)) {
+	
+	for (i = 0; i < unit_num; i++)
+	{
+		if (w_cnt >= (8-2))
+		{
 			delay1ms(1);
 			w_cnt = 0;
 		}
+
 		value = ReadTW88(REG304);
-		if(addr & 0x100)	value |=  0x20;		//UPPER256
-		else				value &= ~0x20;
+		if (addr & 0x100)
+			value |= 0x20;		//UPPER256
+		else
+			value &= ~0x20;
 		WriteTW88(REG304, value);
-		WriteTW88(REG309, (BYTE)addr ); 		//Font Addr
+		
+		WriteTW88(REG309, (BYTE)addr); 		//Font Addr
 		addr++;
 		w_cnt += 2;
 
-		for(j=0; j < unit_size; j++) {
+		for (j = 0; j < unit_size; j++)
+		{
 			WriteTW88(REG30A, *dat++);
+			
 			w_cnt++;
-			if(w_cnt>=8) {
+			if (w_cnt >= 8)
+			{
 				delay1ms(1);
 				w_cnt = 0;
 			}
 		}
 	}
+
 	FOsdSetAccessMode(FOSD_ACCESS_OSDRAM);		//Select OSDRam Access. restore to default
 }
 #endif
