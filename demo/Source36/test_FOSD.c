@@ -113,14 +113,14 @@ void DumpFontOsdPalette(void)
 	//disable all FontOsd/SpiOsd Windows
 	InitFontRamByNum(FONT_NUM_DEF12X18, 0);	//InitFontRam(0, &default_font,"def");
 	//FOsdInitBpp3AlphaTable();
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 8; i++)
 	{
 		FOsdWinInit(i);
 		FOsdWinSetOsdRamStartAddr(i, 0);
 	}
 
 	WaitVBlank(1);
-	FOsdWinEnable(fosd->win,OFF);	// disable
+	FOsdWinEnable(fosd->win, OFF);	// disable
 
 	FOsdWinScreenXY(fosd->win, 0x10, 0x0D);		//sx,sy, n_char, fosd->h);
 	FOsdWinScreenWH(fosd->win, 0x20, 0x10);		//sx,sy, n_char, fosd->h);
