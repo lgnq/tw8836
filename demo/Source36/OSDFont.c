@@ -257,21 +257,23 @@ void FOsdFontSetFifo(BYTE fOn)
 /**
 * set FONT Width & Height
 *
-*	r300[4]		0: CharWidth 12. 1:CharWidth 18.
+*	r300[4]		0: CharWidth 12. 1:CharWidth 16.
 *	r350[4:0]	(Font OSD Char Height ) >> 1
 *	r351[6:0]	Sub-Font Total Count. used bytes for one font. if 12x18, use 27.
 */
 void FOsdSetFontWidthHeight(BYTE width, BYTE height)
 {
 	BYTE value;
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
 
 	value = ReadTW88(REG300);	
-	if(width==16)	value |= 0x10;	   				//width 16
-	else			value &= 0xEF;					//   or 12
-	WriteTW88(REG300, value ); 
+	if (width == 16)
+		value |= 0x10;	   				//width 16
+	else
+		value &= 0xEF;					//   or 12
+	WriteTW88(REG300, value); 
 
-	WriteTW88(REG_FOSD_CHEIGHT, height >> 1 ); 					//Font height(2~32)
+	WriteTW88(REG_FOSD_CHEIGHT, height >> 1); 					//Font height(2~32)
 	WriteTW88(REG_FOSD_MUL_CON, (width >> 2) * (height >> 1));	//sub-font total count.
 }
 
@@ -1391,28 +1393,30 @@ void InitFontRam(WORD dest_font_index, FONT_SPI_INFO_t *font, char *sName)
 #ifdef DEBUG_FOSD
 	dPrintf("\nInitFontRam(%x,,%s)",dest_font_index,sName);
 #endif
+
 	FOsdSetFontWidthHeight(font->width, font->height);
 
 	//download font
 	addr = dest_font_index *(font->width >> 2) * (font->height >> 1);
 	FOsdDownloadFontByDMA(addr, font->loc, font->size);
 
-
 	//assign Multi-Color start address.
-    WriteTW88Page(PAGE3_FOSD );
+    WriteTW88Page(PAGE3_FOSD);
 	value = ReadTW88(REG305) & 0xF1;
-	if((font->bpp2 +dest_font_index) & 0x100)	value |= 0x02;	// 2bit-multi-font start. 8th address
-	if((font->bpp3 +dest_font_index) & 0x100)	value |= 0x04;	// 3bit-multi-font start. 8th address
-	if((font->bpp4 +dest_font_index) & 0x100)	value |= 0x08;	// 4bit-multi-font start. 8th address
+	if ((font->bpp2 +dest_font_index) & 0x100)
+		value |= 0x02;	// 2bit-multi-font start. 8th address
+	if ((font->bpp3 +dest_font_index) & 0x100)
+		value |= 0x04;	// 3bit-multi-font start. 8th address
+	if ((font->bpp4 +dest_font_index) & 0x100)
+		value |= 0x08;	// 4bit-multi-font start. 8th address
 	WriteTW88(REG305, value);	
-	WriteTW88(REG30B, (BYTE)(font->bpp2 + dest_font_index) ); 			// 2bit-multi-font start
+	WriteTW88(REG30B, (BYTE)(font->bpp2 + dest_font_index)); 			// 2bit-multi-font start
 	WriteTW88(REG_FOSD_MADD3, (BYTE)(font->bpp3 +dest_font_index)); 	// 3bit-multi-font start
 	WriteTW88(REG_FOSD_MADD4, (BYTE)(font->bpp4 +dest_font_index)); 	// 4bit-multi-font start
 
-
 	//link palette
 	FOsdSetPaletteColorArray(0,	FOsdHwDefPaletteBpp1,16, 0);
-	if(font->palette_bpp2 != NULL)
+	if (font->palette_bpp2 != NULL)
 		FOsdSetPaletteColorArray(FOSD_LUT_MAP_BPP2_START,(WORD *)font->palette_bpp2,4, 0);
 	if(font->palette_bpp3 != NULL)
 		FOsdSetPaletteColorArray(FOSD_LUT_MAP_BPP3_START,(WORD *)font->palette_bpp3,8, 0);
@@ -1420,8 +1424,10 @@ void InitFontRam(WORD dest_font_index, FONT_SPI_INFO_t *font, char *sName)
 		FOsdSetPaletteColorArray(FOSD_LUT_MAP_BPP4_START,(WORD *)font->palette_bpp4,16, 0);
 
 	//..USE_FONTOSDINFO
-	if(sName != NULL) TWstrcpy(FontOsdInfo.font.name,sName);
-	else              TWstrcpy(FontOsdInfo.font.name,"unknown");
+	if (sName != NULL)
+		TWstrcpy(FontOsdInfo.font.name, sName);
+	else
+		TWstrcpy(FontOsdInfo.font.name, "unknown");
 	FontOsdInfo.font.w = font->width;
 	FontOsdInfo.font.h = font->height;
 
