@@ -873,12 +873,12 @@ BYTE CheckHdmiChipRegister(void)
 	BYTE ret;
 	BYTE i;
 
-
 #ifdef DEBUG_DTV__TEST
 	BYTE TempByte[8];
 	WORD hFPorch,vFPorch;
 	WORD hBPorch,vBPorch;
 #endif
+
 	BYTE hPol,vPol;		
 	WORD hTotal,vTotal;
 	WORD hActive,vActive;
@@ -891,29 +891,32 @@ BYTE CheckHdmiChipRegister(void)
 
 	//read System Status register $201.
 	//If it is too fast, VISR will take care.
-	bTemp = ReadI2CI16Byte(I2CID_EP907M, EP907M_System_Status_1 );
-	if((bTemp & 0xC0) != 0xC0) {
+	bTemp = ReadI2CI16Byte(I2CID_EP907M, EP907M_System_Status_1);
+	if ((bTemp & 0xC0) != 0xC0)
+	{
 		Printf(" => NoSignal");
 #ifdef DEBUG_DTV
 		dPrintf(" $201:%bx",bTemp);
 #endif
+
 		return ERR_FAIL;
 	}
 	//read System Status register $200.
 	//if $200[4]==1, HDMI mode.
 	//actually, ...
-	for(i=0; i < 10; i++) {
+	for (i=0; i < 10; i++)
+	{
 		bTemp = ReadI2CI16Byte(I2CID_EP907M, EP907M_System_Status_0 );
-		if(bTemp & EP907M_System_Status_0__HDMI)
+		if (bTemp & EP907M_System_Status_0__HDMI)
 			break;
 		delay1ms(10);
 	}
-	if(bTemp & EP907M_System_Status_0__HDMI)
+	if (bTemp & EP907M_System_Status_0__HDMI)
 		Puts(" HDMI mode");
 	else
 		Puts(" DVI or VESA mode");
 #ifdef DEBUG_DTV
-	dPrintf(" $200:%bx @%bx",bTemp, i);
+	dPrintf(" $200:%bx @%bx", bTemp, i);
 #endif
 
 #if 0
@@ -966,17 +969,19 @@ BYTE CheckHdmiChipRegister(void)
 
 	//select hStart, vStart for InputCrop.
 	hCropStart = hBPorch + 1;
-	if(hPol==0)
+	if (hPol==0)
 		hCropStart += hSync;	
 	vCropStart = vBPorch + 2;
-	if(vPol==0)
+	if (vPol==0)
 		vCropStart += vSync;
 
 
 	//if source is 720x240, EP907M reports it as 1440x240.
 	//I assume, 720x288, also same.
-	if(hActive==1440) {
-		if(vActive==240 || vActive==288) {
+	if (hActive == 1440)
+	{
+		if (vActive==240 || vActive==288)
+		{
 			hActive = 720;
 			vCropStart >>=1;	 //div2
 		}
@@ -985,9 +990,9 @@ BYTE CheckHdmiChipRegister(void)
 	Printf("\n        %d vPol:%bx vSync:%d vBPorch:%d vCropStart:%d",vActive, vPol, vSync, vBPorch, vCropStart);
 #endif	
 
-
-	ret=MeasStartMeasure();
-	if(ret) {
+	ret = MeasStartMeasure();
+	if (ret)
+	{
 		//if measure fail, it measn no signal... BK130104.
 #ifdef DEBUG_DTV
 		Printf(" meas=> NoSignal");
@@ -1004,17 +1009,20 @@ BYTE CheckHdmiChipRegister(void)
 	hActive = MeasGetHActive( &hCropStart );
 	vActive = MeasGetVActive( &vCropStart );
 
-	if ( hSync > (hActive/2) )	hPol = 1;	//active low. something wrong.
-	else						hPol = 0;	//active high
-	if ( vSync > (vTotal/2) )	vPol = 1;	//active low. something wrong.
-	else						vPol = 0;	//active high
-
+	if (hSync > (hActive/2))
+		hPol = 1;	//active low. something wrong.
+	else
+		hPol = 0;	//active high
+	if (vSync > (vTotal/2))
+		vPol = 1;	//active low. something wrong.
+	else
+		vPol = 0;	//active high
 
 #ifdef DEBUG_DTV
 	Printf("\nMeas %d hPol:%bx hCropStart:%d+4",hActive, hPol, hCropStart);
 	Printf("\n     %d vPol:%bx vCropStart:%d+1",vActive, vPol, vCropStart);
 #endif
-	if(hPol || vPol)
+	if (hPol || vPol)
 		Printf("\nBUG hPol:%bx vPol:%bx",hPol,vPol);
 
 	//
@@ -1030,12 +1038,9 @@ BYTE CheckHdmiChipRegister(void)
 	hCropStart = hCropStart + 4;	//hBPorch = meas_hBPorch+4. hCropStart = hBPorch+1. 			
 	vCropStart = vCropStart + 1;	//vBPorch = meas_vBPorch-1. vCropStart = vBPorch+2;
 
-
-
 #ifdef DEBUG_DTV
 	dPrintf("\nInputCrop hStart:%d vStart:%d",hCropStart,vCropStart);
 #endif
-
 
 	//-------------------------------------------
 	// input crop
@@ -1046,14 +1051,14 @@ BYTE CheckHdmiChipRegister(void)
 
 	HDMISetOutput( hActive, vActive,  vCropStart );
 
-	if(InputMain==INPUT_HDMIPC || InputMain==INPUT_HDMITV)
+	if (InputMain==INPUT_HDMIPC || InputMain==INPUT_HDMITV)
 		AdjustPixelClk(hTotal, 0);	//NOTE:it uses DVI_Divider.
 
-	if(InputMain==INPUT_LVDS)
+	if (InputMain==INPUT_LVDS)
 		LVDS_Video_Status = 1;
+
 	return ERR_SUCCESS;
 }
-
 
 /**
 * Check and Set HDMI
@@ -1170,7 +1175,7 @@ BYTE ChangeHDMI(void)
 * TW8836 EVB1.0 uses a HDMI output for LVDS Tx chip input.
 *
 * video path
-* HDMI=>LVDS Tx chip =>TW8836 LVDSRx => Scaler => Panel
+* HDMI => LVDS Tx chip => TW8836 LVDSRx => Scaler => Panel
 */
 BYTE CheckAndSetLVDSRx(void)
 {
@@ -1187,13 +1192,14 @@ BYTE ChangeLVDSRx(void)
 	BYTE ret;
 	BYTE i;
 
-	if ( InputMain == INPUT_LVDS ) {
+	if (InputMain == INPUT_LVDS)
+	{
 		dPrintf("\nSkip ChangeLVDSRx");
 		return(1);
 	}
 	InputMain = INPUT_LVDS;
 
-	if(GetInputMainEE() != InputMain)
+	if (GetInputMainEE() != InputMain)
 		SaveInputMainEE( InputMain );
 
 	//----------------
@@ -1204,13 +1210,16 @@ BYTE ChangeLVDSRx(void)
 
 	//BK121218.  VISR does not work.
 	//			read EP9553E status register.
-	for(i=0; i < 200; i++) {
+	for (i=0; i < 200; i++)
+	{
 		ret = ReadI2CI16Byte(I2CID_EP907M, 0x000);
-		if(ret==0x01) {
+		if (ret == 0x01)
+		{
 			ret = ReadI2CI16Byte(I2CID_EP907M, 0x201);
-			if(ret & 0x80) {
+			if (ret & 0x80) {
 				ret = ReadI2CI16Byte(I2CID_EP907M, 0x200);
-				if((ret & 0x20) == 0) {
+				if ((ret & 0x20) == 0)
+				{
 #ifdef DEBUG_DTV
 					Printf("\nLINK_ON@%d $R200:%bx $R201:%bx",(WORD)i, ret, ReadI2CI16Byte(I2CID_EP907M, 0x201));
 #endif
@@ -1229,10 +1238,11 @@ BYTE ChangeLVDSRx(void)
 
 	//add timer. Need SFR_EA
 	LVDS_timer =  SystemClock + 200;
-	if(LVDS_timer < SystemClock)
+	if (LVDS_timer < SystemClock)
 		LVDS_timer = 200;
 		
- 	if(ret==0) {
+ 	if (ret == 0)
+	{
 		//success
 		VInput_enableOutput(0);
 		return 0;
@@ -1243,13 +1253,10 @@ BYTE ChangeLVDSRx(void)
 	// Prepare NoSignal Task...
 
 	VInput_gotoFreerun(0);
+
 	return(2);
 }
 #endif
-
-
-
-
 
 //=============================================================================
 // Change to BT656
