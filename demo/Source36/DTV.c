@@ -1106,23 +1106,26 @@ BYTE ChangeHDMI(void)
 {
 	BYTE ret;
 
-	if ( InputMain == INPUT_HDMIPC || InputMain == INPUT_HDMITV ) {
+	if (InputMain == INPUT_HDMIPC || InputMain == INPUT_HDMITV)
+	{
 		dPrintf("\nSkip ChangeHDMI");
+		
 		return(1);
 	}
 
-	if(GetHdmiModeEE())  InputMain = INPUT_HDMITV;
-	else 				 InputMain = INPUT_HDMIPC;
+	if (GetHdmiModeEE())
+		InputMain = INPUT_HDMITV;
+	else
+		InputMain = INPUT_HDMIPC;
 
-	if(GetInputMainEE() != InputMain)
-		SaveInputMainEE( InputMain );
+	if (GetInputMainEE() != InputMain)
+		SaveInputMainEE(InputMain);
 
-	dPrintf("\nChangeHDMI InputMain:%02bx",InputMain);
+	dPrintf("\nChangeHDMI InputMain:%02bx", InputMain);
 
 	//----------------
 	//remove logo first. 
 	//BK130123. FW will not support Logo on HDMI mode.
-
 
 	//----------------
 	// initialize video input
@@ -1138,11 +1141,14 @@ BYTE ChangeHDMI(void)
 #if defined(SUPPORT_HDMI)
 	ret = CheckAndSetHDMI();
 #else
-	ret=ERR_FAIL;
+	ret = ERR_FAIL;
 #endif
-	if(ret==ERR_SUCCESS) {
+
+	if (ret == ERR_SUCCESS)
+	{
 		//success
 		VInput_enableOutput(0);
+		
 		return 0;
 	}
 
@@ -1154,7 +1160,6 @@ BYTE ChangeHDMI(void)
 
 	return(2);
 }
-
 
 //=============================================================================
 // Change to LVDSRx

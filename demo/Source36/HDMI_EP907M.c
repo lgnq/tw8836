@@ -370,16 +370,16 @@ void HdmiInitEp907MChip(void)
 	//Printf("\nselect PORT1.(HDMI port)");
 	Printf("\nUse KL_166 130123 or higher.");
 
-
 	//check EP907M before we request something.
-	for(i=0; i < 100; i++) {
+	for (i=0; i < 100; i++)
+	{
 		WriteI2CI16Byte(I2CID_EP907M, EP907M_System_Control, EP907M_System_Control__PORT_SEL__P2);
 
 		//bTemp = ReadI2CI16Byte(I2CID_EP907M, 0x2100);
 		//bTemp = ReadI2CI16Byte(I2CID_EP907M, 0x2100);
 		delay1ms(10);
 		bTemp = ReadI2CI16Byte(I2CID_EP907M, EP907M_System_Control);
-		if((bTemp & 0x30) == 0x10)
+		if ((bTemp & 0x30) == 0x10)
 			break;
 		delay1ms(10);
 	}
@@ -390,6 +390,7 @@ void HdmiInitEp907MChip(void)
 	//WriteI2CI16Byte(I2CID_EP907M, EP907M_Audio_Output_Control, EP907M_Audio_Output_Control__AAM_EN | 0x01);
 
 	WriteI2CI16Byte(I2CID_EP907M, EP907M_Audio_Output_Control, EP907M_Audio_Output_Control__AAM_EN | 0x01);
+
 #if defined(EVB_10)
 	//this board prefers the falling dege DCLK.
 	WriteI2CI16Byte(I2CID_EP907M, EP907M_Video_Output_Control, 0x00);	 
