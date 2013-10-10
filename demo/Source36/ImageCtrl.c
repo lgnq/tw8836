@@ -1009,17 +1009,19 @@ BYTE OsdGetTrans(void)
 
 	return (BYTE)val;	//0..127
 }
+
 //-----------------------------------------------------------------------------
 /**
 * set Osd Transparent value
 */
 BYTE OsdSetTransparent(BYTE dat) //0..100
 {
-	if(dat <= 100)
+	if (dat <= 100)
 		OsdTransRate = dat;
 
 	return OsdTransRate;
 }
+
 //-----------------------------------------------------------------------------
 /**
 * save Osd Transparent value to EEPROM

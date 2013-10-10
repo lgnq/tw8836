@@ -432,6 +432,7 @@ BYTE main_loop(void)
 			}
 		}
 #endif
+
 		//-------------- Check TW8835 Chip Interrupt -------------
 		if (INT_STATUS || VH_Loss_Changed)
 		{
@@ -672,7 +673,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 		I2C_delay_base = 3;
 		
 #if 1
-		/*
+	   /*
 		*	Check I2C GPIO Expendor.
 		*	If I2C device holds SCL, it can hangup the system.
 		*	0: success
@@ -1623,6 +1624,7 @@ void NoSignalTask(void)
 		WriteTW88Page(page);
 		return;
 	}
+	
 	if (Task_NoSignal_cmd == TASK_CMD_WAIT_MODE)
 		return;
  
@@ -1705,6 +1707,7 @@ void NoSignalTaskOnWaitMode(void)
 	BYTE ret;
 	
 	DECLARE_LOCAL_page
+
 	if ((Task_NoSignal_cmd != TASK_CMD_WAIT_MODE))
 		return;
 	
@@ -1720,7 +1723,7 @@ void NoSignalTaskOnWaitMode(void)
 				ScalerSetMuteManual(ON);
 
 				SW_INTR_cmd = SW_INTR_VIDEO_CHANGED;
-				dPrintf("\nRequest SW Interrupt cmd:%bd InputSubMode:%bd->%bd",SW_INTR_cmd, InputSubMode,ret);
+				dPrintf("\nRequest SW Interrupt cmd:%bd InputSubMode:%bd->%bd", SW_INTR_cmd, InputSubMode, ret);
 				InputSubMode = ret;
 				WriteTW88Page(PAGE0_GENERAL);
 				WriteTW88(REG00F, SW_INTR_VIDEO);	//SW interrupt.		
@@ -1739,7 +1742,7 @@ void NoSignalTaskOnWaitMode(void)
 				ScalerSetMuteManual(ON);
 
 				SW_INTR_cmd = SW_INTR_VIDEO_CHANGED;
-				dPrintf("\nRequest SW Interrupt cmd:%bd InputSubMode:%bd->%bd",SW_INTR_cmd, InputSubMode,ret);
+				dPrintf("\nRequest SW Interrupt cmd:%bd InputSubMode:%bd->%bd", SW_INTR_cmd, InputSubMode, ret);
 				InputSubMode = ret;
 				WriteTW88Page(PAGE0_GENERAL);
 				WriteTW88(REG00F, SW_INTR_VIDEO);	//SW interrupt.		
@@ -1776,16 +1779,19 @@ void Interrupt_enableVideoDetect(BYTE fOn)
 	WORD temp_VH_Loss_Changed;
 	BYTE temp_INT_STATUS, temp_INT_STATUS2;
 #endif
+
 	DECLARE_LOCAL_page
 
 	ReadTW88Page(page);
 	WriteTW88Page(PAGE0_GENERAL);
-	if(fOn) {
+	if (fOn)
+	{
 		WriteTW88(REG002, 0xFF);	//clear
 		WriteTW88(REG004, 0xFF);	//clear
 		WriteTW88(REG003, 0xEC);	//release Video, but still block SYNC
 	}
-	else {
+	else
+	{
 		WriteTW88(REG003, 0xEE);	//block.
 		WriteTW88(REG002, 0xFF);	//clear
 		WriteTW88(REG004, 0xFF);	//clear
@@ -1805,6 +1811,7 @@ void Interrupt_enableVideoDetect(BYTE fOn)
 			dPrintf("\nclear INT_STATUS:%bx INT_STATUS2:%bx VH_Loss_Changed:%d",temp_INT_STATUS,temp_INT_STATUS2,temp_VH_Loss_Changed);
 #endif
 	}
+
 	WriteTW88Page(page);
 }
 
