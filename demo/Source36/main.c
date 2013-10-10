@@ -209,6 +209,7 @@ void main(void)
 	}
 	else
 #endif
+
 	//
 	// init system with a powerup mode
 	//
@@ -218,7 +219,7 @@ void main(void)
 	Prompt(); //second prompt
 	WriteTW88Page(PAGE0_GENERAL);
 
-	while(1) 
+	while (1) 
 	{
 		//==================================================
 		// MAIN LOOP
@@ -669,6 +670,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 		//Init HW with default
 		Init8836AsDefault(InputMain, 1);
 		I2C_delay_base = 3;
+		
 #if 1
 		/*
 		*	Check I2C GPIO Expendor.
@@ -693,9 +695,11 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 				Printf("\nI2CID_SX1504:%bx", value);
 				break;
 		}
+		
 		if (value == 0)
 			Printf("\nI2CID_SX1504 0:%02bx 1:%bx", ReadI2CByte(I2CID_SX1504, 0), ReadI2CByte(I2CID_SX1504, 1));
 #endif
+
 		//------------------
 		//first GPIO position.
 		//GPIO needs TRI_EN=0.
@@ -771,7 +775,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 	//
 	// Power Up FP LED.
 	// Now you can see somthing on your panel.
-///	LedPowerUp();
+	LedPowerUp();
 
 	//enable human input. (remocon,Touch, and Keypad).
 	EnableRemoInt();
