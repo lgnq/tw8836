@@ -228,6 +228,7 @@ void info_to_header(image_info_t *info)
 	header->dy = info->dy;
 	header->lut_size = 0x004 << header->bpp;
 }
+
 /**
 * desc: convert rle2 to header
 *		header_table is a global	
@@ -242,16 +243,17 @@ void rle2_to_header(struct RLE2_HEADER *rle_header)
 
 	header->lut_type = rle_header->LUT_format & 0x01;
 	colors = (WORD)rle_header->LUT_colors+1; //word
-	for(bpp=0; bpp < 9 ;) {
-		if(colors & 0x01)
+	for (bpp = 0; bpp < 9 ;)
+	{
+		if (colors & 0x01)
 			break;
 		colors >>= 1;
 		bpp++;
 	}
 	header->bpp = bpp;
 	header->rle = rle_header->rledata_cnt & 0x0F;
-	header->dx = rle_header->w;
-	header->dy = rle_header->h;
+	header->dx  = rle_header->w;
+	header->dy  = rle_header->h;
 	header->lut_size = 0x004 << bpp;
 }
 
@@ -324,7 +326,6 @@ BYTE MenuGetLevel(void)
 // Header
 //=========================
 
-//-----------------------------------------------------------------------------
 /**
 * Function
 *
@@ -332,7 +333,7 @@ BYTE MenuGetLevel(void)
 * @param
 * @return
 */
-BYTE MenuReadRleHeader(DWORD spi_loc,struct RLE2_HEADER *header)
+BYTE MenuReadRleHeader(DWORD spi_loc, struct RLE2_HEADER *header)
 {
 	WORD wTemp;
 	DWORD dTemp;
@@ -345,13 +346,16 @@ BYTE MenuReadRleHeader(DWORD spi_loc,struct RLE2_HEADER *header)
 	SpiFlashDmaRead2XMem((BYTE *)header, spi_loc, sizeof(struct RLE2_HEADER));
 	
 	ptr = (BYTE *)header;
-	for(i=0; i < sizeof(struct RLE2_HEADER); i++) {
-		dMenuPrintf("%02bx ",*ptr++);
+	for (i = 0; i < sizeof(struct RLE2_HEADER); i++)
+	{
+		dMenuPrintf("%02bx ", *ptr++);
 	}
-	if(header->id[0]!='I' || header->id[1]!='T') {
+	if (header->id[0] != 'I' || header->id[1] != 'T')
+	{
 		wMenuPuts(" MenuReadRleHeader fail");
 		return 1;	//fail
 	}
+	
 	//swap
 	wTemp = header->w;
 	header->w = (wTemp >> 8 | wTemp << 8);
@@ -359,7 +363,7 @@ BYTE MenuReadRleHeader(DWORD spi_loc,struct RLE2_HEADER *header)
 	wTemp = header->h;
 	header->h = (wTemp >> 8 | wTemp << 8);
 
-	dTemp=header->size;
+	dTemp = header->size;
 	header->size = dTemp & 0x000000FF;
 	header->size <<= 8; dTemp >>= 8;
 	header->size |= dTemp & 0x000000FF;
@@ -379,11 +383,10 @@ BYTE MenuReadRleHeader(DWORD spi_loc,struct RLE2_HEADER *header)
 	return 0;
 }
 
-
 /**
 * desc: update header_table
 */
-//-----------------------------------------------------------------------------
+
 /**
 * Function
 *
@@ -439,7 +442,6 @@ BYTE NoSignalLogoShow;
 */
 void InitLogo1(void)
 {
-	//--------------------------
 	struct image_item_info_s *image;
 	menu_image_header_t *header = &header_table;
 	WORD lut_loc;
@@ -461,7 +463,8 @@ void InitLogo1(void)
 	NoSignalLogoShow = 1;
 
 	//check scaler FreeRun
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+
 	FreeRunManual = ReadTW88(REG21C);
 	//if ( FreeRunManual & 0x04 )
 		ScalerSetFreerunManual(OFF);
@@ -486,21 +489,22 @@ void InitLogo1(void)
 	SpiOsdWinScreen( WIN_LOGO, sx, sy, header->dx, header->dy );
 	if (WIN_LOGO == 0)
 	{
-		SpiOsdWin0ImageOffsetXY( 0, 0 );
-		SpiOsdWin0Animation( 1, 0, 0, 0);
+		SpiOsdWin0ImageOffsetXY(0, 0);
+		SpiOsdWin0Animation(1, 0, 0, 0);
 	}
-	SpiOsdWinPixelAlpha( WIN_LOGO, ON );
-	SpiOsdWinGlobalAlpha( WIN_LOGO, 0);							////////
+	SpiOsdWinPixelAlpha(WIN_LOGO, ON);
+	SpiOsdWinGlobalAlpha(WIN_LOGO, 0);							////////
 	SpiOsdWinPixelWidth(WIN_LOGO, header->bpp);
 	SpiOsdWinLutOffset(WIN_LOGO, 0 /* menu_item->osd_s.lut */);
 
-	SpiOsdWinBuffEnable( WIN_LOGO, ON );
+	SpiOsdWinBuffEnable(WIN_LOGO, ON);
 	//SpiOsdWinBuffEnable( WIN_LOGO, OFF );
 
 	//write to HW
 	WaitVBlank(1);
-	if (header->rle) {	//need RLE ?
-		SpiOsdRlcReg( WIN_LOGO, header->bpp,header->rle);
+	if (header->rle)
+	{	//need RLE ?
+		SpiOsdRlcReg(WIN_LOGO, header->bpp, header->rle);
 	}	
 	else
 	{
@@ -520,7 +524,6 @@ void InitLogo1(void)
 	// finish draw
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Function
 *
@@ -791,8 +794,6 @@ void TestMainMenuImage(BYTE type)
 	SpiOsdLoadLUT(sosd_win, header->lut_type, 0 /*menu_item->osd_s.lut*/, header->lut_size, header->lut_loc,image->alpha);
 }
 
-
-
 //=========================
 // DRAW
 //=========================
@@ -827,7 +828,7 @@ void MenuDrawCurrString(BYTE itemno, BYTE *str)
 *		item number.
 *
 */
-//-----------------------------------------------------------------------------
+
 /**
 * Function
 *
@@ -910,7 +911,7 @@ void MenuDrawCurrImage(BYTE use1, BYTE item)
 		//write to buffer
 		//
 		if (header->rle)
-			SOsdHwBuffSetRle(sosd_win,header->bpp,header->rle);
+			SOsdHwBuffSetRle(sosd_win, header->bpp, header->rle);
 		SOsdHwBuffSetLut(sosd_win, /*header->lut_type,*/ menu_item->lut, header->lut_size, header->lut_loc);
 	
 		//pixel alpha blending. after load Palette
@@ -947,7 +948,6 @@ void MenuDrawCurrImage(BYTE use1, BYTE item)
 	}
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Function
 *

@@ -1028,27 +1028,23 @@ BYTE IsBackDrivePortOn(void)
 }
 #endif
 
-//-----------------------------------------------------------------------------
 /**
  * Update OSD Timer
- *
 */
 void UpdateOsdTimerClock(void)
 {
 	DECLARE_LOCAL_page
 
-	OsdTimerClock = (DWORD)OsdGetTime() *100;
+	OsdTimerClock = (DWORD)OsdGetTime() * 100;
 	
 	ReadTW88Page(page);
 
 	//Turn On FontOSD.
 	FOsdOnOff(ON, 0);	//with vdelay 0
 
-
 	WriteTW88Page(page);		
 }
 
-//-----------------------------------------------------------------------------
 /**
  *	Check OSD Timer and clear OSD if timer is expired.
 */

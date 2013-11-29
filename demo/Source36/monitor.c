@@ -2426,15 +2426,18 @@ void Monitor(void)
 		MonitorMenu();
 	}
 	//---------------- Font Osd Debug -------------------------
-	else if( !stricmp( argv[0], "fosd" ) ) {
+	else if (!stricmp(argv[0], "fosd"))
+	{
 		MonitorFOsd();
 	}
 	//---------------- SPI Osd Debug -------------------------
-	else if( !stricmp( argv[0], "sosd" ) ) {
+	else if (!stricmp(argv[0], "sosd"))
+	{
 		MonitorSOsd();
 	}
 	//---------------- MCU Debug -------------------------
-	else if( !stricmp( argv[0], "MCU" ) ) {
+	else if (!stricmp(argv[0], "MCU"))
+	{
 		MonitorMCU();
 	}
 	//---------------- Debug Level ---------------------

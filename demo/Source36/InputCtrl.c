@@ -134,7 +134,6 @@ void SetInputMain(BYTE input)
 
 #define VBLANK_WAIT_VALUE	0xFFFE 
 
-//-----------------------------------------------------------------------------
 /**
 * wait Vertical Blank
 *
@@ -168,7 +167,6 @@ void WaitVBlank(BYTE cnt)
 	WriteTW88Page(page);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * wait Vertical Blank
 *

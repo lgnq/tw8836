@@ -454,10 +454,6 @@ void	DebugRegister( WORD reg )
 }
 #endif
 
-
-//=============================================================================
-//                                                                           
-//=============================================================================
 /**
 * print SystemClock
 *
@@ -466,9 +462,11 @@ void	DebugRegister( WORD reg )
 void PrintSystemClockMsg(char *msg)
 {
 	DWORD time;
-	SFR_EA=0;
+
+	SFR_EA = 0;
 	time = SystemClock;
-	SFR_EA=1;
-	ePrintf("\nSystemTime:%ld.%02ld %s", time/100, time%100, msg );
+	SFR_EA = 1;
 	
+	ePrintf("\nSystemTime:%ld.%02ld %s", time/100, time%100, msg);
 }
+

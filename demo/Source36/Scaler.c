@@ -1016,25 +1016,29 @@ WORD ScalerCalcFreerunHtotal(void)
 * free run control R21C[2] -Panel free run control. 1 = free run with HTOTAL(R21C[7:4]R21D[7:0] and LNTT(R20D[7:6]R219[7:0]).
 * free run on the condition of input loss R21C[1].
 */
-void ScalerSetFreerunManual( BYTE on )
+void ScalerSetFreerunManual(BYTE on)
 {
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
 
-	if(on)	WriteTW88(REG21C, (ReadTW88(REG21C) | 0x04) );			//on manual freerun
-	else 	WriteTW88(REG21C, (ReadTW88(REG21C) & ~0x04) );		//off manual freerun
+	if (on)
+		WriteTW88(REG21C, (ReadTW88(REG21C) | 0x04));			//on manual freerun
+	else
+		WriteTW88(REG21C, (ReadTW88(REG21C) & ~0x04));		//off manual freerun
 }
+
 #ifdef UNCALLED_CODE
-BYTE ScalerIsFreerunManual( void )
+BYTE ScalerIsFreerunManual(void)
 {
 	BYTE value;
 
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
 	value = ReadTW88(REG21C);
-	if(value & 0x04) return 1;
+	if (value & 0x04)
+		return 1;
 	return 0;
 }
 #endif
-//-----------------------------------------------------------------------------
+
 /**
 * set FreerunAuto and FreerunManual
 */

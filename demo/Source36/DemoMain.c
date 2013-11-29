@@ -221,30 +221,30 @@ void PigeonDemo( void )
 	dPuts("\nFinished LUTRoseDMA");
 }
 #endif
-void RoseDemo( void )
+
+void RoseDemo(void)
 {
 	SpiOsdEnable(ON);
 
 	SOsdWinBuffClean(0);		//ClearSpiOsdWinBuffer();
 
-	SpiOsdWinImageLoc( 0, ROSE_START );
-	SpiOsdWinImageSizeWH( 0, 400, 400 );
-	SpiOsdWin0ImageOffsetXY( 0, 0 );
-	SpiOsdWinScreen( 0, 200, 40, 400, 400 );
-	SpiOsdWin0Animation( 2/*3*/, 0, 9, 3);
+	SpiOsdWinImageLoc(0, ROSE_START);
+	SpiOsdWinImageSizeWH(0, 400, 400);
+	SpiOsdWin0ImageOffsetXY(0, 0);
+	SpiOsdWinScreen(0, 200, 40, 400, 400);
+	SpiOsdWin0Animation(2/*3*/, 0, 9, 3);
 
 	SpiOsdWinPixelWidth(0, 8);
 
-	SpiOsdWinGlobalAlpha( 0, 0 );
-	SpiOsdWinBuffEnable( 0, ON );
+	SpiOsdWinGlobalAlpha(0, 0);
+	SpiOsdWinBuffEnable(0, ON);
 	dPuts("\nFinished Rose window init");
-	SpiOsdWinLutOffset(0,0);
+	SpiOsdWinLutOffset(0, 0);
 
 	WaitVBlank(1);
 	SpiOsdLoadLUT(0, 0/*1*/, 0, 0x400, ROSE_LUT_LOC, 0xFF);	//win0
 	SOsdWinBuffWrite2Hw(0, 0);
 	dPuts("\nFinished LUTRoseDMA");
-
 }
 
 //=============================================================================

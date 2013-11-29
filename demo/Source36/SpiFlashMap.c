@@ -547,9 +547,9 @@ void MonSOsdImgInfo(void)
 	for(i=0; i < (12+4+2+1+6); i++)
 #endif
 	{
-		Printf("\n%02bd %s",i,MonSOsdImgTable[i].name);
+		Printf("\n%02bd %s", i, MonSOsdImgTable[i].name);
 		image = MonSOsdImgTable[i].image;
-		Printf(" loc:%lx alpha:%bx",image->loc,image->alpha);
+		Printf(" loc:%lx alpha:%bx", image->loc, image->alpha);
 
 		//prepare header
 		MenuPrepareImageHeader(image);
@@ -558,10 +558,11 @@ void MonSOsdImgInfo(void)
 		Printf(" bpp%bd", header->bpp);
 		Printf(" rle%bd", header->rle);
 		Printf(" %dx%d", header->dx, header->dy);
-		Printf(" alpha:%2bx",image->alpha);
-		Printf(" lut%s size:%d*4",header->lut_type? "s": " ", header->lut_size >> 2);		 
+		Printf(" alpha:%2bx", image->alpha);
+		Printf(" lut%s size:%d*4", header->lut_type? "s": " ", header->lut_size >> 2);		 
 	}
 }
+
 void MonOsdLutLoad(BYTE img_n, BYTE sosd_win, WORD lut)
 {
 	struct image_item_info_s *image;
@@ -590,7 +591,7 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 //	BYTE i;
 	WORD sx, sy;
 
-	Printf("\nMonOsdImgLoad(%bd,%bd,%d)",img_n,sosd_win,item_lut);
+	Printf("\nMonOsdImgLoad(%bd,%bd,%d)", img_n, sosd_win, item_lut);
 
 #if 0
 	UseSOsdHwBuff=1;
@@ -611,19 +612,19 @@ void MonOsdImgLoad(BYTE img_n, BYTE sosd_win, WORD item_lut)
 	SpiOsdWinScreen(sosd_win, sx, sy, header->dx, header->dy);
 	if (sosd_win == 0)
 	{
-		SpiOsdWin0ImageOffsetXY( 0, 0 );
-		SpiOsdWin0Animation( 1, 0, 0, 0);
+		SpiOsdWin0ImageOffsetXY(0, 0);
+		SpiOsdWin0Animation(1, 0, 0, 0);
 	}
 	if (image->alpha != 0xFF)
-		SpiOsdWinPixelAlpha( sosd_win, ON );
+		SpiOsdWinPixelAlpha(sosd_win, ON);
 	else
 	{
-		SpiOsdWinGlobalAlpha( sosd_win, 0 /*EE_Read(EEP_OSD_TRANSPARENCY)*/);
+		SpiOsdWinGlobalAlpha(sosd_win, 0 /*EE_Read(EEP_OSD_TRANSPARENCY)*/);
 	}
 	SpiOsdWinPixelWidth(sosd_win, header->bpp);
 	SpiOsdWinLutOffset(sosd_win, item_lut);
 
-	SpiOsdWinBuffEnable( sosd_win, ON );
+	SpiOsdWinBuffEnable(sosd_win, ON);
 	//
 	//write to HW
 	//

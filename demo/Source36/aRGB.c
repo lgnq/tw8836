@@ -2445,7 +2445,6 @@ BYTE CheckAndSetComponent( void )
 	ScalerSetFreerunAutoManual(ON,OFF);
 	ScalerSetMuteAutoManual(ON,OFF);
 
-
 #if defined(PANEL_AUO_B133EW01)
 #else
 	SspllSetFreqReg(0x20000);	//108MHz. Where is a POST value ?

@@ -44,10 +44,8 @@
 #include "measure.h"
 //#include "SOsdMenu.h"
 
-
 //#include "Data\DataInitPC.inc"
 //#include "Data\DataInitMonitor.inc"
-
 
 #if 0
 void SW_Reset(void)
@@ -59,7 +57,6 @@ void SW_Reset(void)
 	WriteTW88Page(page);
 }
 #endif	
-
 
 //=============================================================================
 //	INPUT CLOCKS			                                               
@@ -77,21 +74,20 @@ void ClockHigh(void)
 #if 0
 	dPrintf("\nHigh");	
 
-	WriteTW88Page(PAGE0_SSPLL );
-	WriteTW88(REG0F6, 0x00 );	// PCLK div by 1
+	WriteTW88Page(PAGE0_SSPLL);
+	WriteTW88(REG0F6, 0x00);	// PCLK div by 1
 
-	WriteTW88Page(PAGE2_SCALER );
-	WriteTW88(REG20D, 0x81 );	// PCLKO div by 2
+	WriteTW88Page(PAGE2_SCALER);
+	WriteTW88(REG20D, 0x81);	// PCLKO div by 2
 
 	WriteTW88Page(PAGE4_CLOCK);
-	WriteTW88(REG4E1, 0xe0 );	// Source=PCLK, Delay=1, Edge=1
+	WriteTW88(REG4E1, 0xe0);	// Source=PCLK, Delay=1, Edge=1
 	ClkPllSetSpiInputClockLatch(3);	//just for test.
 
 	SPI_SetReadModeByRegister(0x05);	// SPI mode QuadIO, Match DMA mode with SPI-read
 #endif
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set Low speed clock. only for test
 */
@@ -100,20 +96,19 @@ void ClockLow(void)
 #if 0
 	dPrintf("\nLow");	
 
-	WriteTW88Page(PAGE0_SSPLL );
-	WriteTW88(REG0F6, 0x00 );	// PCLK div by 1
+	WriteTW88Page(PAGE0_SSPLL);
+	WriteTW88(REG0F6, 0x00);	// PCLK div by 1
 
-	WriteTW88Page(PAGE2_SCALER );
-	WriteTW88(REG20D, 0x80 );	// PCLKO div by 1
+	WriteTW88Page(PAGE2_SCALER);
+	WriteTW88(REG20D, 0x80);	// PCLKO div by 1
 
 	WriteTW88Page(PAGE4_CLOCK);
-	WriteTW88(REG4E1, 0x20 );	// Source=PCLK, Delay=0, Edge=0
+	WriteTW88(REG4E1, 0x20);	// Source=PCLK, Delay=0, Edge=0
 
 	SPI_SetReadModeByRegister(0x05);	// SPI mode QuadIO, Match DMA mode with SPI-read
 #endif
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set 27MHz clock. only for test
 */
@@ -122,14 +117,14 @@ void Clock27(void)
 #if 0
 	dPrintf("\n27MHz");	
 
-	WriteTW88Page(PAGE0_SSPLL );
-	WriteTW88(REG0F6, 0x00 );	// PCLK div by 1
+	WriteTW88Page(PAGE0_SSPLL);
+	WriteTW88(REG0F6, 0x00);	// PCLK div by 1
 
-	WriteTW88Page(PAGE2_SCALER );
-	WriteTW88(REG20D, 0x80 );	// PCLKO div by 1
+	WriteTW88Page(PAGE2_SCALER);
+	WriteTW88(REG20D, 0x80);	// PCLKO div by 1
 
 	WriteTW88Page(PAGE4_CLOCK);
-	WriteTW88(REG4E1, 0x00 );	// Source=27M
+	WriteTW88(REG4E1, 0x00);	// Source=27M
 
 	SPI_SetReadModeByRegister(0x05);	// SPI mode QuadIO, Match DMA mode with SPI-read
 #endif
@@ -139,20 +134,19 @@ void Clock27(void)
 // SSPLL
 //=========================================
 
-//-----------------------------------------------------------------------------
 /**
 * power up the SSPLL
 */
 void SSPLL_PowerUp(BYTE fOn)
 {
 	WriteTW88Page(PAGE0_SSPLL);
+	
 	if (fOn)
 		WriteTW88(REG0FC, ReadTW88(REG0FC) & ~0x80);
 	else
 		WriteTW88(REG0FC, ReadTW88(REG0FC) |  0x80);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * get PPF(PLL Pixel Frequency) value. SSPLL value
 *
@@ -174,7 +168,7 @@ DWORD SspllGetPPF(void)
 	dPrintf("\r\n(GetFBDN) :%ld", FPLL);
 	#endif
 
-	i= SspllGetPost();
+	i = SspllGetPost();
 	ppf = SspllFPLL2FREQ(FPLL, i);
 // 	dPrintf("\r\n(GetPPF) :%ld", ppf);
 
@@ -211,13 +205,14 @@ DWORD SspllGetPPF(void)
 */
 void SspllSetFreqReg(DWORD FPLL)
 {
-	dPrintf("\nSspllSetFreqReg(%lx)",FPLL);
+	dPrintf("\nSspllSetFreqReg(%lx)", FPLL);
 	WriteTW88Page(PAGE0_SSPLL);
-	WriteTW88(REG0FA_FPLL2, (BYTE)FPLL );
+	
+	WriteTW88(REG0FA_FPLL2, (BYTE)FPLL);
 	WriteTW88(REG0F9_FPLL1, (BYTE)(FPLL>>8));
 	WriteTW88(REG0F8_FPLL0, (ReadTW88(REG0F8_FPLL0)&0xF0) | (FPLL>>16));
 }
-//-----------------------------------------------------------------------------
+
 /**
 * get SSPLL register value
 *
@@ -231,16 +226,16 @@ DWORD SspllGetFreqReg(void)
 	DWORD dFPLL;
 	
 	WriteTW88Page(PAGE0_SSPLL);
-	dFPLL = ReadTW88(REG0F8_FPLL0)&0x0F;
-	dFPLL <<=8;
+
+	dFPLL = ReadTW88(REG0F8_FPLL0) & 0x0F;
+	dFPLL <<= 8;
 	dFPLL |= ReadTW88(REG0F9_FPLL1);
-	dFPLL <<=8;
+	dFPLL <<= 8;
 	dFPLL |= ReadTW88(REG0FA_FPLL2);
 
 	return dFPLL;
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set SSPLL AnalogControl register
 *
@@ -252,10 +247,10 @@ DWORD SspllGetFreqReg(void)
 void SspllSetAnalogControl(BYTE value)
 {
 	WriteTW88Page(PAGE0_SSPLL);
-	WriteTW88(REG0FD_SSPLL_ANALOG, value );
+	
+	WriteTW88(REG0FD_SSPLL_ANALOG, value);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * get SSPLL Post value
 */
@@ -264,7 +259,9 @@ BYTE SspllGetPost(void)
 	BYTE post;
 
 	WriteTW88Page(PAGE0_SSPLL);
+
 	post = ReadTW88(REG0FD);
+
 	return ((post>>6) & 0x03);
 }
 
@@ -277,20 +274,22 @@ BYTE SspllGetPost(void)
     FPLL 			= (FREQ / 1000) *((2^12) * (2^POST)) / (3375) 			   			
 */
 #if 1 //GOOD
-//-----------------------------------------------------------------------------
 /**
 * get FPLL value from freq
 */
 DWORD SspllFREQ2FPLL(DWORD FREQ, BYTE POST)
 {
 	DWORD FPLL;
-	FPLL = FREQ/1000L;
+
+	FPLL   = FREQ / 1000L;
 	FPLL <<= POST;
 	FPLL <<= 12;
-	FPLL = FPLL / 3375L;
+	FPLL   = FPLL / 3375L;
+
 	return FPLL;
 }
 #endif
+
 #if 0	//BKFYI:example
 /*
     FPLL 			= FREQ *((2^15) * (2^POST)) / 27000000 			   			
@@ -330,20 +329,21 @@ DWORD SspllFREQ2FPLL(DWORD FREQ, BYTE POST)
 					= 421875 * FPLL / (512 *(2^POST))
 	   				= FPLL / 64 * 421875 / 8 / (2^POST)
 */
-//-----------------------------------------------------------------------------
+
 /**
 * get freq from FPLL
 */
 DWORD SspllFPLL2FREQ(DWORD FPLL, BYTE POST)
 {
 	DWORD FREQ;
-	FREQ = FPLL / 64;
-	FREQ *= 421875;
-	FREQ /= 8;
+
+	FREQ   = FPLL / 64;
+	FREQ  *= 421875;
+	FREQ  /= 8;
 	FREQ >>= POST;
+
 	return FREQ;
 }
-
 
 //SSPLL Set Frequency And PLL
 //R0F8
@@ -362,19 +362,39 @@ DWORD SspllFPLL2FREQ(DWORD FPLL, BYTE POST)
 */
 void SspllSetFreqAndPll(DWORD _PPF)
 {
-	BYTE	ppf, CURR, VCO, POST;
-	DWORD	FPLL;
+	BYTE ppf, CURR, VCO, POST;
+	DWORD FPLL;
 	
 	dPrintf("\nSspllSetFreqAndPll(%ld)",_PPF);
-	ppf = _PPF/1000000L;		//base:1MHz
+	ppf = _PPF / 1000000L;		//base:1MHz
 
 	//----- Frequency Range --------------------
-	if     ( ppf < 27 )  { VCO=2; CURR=0; POST=2; }		// step = 0.5MHz
-	else if( ppf < 54 )  { VCO=2; CURR=1; POST=1; }		// step = 1.0MHz
-	else if( ppf < 108 ) { VCO=2; CURR=2; POST=0; }		// step = 1.0MHz
-	else                 { VCO=3; CURR=3; POST=0; }		// step = 1.0MHz
+	if (ppf < 27)
+	{
+		VCO  = 2;
+		CURR = 0;
+		POST = 2;
+	}		// step = 0.5MHz
+	else if (ppf < 54)
+	{
+		VCO  = 2;
+		CURR = 1;
+		POST = 1;
+	}		// step = 1.0MHz
+	else if (ppf < 108)
+	{
+		VCO  = 2;
+		CURR = 2;
+		POST = 0;
+	}		// step = 1.0MHz
+	else
+	{
+		VCO  = 3;
+		CURR = 3;
+		POST = 0;
+	}		// step = 1.0MHz
 
-	CURR = VCO+1;	//BK110721. Harry Suggest.
+	CURR = VCO + 1;	//BK110721. Harry Suggest.
 
 	//----- Get FBDN
 	FPLL = SspllFREQ2FPLL(_PPF, POST);
@@ -383,14 +403,16 @@ void SspllSetFreqAndPll(DWORD _PPF)
 	SspllSetFreqReg(FPLL);
 	SspllSetAnalogControl((VCO<<4) | (POST<<6) | CURR);
 
-	dPrintf("\nPOST:%bx VCO:%bx CURR:%bx",POST, VCO, CURR);
+	dPrintf("\nPOST:%bx VCO:%bx CURR:%bx", POST, VCO, CURR);
 
 	//adjust pclk divider
-	if(ppf >=150) {
+	if (ppf >= 150)
+	{
 		ppf /= 2;
 		PclkSetDividerReg(1);	//div2
 	}
-	else {
+	else
+	{
 		PclkSetDividerReg(0);	//div1:default
 	}
 
@@ -399,11 +421,11 @@ void SspllSetFreqAndPll(DWORD _PPF)
 //	PclkoSetDiv( (ppf+PANEL_PCLK_TYP -1) / PANEL_PCLK_TYP - 1);
 //  BKTODO: I need 1.5 divider.
 #else
-	PclkoSetDiv( (ppf+39) / 40 - 1); //pixel clock polarity : Invert 0:div1, 1:div2, 2:div3
+	PclkoSetDiv((ppf + 39) / 40 - 1); //pixel clock polarity : Invert 0:div1, 1:div2, 2:div3
 										//BKTODO:move pixel clock polarity...	
 #endif
-	PclkSetPolarity(1);	//invert
 
+	PclkSetPolarity(1);	//invert
 }
 
 #if 0
@@ -477,13 +499,13 @@ void SspllSetFreqAndPllAndDiv(DWORD _PPF, BYTE div)
 // PCLK
 //=========================================
 
-//-----------------------------------------------------------------------------
 /**
 * set PCLK divider
 */
 void PclkSetDividerReg(BYTE divider)
 {
 	WriteTW88Page(0);
+
 	WriteTW88(REG0F6, (ReadTW88(REG0F6) & 0xF8) | divider);
 }
 
@@ -555,7 +577,7 @@ void PclkoSetDiv(/*BYTE pol,*/ BYTE div)
 
 	WriteTW88(REG20D, value);
 }
-//-----------------------------------------------------------------------------
+
 /**
 * set PCLK polarity
 *
@@ -567,30 +589,34 @@ void PclkoSetDiv(/*BYTE pol,*/ BYTE div)
 void PclkSetPolarity(BYTE pol)
 {
 	BYTE value;
+
 	WriteTW88Page(PAGE2_SCALER);
+
 	value = ReadTW88(REG20D);
-	if(pol)	value |=  0x10;
-	else	value &= ~0x10;
+	if (pol)
+		value |=  0x10;
+	else
+		value &= ~0x10;
 	WriteTW88(REG20D, value);
 }
-
 
 //=========================================
 // CLKPLL
 //=========================================
 
-//-----------------------------------------------------------------------------
 /**
 * select ClkPLL input
 */
 void ClkPllSetSelectReg(BYTE ClkPllSel)
 {
 	WriteTW88Page(4);
-	if(ClkPllSel) WriteTW88(REG4E0, ReadTW88(REG4E0) |  0x01);
-	else		  WriteTW88(REG4E0, ReadTW88(REG4E0) & ~0x01);
+
+	if (ClkPllSel)
+		WriteTW88(REG4E0, ReadTW88(REG4E0) |  0x01);
+	else
+		WriteTW88(REG4E0, ReadTW88(REG4E0) & ~0x01);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Set SPI input clock latch.
 * To support a high speed SPI clock, it needs a positive edge & 1 Cycle Delay.
@@ -639,8 +665,6 @@ void ClkPllSetSelectReg(BYTE ClkPllSel)
 *	
 */
 
-
-
 #define SPICLOCK_LOW	0
 #define SPICLOCK_HIGH	3
 #if 0
@@ -659,10 +683,10 @@ void ClkPllSetSpiInputClockLatch(BYTE property)
 void ClkPllSetDividerReg(BYTE divider)
 {
 	WriteTW88Page(4);
+
 	WriteTW88(REG4E1, (ReadTW88(REG4E1) & ~0x07) | divider);	//CLKPLL Divider
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set ClkPLL input and ClkPLL divider
 * 
@@ -671,12 +695,13 @@ void ClkPllSetDividerReg(BYTE divider)
 void ClkPllSetSelDiv(BYTE ClkPllSel, BYTE ClkPllDiv)
 {
 	BYTE mcu_sel;
-	DWORD clkpll,spi_clk;
-	BYTE i=0;
+	DWORD clkpll, spi_clk;
+	BYTE i = 0;
 
 	//check & move MCU CLK source to 27M 
 	mcu_sel = McuSpiClkReadSelectReg();
-	if(mcu_sel==MCUSPI_CLK_PCLKPLL) {
+	if (mcu_sel == MCUSPI_CLK_PCLKPLL)
+	{
 		McuSpiClkSelect(MCUSPI_CLK_27M);
 		I2C_delay_base = 1;	
 	}
@@ -685,22 +710,23 @@ void ClkPllSetSelDiv(BYTE ClkPllSel, BYTE ClkPllDiv)
 	//
 
 	ClkPllSetSelectReg(ClkPllSel);
-	do {
+	do 
+	{
 		ClkPllSetDividerReg(ClkPllDiv);
 		ClkPllDiv++;
-		clkpll =ClkPllGetFreq();
-		spi_clk=SpiClkGetFreq(clkpll);
+		clkpll  = ClkPllGetFreq();
+		spi_clk = SpiClkGetFreq(clkpll);
 		i++;
 	} while(spi_clk > 75000000L);	//MAX SPICLK
-	if(i!=1)
+	
+	if (i != 1)
 		ePrintf("\nClkPllSetSelDiv div encreased:%d",i-1);
 
 	//restore MCU CLK source
-	if(mcu_sel==MCUSPI_CLK_PCLKPLL)
+	if (mcu_sel == MCUSPI_CLK_PCLKPLL)
 		McuSpiClkSelect(MCUSPI_CLK_PCLKPLL);	
 }
 
-//-----------------------------------------------------------------------------
 /**
 * get ClkPLL frequency
 */
@@ -713,17 +739,21 @@ DWORD ClkPllGetFreq(void)
 	WriteTW88Page(4);
 	temp8 = ReadTW88(REG4E0) & 0x01;
 
-	if(temp8==0) {
+	if (temp8 == 0)
+	{
 		temp32 = SspllGetPPF();
 		clkpll = PclkGetFreq(temp32);
 	}
-	else {
+	else
+	{
 		clkpll=108000000L;
 	}
+	
 	WriteTW88Page(4);
 	temp8 = ReadTW88(REG4E1) & 0x07;
 
-	switch(temp8) {
+	switch (temp8)
+	{
 	case 0:	temp32 = clkpll;		break;
 	case 1:	temp32 = clkpll*2/3;	break;
 	case 2:	temp32 = clkpll*2;		break;
@@ -919,7 +949,6 @@ OK		PCLK_SEL  		PLL				 		PCLK
 BYTE shadow_r4e0;
 BYTE shadow_r4e1;
 
-//-----------------------------------------------------------------------------
 /**
 * select PCLK for McuSpi
 *
@@ -954,7 +983,6 @@ BYTE McuSpiClkToPclk(BYTE divider)
 	return 0;
 }
 
-//-----------------------------------------------------------------------------
 /**
 * restore MCUSPI clock
 *
@@ -975,7 +1003,6 @@ void McuSpiClkRestore(void)
 	//WriteTW88(REG0F6, ReadTW88(REG0F6) & 0xF8); 
 }
 
-//-----------------------------------------------------------------------------
 /**
 * read MCUSPI clock mode
 */
@@ -989,7 +1016,6 @@ BYTE McuSpiClkReadSelectReg(void)
 	return (value >> 4);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Select McuSpi clock source
 *
@@ -1004,10 +1030,12 @@ void McuSpiClkSelect(BYTE McuSpiClkSel)
 {
 #ifdef PANEL_AUO_B133EW01
 	//I will use SSPLL. Do not change MCU clock.
-	BYTE value=McuSpiClkSel;
+	BYTE value = McuSpiClkSel;
 #else
 	BYTE value;
+
 	WriteTW88Page(PAGE4_CLOCK);
+
 	value = ReadTW88(REG4E1) & 0x0F;
 	WriteTW88(REG4E1, (McuSpiClkSel << 4) | value);
 #endif

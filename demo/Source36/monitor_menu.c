@@ -182,7 +182,8 @@ void MonitorFOsd(void)
 {
 	DECLARE_LOCAL_page
 
-	if(!stricmp( argv[1], "?")) {
+	if (!stricmp(argv[1], "?"))
+	{
 		Puts("\n  === Help for FOSD command ===");
 		Puts("\nFOSD BPP3			;calculate 3BPP alpha order");
 		Puts("\nFOSD BPP2	[winno]	;draw 2BPP intersil icon");
@@ -209,7 +210,8 @@ void MonitorFOsd(void)
 
 	//-----------------------------------------------------
 	// print Font information
-	else if(!stricmp( argv[1], "info" )) {
+	else if (!stricmp(argv[1], "info"))
+	{
 		extern void FontInfoByNum(BYTE FontMode);
 		
 		//FOsdMon_info();
@@ -226,7 +228,8 @@ void MonitorFOsd(void)
 	}
 	//-----------------------------------------------------
 	// download font
-	else if(!stricmp( argv[1], "dnfont" )) {
+	else if (!stricmp(argv[1], "dnfont"))
+	{
 		BYTE num;
 		WORD loc;
 		if(argc < 3) {
@@ -382,7 +385,8 @@ void MonitorFOsd(void)
 //SPI OSD
 void MonitorSOsd(void)
 {
-	if(!stricmp( argv[1], "?")) {
+	if (!stricmp(argv[1], "?"))
+	{
 		Puts("\n=== Help for SOSD command ===");
 		Puts("\n\ton/off		;SOSD on/off");
 		Puts("\n\t [rose|pigeon]");
@@ -392,18 +396,23 @@ void MonitorSOsd(void)
 		Puts("\nAdd Your Test Function			;add comment");
  	}
 	//-------<<on>>-----------------------------
-	else if(!stricmp( argv[1], "on")) {
+	else if (!stricmp(argv[1], "on"))
+	{
 		SpiOsdEnable(ON);
 	}
 	//-------<<off>>-----------------------------
-	else if(!stricmp( argv[1], "off")) {
+	else if (!stricmp(argv[1], "off"))
+	{
 		SpiOsdEnable(OFF);
 	}
 	//-------<<rose>>-----------------------------
-	else if(!stricmp( argv[1], "rose")) {
-		if(argc >= 3) {
-			if(!stricmp( argv[2], "info")) {
-				Printf("\nimg loc:%lx size:%lx lut loc:%lx size:%lx 400x400x10",ROSE_START,ROSE_LEN, ROSE_LUT_LOC,PIGEON_ROSE_LUT_LEN);
+	else if (!stricmp(argv[1], "rose"))
+	{
+		if (argc >= 3)
+		{
+			if (!stricmp(argv[2], "info"))
+			{
+				Printf("\nimg loc:%lx size:%lx lut loc:%lx size:%lx 400x400x10", ROSE_START, ROSE_LEN, ROSE_LUT_LOC, PIGEON_ROSE_LUT_LEN);
 			}
 			else
 				Printf("\nInvalid command...");	
@@ -411,9 +420,12 @@ void MonitorSOsd(void)
 		RoseDemo();
 	}
 	//-------<<pigeon>>-----------------------------
-	else if(!stricmp( argv[1], "pigeon")) {
-		if(argc >= 3) {
-			if(!stricmp( argv[2], "info")) {
+	else if (!stricmp(argv[1], "pigeon"))
+	{
+		if (argc >= 3)
+		{
+			if (!stricmp(argv[2], "info"))
+			{
 				Printf("\nimg loc:%lx size:%lx lut loc:%lx size:%lx 400x400x10",PIGEON_START,PIGEON_LEN, PIGEON_LUT_LOC,PIGEON_ROSE_LUT_LEN);
 			}
 			else
@@ -422,23 +434,26 @@ void MonitorSOsd(void)
 		PigeonDemo();
 	}
 	//-------<<?? test image information>>-----------------------------
-	else if(!stricmp( argv[1], "??")) {
+	else if (!stricmp(argv[1], "??"))
+	{
 		MonSOsdImgInfo();
 	}
 	//-------<<lut offset# addr#>>-----------------------------
-	else if(!stricmp( argv[1], "lut")) {
+	else if (!stricmp(argv[1], "lut"))
+	{
 		BYTE img_n;
 		WORD lut;
-		if(argc < 4)
+		if (argc < 4)
 			Printf("\nInvalid command...");		 
-		else {
-			img_n=a2i(argv[2]);
-			lut  =a2i(argv[3]);
-			MonOsdLutLoad(img_n,3, lut); //I don't know winno. so tempolary assign 3.
+		else
+		{
+			img_n = a2i(argv[2]);
+			lut   = a2i(argv[3]);
+			MonOsdLutLoad(img_n, 3, lut); //I don't know winno. so tempolary assign 3.
 		}	
 	}
 	//-------<<img0 win# lut#>>-----------------------------
-	else if(!stricmp( argv[1], "img"))
+	else if (!stricmp(argv[1], "img"))
 	{
 		BYTE img_n,winno;
 		WORD lut;
@@ -454,12 +469,14 @@ void MonitorSOsd(void)
 		}	
 	}
 	//-------<<img1 win# lut#>>-----------------------------
-	else if(!stricmp( argv[1], "dnitem")) {
+	else if (!stricmp(argv[1], "dnitem"))
+	{
 		BYTE img_n,winno;
 		WORD lut;
-		if(argc < 4) 
+		if (argc < 4) 
 			Printf("\nInvalid command...");
-		else {
+		else
+		{
 			if(!stricmp( argv[3], "lut")) {
 				img_n = a2i(argv[2]);
 				winno = ReadTW88(REG009) >> 5;

@@ -88,19 +88,21 @@ struct fosd_menu_item_s {
 #define LUT_TYPE_S	1
 
 //menu_image_header
-typedef struct menu_image_header_s {
+typedef struct menu_image_header_s
+{
 	DWORD lut_loc;
 	DWORD image_loc;
 
 	BYTE lut_type;	//1:luts(byte pointer method.default on TW8835MENU), 0:lut(address method)
 	BYTE bpp;
 	BYTE rle;		//upper:bpp bottom:rle_counter.
-	WORD dx,dy;		//width, height
+	WORD dx, dy;		//width, height
 	WORD lut_size;	//we don't need it. we can assume LUT size & image size.
 } menu_image_header_t;
 
 
-typedef struct image_info_s {
+typedef struct image_info_s
+{
 	BYTE lut_type;	//1:luts(byte pointer method.default on TW8835MENU), 0:lut(address method)
 	BYTE rle;		//upper:bpp bottom:rle_counter.
 	WORD dx,dy;		//width, height

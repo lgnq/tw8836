@@ -10,10 +10,8 @@
  *
  * errata
  *	MultiFont can not be overlapped.
- *
- *
- *
  */
+
 #include "config.h"
 #include "reg.h"
 #include "typedefs.h"
@@ -88,7 +86,7 @@ code WORD FOsdSwDefPaletteBpp1[16] =
 */
 code WORD FOsdDefPaletteBpp2[4] =
 {	
-	0xF7DE,0x0000,0x5AAB,0xC000
+	0xF7DE, 0x0000, 0x5AAB, 0xC000
 }; 
 
 /**
@@ -96,21 +94,24 @@ code WORD FOsdDefPaletteBpp2[4] =
 */
 code WORD FOsdDefPaletteBpp3[8] =
 {	
-	0xFFFF,0x0000,0xDEDB,0x9492,0x6B6D,0xB5B6,0x4A49,0x2124		//consolas22_16x26
+	0xFFFF, 0x0000, 0xDEDB, 0x9492, 0x6B6D, 0xB5B6, 0x4A49, 0x2124		//consolas22_16x26
 };
 
 /**
 * FOSD 3 BPP Alpha default color table
 */
-code BYTE FOsdDefPaletteBpp3Alpha[8] = { 1,7,6,4,3,5,2,0 };		//consolas22_16x26
+code BYTE FOsdDefPaletteBpp3Alpha[8] = 
+{
+	1, 7, 6, 4, 3, 5, 2, 0 
+};		//consolas22_16x26
  
 /**
 * FOSD 3 BPP default color table
 */
 code WORD FOsdDefPaletteBpp4[16] =
 {
-	0xD6BA,0x20E3,0xF79E,0x62E8,0xE104,0xA944,0x39A6,0x7BAC,
-	0x51A6,0xC617,0x9CD1,0xB5B5,0x9BC9,0xDD85,0xF643,0xAC87
+	0xD6BA, 0x20E3, 0xF79E, 0x62E8, 0xE104, 0xA944, 0x39A6, 0x7BAC,
+	0x51A6, 0xC617, 0x9CD1, 0xB5B5, 0x9BC9, 0xDD85, 0xF643, 0xAC87
 };
 
 #ifdef SUPPORT_UDFONT
@@ -178,33 +179,46 @@ struct FontOsdInfo_s
 #define	FONT_ALPHA		0x01
 
 #ifdef MODEL_TW8835
-code	WORD	FOSDWinBase[] = 
+code WORD FOSDWinBase[] = 
 { 
-	FONTWIN1_ST, FONTWIN2_ST, FONTWIN3_ST, FONTWIN4_ST
+	FONTWIN1_ST,
+	FONTWIN2_ST,
+	FONTWIN3_ST,
+	FONTWIN4_ST
 };
 #else	//TW8836
-code	WORD	FOSDWinBase[] =
+code WORD FOSDWinBase[] =
 { 
-	FONTWIN1_ST, FONTWIN2_ST, FONTWIN3_ST, FONTWIN4_ST, FONTWIN5_ST, FONTWIN6_ST, FONTWIN7_ST, FONTWIN8_ST
+	FONTWIN1_ST,
+	FONTWIN2_ST, 
+	FONTWIN3_ST,
+	FONTWIN4_ST,
+	FONTWIN5_ST,
+	FONTWIN6_ST,
+	FONTWIN7_ST,
+	FONTWIN8_ST
 };
 #endif
 
 //BKTODO: move default font in this bank. 
 //it have a BANK issue.
 	 BYTE BPP3_alpha_lut_offset[8];					//need base_lut to use.
-code BYTE BPP3_alpha_value[8]={0,2,3,4,5,6,7,8};
+code BYTE BPP3_alpha_value[8] = 
+{
+	0, 2, 3, 4, 5, 6, 7, 8
+};
 
 /**
 * print FontInfo
 */
 void DumpFontInfo(void)
 {
-	ePrintf("\nFont:%s",FontOsdInfo.font.name);
-	ePrintf(" %bdx%bd", FontOsdInfo.font.w,FontOsdInfo.font.h);
-	ePrintf(" bpp2:%x",FontOsdInfo.font.bpp2);
-	ePrintf(" bpp3:%x",FontOsdInfo.font.bpp3);
-	ePrintf(" bpp4:%x",FontOsdInfo.font.bpp4);
-	ePrintf(" end:%x",FontOsdInfo.font.max);
+	ePrintf("\nFont:%s", FontOsdInfo.font.name);
+	ePrintf(" %bdx%bd", FontOsdInfo.font.w, FontOsdInfo.font.h);
+	ePrintf(" bpp2:%x", FontOsdInfo.font.bpp2);
+	ePrintf(" bpp3:%x", FontOsdInfo.font.bpp3);
+	ePrintf(" bpp4:%x", FontOsdInfo.font.bpp4);
+	ePrintf(" end:%x", FontOsdInfo.font.max);
 }
 
 //=============================================================================
@@ -260,6 +274,7 @@ void FOsdRamSetFifo(BYTE fOn, BYTE vdelay)
 void FOsdFontSetFifo(BYTE fOn)
 {
 	WriteTW88Page(PAGE3_FOSD);
+
 	if (fOn)
 		WriteTW88(REG300, ReadTW88(REG300) & ~0x02);	//turn off bypass, so FIFO will be ON.
 	else
@@ -289,7 +304,6 @@ void FOsdSetFontWidthHeight(BYTE width, BYTE height)
 	WriteTW88(REG_FOSD_MUL_CON, (width >> 2) * (height >> 1));	//sub-font total count.
 }
 
-//-------------------------------------------------------------------
 /**
 * calculate and set FontOSD DE value
 *
@@ -356,9 +370,6 @@ void FOsdSetDeValue(void)
 #endif
 }
 
-//=============================================================================
-//=============================================================================
-
 /**
 * set FOSD blink attribute
 *
@@ -370,6 +381,7 @@ void FOsdSetDeValue(void)
 void FOsdBlinkOnOff(BYTE fOn)
 {
 	WriteTW88Page(PAGE3_FOSD);
+
 	if (fOn)
 		WriteTW88(REG304, ReadTW88(REG304) | 0x80);
 	else
@@ -401,8 +413,10 @@ void FOsdRamSetWriteMode(BYTE fMode)
 	BYTE value;
 	
 	WriteTW88Page(PAGE3_FOSD);
+
 	value = ReadTW88(REG304) & 0xF3;
 	value |= (fMode << 2);
+
 	WriteTW88(REG304, value);
 }
 
@@ -478,10 +492,12 @@ void FOsdRamSetAddress(WORD addr)
 void FOsdRamSetData(WORD dat)
 {
 	WriteTW88Page(PAGE3_FOSD);
+
 	if (dat & 0x100)
 		WriteTW88(REG304,ReadTW88(REG304) |  0x20); 
 	else
 		WriteTW88(REG304,ReadTW88(REG304) & ~0x20);
+
 	WriteTW88(REG307, (BYTE)dat);
 }
 
@@ -536,7 +552,6 @@ void FOsdFontWrite(WORD start, BYTE *dat, BYTE bytesperfont, BYTE size)
 //r30B[7:0]
 //	MADD2
 
-//-------------------------------------------------------------------
 /**
 * OnOff FontOSD
 *
@@ -550,6 +565,7 @@ BYTE FOsdOnOff(BYTE fOnOff, BYTE vdelay)
 	BYTE value;
 	
 	WriteTW88Page(PAGE3_FOSD);
+
 	value = ReadTW88(REG30C);
 	if (fOnOff)
 	{
@@ -558,6 +574,7 @@ BYTE FOsdOnOff(BYTE fOnOff, BYTE vdelay)
 			if (vdelay)
 				WaitVBlank(vdelay);
 			WriteTW88(REG30C, value & ~0x40);
+
 			return 1;
 		}
 	}
@@ -568,6 +585,7 @@ BYTE FOsdOnOff(BYTE fOnOff, BYTE vdelay)
 			if (vdelay)
 				WaitVBlank(vdelay);
 			WriteTW88(REG30C, value | 0x40);
+
 			return 1;
 		}
 	}
@@ -598,8 +616,9 @@ void FOsdSetPaletteColor(BYTE start, WORD color, BYTE size, BYTE vdelay)
 	McuSpiClkToPclk(CLKPLL_DIV_2P0);
 
 	WriteTW88Page(PAGE3_FOSD);
+
 	r30c = ReadTW88(REG30C) & 0xC0;
-	for (i=start; i < (start+size); i++)
+	for (i = start; i < (start+size); i++)
 	{
 		WriteTW88(REG30C, r30c | i );
 		WriteTW88(REG30D, (BYTE)(color>>8));
@@ -633,8 +652,9 @@ void FOsdSetPaletteColorArray(BYTE index, WORD *array, BYTE size, BYTE vdelay)
 #endif
 
 	WriteTW88Page(PAGE3_FOSD);
+
 	r30c = ReadTW88(REG30C) & 0xC0;
-	for (i=0; i < size; i++)
+	for (i = 0; i < size; i++)
 	{
 		WriteTW88(REG30C, (index+i) | r30c);
 		WriteTW88(REG30D, (BYTE)(array[i] >> 8));
@@ -685,7 +705,7 @@ void FOsdRamWriteByteStr(BYTE *str, BYTE len)
 	WriteTW88(REG304, ReadTW88(REG304) & ~0x20);
 	
 	w_count = 1;
-	for (i=0; i < len; i++)
+	for (i = 0; i < len; i++)
 	{
 		WriteTW88(REG307, *str++);
 		w_count++;
@@ -840,8 +860,8 @@ void FOsdWinAlphaPixel(BYTE winno, BYTE lut, BYTE alpha)
 	WORD index = FOSDWinBase[winno] + FONT_ALPHA;
 
 	WriteTW88Page(PAGE3_FOSD);
-	WriteTW88(REG352,  lut);	 			// first, select color index
-	WriteTW88(index, alpha);				// second, write alpha value
+	WriteTW88(REG352, lut);				// first, select color index
+	WriteTW88(index, alpha);			// second, write alpha value
 }
 
 //array { index , alpha}
@@ -942,9 +962,10 @@ void FOsdWinScreenWH(BYTE winno, BYTE w, BYTE h)
 */
 WORD FOsdWinGetX(BYTE winno)
 {
-	WORD	Pos;
+	WORD Pos;
 
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
+	
 	Pos = ReadTW88(FOSDWinBase[winno]+2)&0x70;
 	Pos <<= 4;
 	Pos += ReadTW88(FOSDWinBase[winno]+3);
@@ -972,13 +993,15 @@ void FOsdWinSetX(BYTE winno, WORD x)
 WORD FOsdWinGetY(BYTE winno)
 {
 	WORD index;
-	WORD	Pos;
+	WORD Pos;
 
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
+	
 	index = FOSDWinBase[winno];
 	Pos = ReadTW88(index+2)&0x03;
 	Pos <<= 8;
 	Pos += ReadTW88(index+4);
+
 	return (Pos);
 }
 
@@ -991,7 +1014,7 @@ void FOsdWinSetY(BYTE winno, WORD y)
 
 	//dPrintf("\nFOsdWinSetY( %bd, %d )", winno, y );
 
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
 	index = FOSDWinBase[winno];
 	WriteTW88(index+2, (ReadTW88(index+2)&0xFC)|(y>>8));
 	WriteTW88(index+4, y);
@@ -1002,11 +1025,11 @@ void FOsdWinSetY(BYTE winno, WORD y)
 */
 void FOsdWinSetW(BYTE winno, WORD w)
 {
-	WORD 	index;
+	WORD index;
 
 	//dPrintf("\nFOsdWinSetW( %bd, %d )", winno, w );
 
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
 	index = FOSDWinBase[winno];  //????
 	WriteTW88(index+6, w);
 }
@@ -1085,8 +1108,6 @@ void FOsdWinSetOsdRamStartAddr(BYTE winno, WORD addr)
 // Initialize Functions
 //=======================================
 
-
-//-------------------------------------------------------------------
 /**
 * Init FontOSD
 */
@@ -1750,7 +1771,7 @@ void WriteStringToAddr(WORD addr, BYTE *str, BYTE cnt)
 */
 void FOsdRamMemsetAttr(WORD addr, BYTE attr, BYTE len)
 {
-	BYTE	i;
+	BYTE i;
 	BYTE w_count;
 
 	//Printf("\nFOsdRamMemsetAttr(%bx,%bx,%bx)",addr,color,cnt);
@@ -1759,12 +1780,14 @@ void FOsdRamMemsetAttr(WORD addr, BYTE attr, BYTE len)
 	delay1ms(1);
 
 	w_count = 0;
-	for(i=0; i < len; i++) {
+	for (i = 0; i < len; i++)
+	{
 		WriteTW88(REG308, attr);
 		w_count++;
-		if(w_count==6/*8*/) {	//NOTE
+		if (w_count == 6/*8*/)
+		{	//NOTE
 			delay1ms(1);
-			w_count=0;
+			w_count = 0;
 		}
 	}
 }
@@ -1860,7 +1883,7 @@ void FOsdRamClearAll(WORD dat, BYTE attr)
 	else
 		WriteTW88(REG304, ReadTW88(REG304) & ~0x20);
 
-	for (i=0; i < FOSD_MAX_OSDRAM_SIZE; i++)
+	for (i = 0; i < FOSD_MAX_OSDRAM_SIZE; i++)
 	{
 		WriteTW88(REG307, dat);
 	}
@@ -1884,7 +1907,7 @@ void InitFOsdMenuWindow(BYTE *ptr)
 	WORD index;
 	BYTE data_cnt;
 		
-	WriteTW88Page(PAGE3_FOSD );
+	WriteTW88Page(PAGE3_FOSD);
 
 	//debug message
 #if 0
@@ -1906,11 +1929,13 @@ void InitFOsdMenuWindow(BYTE *ptr)
 
 
 	data_cnt = *ptr;	  //read counter
-    while( data_cnt ) {
+    while (data_cnt)
+	{
 		ptr++;
 		index = FOSDWinBase[*ptr];				// start register address
 		ptr++;
-		do {
+		do
+		{
 			WriteTW88(index, *ptr );
 			index++; 
 			ptr++;
@@ -1928,7 +1953,7 @@ void InitFOsdMenuWindow(BYTE *ptr)
 //Bank issue  
 void FOsdDefaultLUT( void )
 {
-	FOsdSetPaletteColorArray(0,FOsdHwDefPaletteBpp1,16, 1); //with 1 vdelay
+	FOsdSetPaletteColorArray(0, FOsdHwDefPaletteBpp1, 16, 1); //with 1 vdelay
 }
 #endif
 
@@ -2052,8 +2077,8 @@ void FontInfoByNum(BYTE FontMode)
 */
 void DumpFont(void)
 {
-	WORD start,next,size;
-	WORD dat,addr;
+	WORD start, next, size;
+	WORD dat, addr;
 	BYTE value;
 	BYTE w_cnt;
 	WORD Y;
@@ -2070,19 +2095,21 @@ void DumpFont(void)
 	FOsdRamSetAddrAttr(start, 0x0F);
 	delay1ms(1);
 	w_cnt = 0;
-	for(addr=0; addr < next; addr++) {
+	for (addr = 0; addr < next; addr++)
+	{
 		FOsdRamSetData(addr); //same as data
 		w_cnt++;
-		if(w_cnt==4) {
+		if (w_cnt == 4)
+		{
 			w_cnt = 0;
 			delay1ms(1);
 		}
 	}
-	FOsdWinScreenXY(0, 0,0);
+	FOsdWinScreenXY(0, 0, 0);
 	FOsdWinScreenWH(0, (size >=16 ? 16: size), (size >> 4) + (size & 0x0F ? 1 : 0));	Y = ((size >> 4) + 1)* FontOsdInfo.font.h + 10;
-	FOsdWinZoom(0, 1/*0*/,0);
+	FOsdWinZoom(0, 1/*0*/, 0);
 	FOsdWinMulticolor(0, ON);
-	FOsdWinSetOsdRamStartAddr(0,start);
+	FOsdWinSetOsdRamStartAddr(0, start);
 	FOsdWinEnable(0, ON);
 
 	//WIN1 for 2BPP
@@ -2093,18 +2120,19 @@ void DumpFont(void)
 	size /= 2;
 	Printf("\n2BPP start:%d end:%d size:%d",start,next,size);
 	FOsdRamSetAddrAttr(start, 36>>2);
-	for(addr=start,dat=start; dat < next; addr++,dat+=2) {
+	for (addr=start,dat=start; dat < next; addr++,dat+=2)
+	{
 		FOsdRamSetAddress(addr);
 		FOsdRamSetAttr(36>>2);
 		FOsdRamSetAddress(addr);
 		FOsdRamSetData(dat);	
 		delay1ms(1);
 	}
-	FOsdWinScreenXY(1, 0,Y);
+	FOsdWinScreenXY(1, 0, Y);
 	FOsdWinScreenWH(1, (size >=16 ? 16: size), (size >> 4) + (size & 0x0F ? 1 : 0));	Y += ((size >> 4) + 1)* FontOsdInfo.font.h + 10;
-	FOsdWinZoom(1, 1/*0*/,0);
+	FOsdWinZoom(1, 1/*0*/, 0);
 	FOsdWinMulticolor(1, ON);
-	FOsdWinSetOsdRamStartAddr(1,start);
+	FOsdWinSetOsdRamStartAddr(1, start);
 	FOsdWinEnable(1, ON);
 
 	//WIN2 for 3BPP
@@ -2115,20 +2143,20 @@ void DumpFont(void)
 	size /= 3;
 	Printf("\n3BPP start:%d end:%d size:%d",start,next,size);
 	FOsdRamSetWriteMode(FOSD_OSDRAM_WRITE_NORMAL);
-	for(addr=start,dat=start; dat < next; addr++, dat+=3) {
+	for (addr=start,dat=start; dat < next; addr++, dat+=3)
+	{
 		FOsdRamSetAddress(addr);
 		FOsdRamSetAttr(40>>2);
 		FOsdRamSetAddress(addr);
 		FOsdRamSetData(dat);	
 		delay1ms(1);
 	}
-	FOsdWinScreenXY(2, 0,Y);
+	FOsdWinScreenXY(2, 0, Y);
 	FOsdWinScreenWH(2, (size >=16 ? 16: size), (size >> 4) + (size & 0x0F ? 1 : 0));	Y += ((size >> 4) + 1)* FontOsdInfo.font.h + 10;
-	FOsdWinZoom(2, 1/*0*/,0);
+	FOsdWinZoom(2, 1/*0*/, 0);
 	FOsdWinMulticolor(2, ON);
-	FOsdWinSetOsdRamStartAddr(2,start);
+	FOsdWinSetOsdRamStartAddr(2, start);
 	FOsdWinEnable(2, ON);
-
 
 	//WIN3 for 4BPP
 	FOsdWinInit(3);
@@ -2139,18 +2167,19 @@ void DumpFont(void)
 	size /= 4;
 	Printf("\n4BPP start:%d end:%d size:%d",start,next,size);
 	FOsdRamSetAddrAttr(start, 48>>2);
-	for(addr=start,dat=start; dat < next; addr++, dat+=4) {
+	for (addr=start,dat=start; dat < next; addr++, dat+=4)
+	{
 		FOsdRamSetAddress(addr);
 		FOsdRamSetAttr(48>>2);
 		FOsdRamSetAddress(addr);
 		FOsdRamSetData(dat);	
 		delay1ms(1);
 	}
-	FOsdWinScreenXY(3, 0,Y);
+	FOsdWinScreenXY(3, 0, Y);
 	FOsdWinScreenWH(3, (size >=16 ? 16: size), (size >> 4) + (size & 0x0F ? 1 : 0));
-	FOsdWinZoom(3, 2,3/*0,0*/);
+	FOsdWinZoom(3, 2, 3/*0,0*/);
 	FOsdWinMulticolor(3, ON);
-	FOsdWinSetOsdRamStartAddr(3,start);
+	FOsdWinSetOsdRamStartAddr(3, start);
 	FOsdWinEnable(3, ON);
 }
 

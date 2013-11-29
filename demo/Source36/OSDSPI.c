@@ -298,8 +298,6 @@ void SpiOsdWinBuffEnable(BYTE winno, BYTE en)
 	else   *data_p &= 0xfe;
 }
 
-
-//-----------------------------------------------------------------------------
 /**
 * Description
 *	clear all SpiWinBuff[]
@@ -324,7 +322,6 @@ void SOsdWinBuffClean(BYTE hw)
 	}
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Description
 * 	write SpiWinBuff to HW registers
@@ -354,8 +351,10 @@ void SOsdWinBuffWrite2Hw(BYTE start, BYTE end)
 #endif
 
 	//win0 uses 0x20, if not win0, increase 0x10.
-	if(start)	start++;
-	if(end)		end++;
+	if (start)
+		start++;
+	if (end)
+		end++;
 
 #ifdef DEBUG_OSD
 	//dump BK130104
@@ -365,7 +364,6 @@ void SOsdWinBuffWrite2Hw(BYTE start, BYTE end)
 	//		Printf(" %02bx", data_p[i]);
 	//}
 #endif
-	
 
 #ifdef DEBUG_OSD
 	//NOTE: If you print the debug message, we have to check the vblank again.
@@ -374,7 +372,8 @@ void SOsdWinBuffWrite2Hw(BYTE start, BYTE end)
 	WriteTW88Page(PAGE4_SOSD);
 	data_p = &SpiWinBuff[start << 4];
 
-	for(i=start; i <= end; i++) {
+	for (i = start; i <= end; i++)
+	{
 		reg_i = 0x400 | (i << 4) + 0x20;
 													
 		WriteTW88(reg_i++, *data_p++);	//0
@@ -393,7 +392,8 @@ void SOsdWinBuffWrite2Hw(BYTE start, BYTE end)
 		WriteTW88(reg_i++, *data_p++);	//D
 		WriteTW88(reg_i++, *data_p++);	//E
 		WriteTW88(reg_i++, *data_p++);	//F
-		if(i==0) {
+		if (i == 0)
+		{
 			i++;
 			WriteTW88(reg_i++, *data_p++);	//10  REG430
 			WriteTW88(reg_i++, *data_p++);	//11
@@ -409,7 +409,6 @@ void SOsdWinBuffWrite2Hw(BYTE start, BYTE end)
 	}
 }
 #pragma RESTORE
-
 
 #if 0
 //-----------------------------------------------------------------------------
@@ -445,7 +444,6 @@ void SpiOsdWinBuffSynchEnable(void)
 }
 #endif
 
-//-----------------------------------------------------------------------------
 /**
 * Description
 *	turn off all SpiOsd Window.
@@ -465,7 +463,6 @@ void SpiOsdWinHWOffAll(BYTE wait)
 		SpiOsdWinHWEnable(i, 0);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Description
 * 	set image location
@@ -644,7 +641,7 @@ void SpiOsdWinScreen(BYTE winno, WORD x, WORD y, WORD w, WORD h)
 * @param
 * @return
 */
-void SpiOsdWinLutOffset( BYTE winno, WORD table_offset )
+void SpiOsdWinLutOffset(BYTE winno, WORD table_offset)
 {
 	DATA BYTE XDATA *data_p;
 
@@ -688,6 +685,7 @@ void SpiOsdWinPixelWidth(BYTE winno, BYTE bpp)
 	*data_p &= 0x3f;
 	*data_p |= (mode <<6);
 }
+
 //-----------------------------------------------------------------------------
 /**
 * Description
@@ -700,12 +698,12 @@ void SpiOsdWinPixelWidth(BYTE winno, BYTE bpp)
 */
 /**
 */
-void SpiOsdWinFillColor( BYTE winno, BYTE color )
+void SpiOsdWinFillColor(BYTE winno, BYTE color)
 {
 	WORD index;
 
 	index = SpiOsdWinBase[winno];
-	WriteTW88Page(PAGE4_SOSD );
+	WriteTW88Page(PAGE4_SOSD);
 
 	if (color)
 	{
@@ -715,6 +713,7 @@ void SpiOsdWinFillColor( BYTE winno, BYTE color )
 	{
 		WriteTW88(index, (ReadTW88(index ) & 0xFB ) );				// dis Alpha & Global
 	}
+	
 	index = SpiOsdWinBase[winno] + SPI_OSDWIN_FILLCOLOR;
 	if (!winno)
 		index += 8;
@@ -733,18 +732,21 @@ void SpiOsdWinFillColor( BYTE winno, BYTE color )
 /**
 * set global alpha
 */
-void SpiOsdWinGlobalAlpha( BYTE winno, BYTE alpha )
+void SpiOsdWinGlobalAlpha(BYTE winno, BYTE alpha)
 {
 	DATA BYTE XDATA *data_p;
 
-	if(winno) winno++;
+	if (winno)
+		winno++;
 	data_p = &SpiWinBuff[winno << 4];
 
 	*data_p &= 0xCF;
-	if(alpha) *data_p |= 0x10;
+	if (alpha)
+		*data_p |= 0x10;
 
 	data_p += SPI_OSDWIN_ALPHA;
-	if(!winno)	data_p += 4;
+	if (!winno)
+		data_p += 4;
 	*data_p = alpha;
 }
 
@@ -757,22 +759,24 @@ void SpiOsdWinGlobalAlpha( BYTE winno, BYTE alpha )
 *	0 to 7F. 0x7F is a higest transparent value.
 * @return
 */
-void	SpiOsdWinPixelAlpha( BYTE winno, BYTE alpha )
+void SpiOsdWinPixelAlpha(BYTE winno, BYTE alpha)
 {
 	DATA BYTE XDATA *data_p;
 
-	if(winno) winno++;
+	if (winno)
+		winno++;
 	data_p = &SpiWinBuff[winno << 4];
 
-	if(alpha)	*data_p |= 0x30;
-	else		*data_p &= 0xCF;
+	if (alpha)
+		*data_p |= 0x30;
+	else
+		*data_p &= 0xCF;
 
 	data_p += SPI_OSDWIN_ALPHA;
-	if(!winno)	data_p += 4;
+	if (!winno)
+		data_p += 4;
 	*data_p = alpha;
 }
-
-
 
 //-----------------------------------------------------------------------------
 /**
@@ -795,8 +799,10 @@ void SpiOsdWin0SetPriority(BYTE high)
 
 	data_p = &SpiWinBuff[0];
 
-	if(high) *data_p |= 0x02;
-	else   	*data_p &= 0xfd;
+	if (high)
+		*data_p |= 0x02;
+	else
+		*data_p &= 0xfd;
 #endif
 }
 
@@ -857,8 +863,6 @@ void SpiOsdWin0ImageOffsetXY (WORD x, WORD y)
 	*data_p++ = (BYTE)y;
 }
 
-
-
 #ifdef FUNCTION_VERIFICATION
 //no DMA
 //@param
@@ -869,10 +873,6 @@ void SpiOsdWin0ImageOffsetXY (WORD x, WORD y)
 //{
 //}
 #endif
-
-
-
-
 
 //-----------------------------------------------------------------------------
 /**
@@ -885,14 +885,15 @@ void SOsdHwBuffClean(void)
 {
 	BYTE i;
 
-	SOsdHwBuff_alpha_A=0xffff;
-	SOsdHwBuff_alpha_B=0xffff;
-	SOsdHwBuff_rle_A_win=0;
-	SOsdHwBuff_rle_B_win=0;
+	SOsdHwBuff_alpha_A   = 0xffff;
+	SOsdHwBuff_alpha_B   = 0xffff;
+	SOsdHwBuff_rle_A_win = 0;
+	SOsdHwBuff_rle_B_win = 0;
 
-	for(i=0; i<=8; i++) {
+	for (i=0; i<=8; i++)
+	{
 		//clear use flag
-		SOsdHwBuff_win[i*9]=0;		
+		SOsdHwBuff_win[i*9] = 0;		
 	}
 }
 
@@ -908,7 +909,7 @@ void SOsdHwBuffClean(void)
 *	image location on SpiFlash
 * @return
 */
-void SOsdHwBuffSetLut(BYTE win, /*BYTE type,*/  WORD LutOffset, WORD size, DWORD address)
+void SOsdHwBuffSetLut(BYTE win, /*BYTE type,*/WORD LutOffset, WORD size, DWORD address)
 {
    	SOsdHwBuff_win[win*9+0] = 1;
 	SOsdHwBuff_win[win*9+1] = (BYTE)(size >> 8);
@@ -964,7 +965,7 @@ void SOsdHwBuffSetRle(BYTE win, BYTE bpp, BYTE count)
 */
 void SOsdHwBuffSetAlpha(BYTE win, WORD alpha_index)
 {
-	if(win==1 || win==2)
+	if (win==1 || win==2)
 		SOsdHwBuff_alpha_B = alpha_index;
 	else
 		SOsdHwBuff_alpha_A = alpha_index;
@@ -1027,23 +1028,23 @@ void SOsdHwBuffWrite2Hw(void)
 	McuSpiClkToPclk(CLKPLL_DIV_3P0);	//with divider 3(36MHz)	try 3	TW8836
 #endif
 
-
 	//----------------------------
 	//update LUT
-	WriteTW88Page(PAGE4_SOSD );
-	WriteTW88(REG410, 0xa0 );    			// LUT Write Mode, En & byte ptr inc. DMA needs it.
+	WriteTW88Page(PAGE4_SOSD);
+	WriteTW88(REG410, 0xa0);    			// LUT Write Mode, En & byte ptr inc. DMA needs it.
 	WriteTW88(REG411, 0); 					// LUT addr. set 0 on DMA
 
 
-	for(win=0; win <= 8; win++) {
+	for (win=0; win <= 8; win++)
+	{
 		//check Use flag.
-		if(SOsdHwBuff_win[win*9] == 0) 
+		if (SOsdHwBuff_win[win*9] == 0) 
 			continue;
 
 //#ifdef DEBUG_OSD
 //		dPrintf("SWIN:%bd ",win);
 //#endif
-		if(win == 1 || win == 2)	//BK121312
+		if (win == 1 || win == 2)	//BK121312
 			WriteTW88(REG410, 0xa4 );
 		else
 			WriteTW88(REG410, 0xa0 );
@@ -1072,12 +1073,12 @@ void SOsdHwBuffWrite2Hw(void)
 
 		WriteTW88(REG4C0_SPIBASE+0x04, 0x01 ); 			// DMA Start
 		//while(ReadTW88Page() != PAGE4_SPI);			//trick. check DONE. BusyWait
-
 	}
 	//
 	// update alpha
 	//
-	if(SOsdHwBuff_alpha_B != 0xFFFF) {
+	if (SOsdHwBuff_alpha_B != 0xFFFF)
+	{
 		//WriteTW88(REG410, 0xc3 | 0x04);    		// LUT Write Mode, En & byte ptr inc.	with GROUP B
 		//if(SOsdHwBuff_alpha_A >> 8)	WriteTW88(REG410, ReadTW88(REG410) | 0x08);	//support 512 palette
 		//else            			WriteTW88(REG410, ReadTW88(REG410) & 0xF7);
@@ -1089,13 +1090,14 @@ void SOsdHwBuffWrite2Hw(void)
 
 		SOsdHwBuff_alpha_B = 0xFFFF;					//clear. BK130107
 	}
-	if(SOsdHwBuff_alpha_A != 0xFFFF) {
+	if (SOsdHwBuff_alpha_A != 0xFFFF)
+	{
 		//WriteTW88(REG410, 0xc3 );    		// LUT Write Mode, En & byte ptr inc.
 		//if(SOsdHwBuff_alpha_A >> 8)	WriteTW88(REG410, ReadTW88(REG410) | 0x08);	//support 512 palette
 		//else            			WriteTW88(REG410, ReadTW88(REG410) & 0xF7);
 
 		bTemp = 0xC3;									// LUT Write Mode, En & byte ptr inc.
-		if(SOsdHwBuff_alpha_A >> 8) bTemp |= 0x08;		//support 512 palette
+		if (SOsdHwBuff_alpha_A >> 8) bTemp |= 0x08;		//support 512 palette
 
 		WriteTW88(REG410, bTemp);
 		WriteTW88(REG411, (BYTE)SOsdHwBuff_alpha_A ); 	// alpha index
@@ -1103,8 +1105,6 @@ void SOsdHwBuffWrite2Hw(void)
 
 		SOsdHwBuff_alpha_A = 0xFFFF;					//clear. BK130107
 	}
-
-
 
 #if defined(TW8836_CHIPDEBUG)
 	//BK120615. for test clock source
@@ -1148,19 +1148,23 @@ void SOsdHwBuffWrite2Hw(void)
 	//}
 	//temp BK121217
 	// we have A & B
-	if(SOsdHwBuff_rle_A_win) {
+	if (SOsdHwBuff_rle_A_win)
+	{
 		WriteTW88(REG404, SOsdHwBuff_rle_A_win << 4);
 		WriteTW88(REG405, ((SOsdHwBuff_rle_A_bpp==7?8:SOsdHwBuff_rle_A_bpp) << 4) | (SOsdHwBuff_rle_A_count));
 	}
-	else {
+	else
+	{
 		WriteTW88(REG404, 0);
 		WriteTW88(REG405, 0);
 	}
-	if(SOsdHwBuff_rle_B_win) {
+	if (SOsdHwBuff_rle_B_win)
+	{
 		WriteTW88(REG406, SOsdHwBuff_rle_B_win << 4);
 		WriteTW88(REG407, ((SOsdHwBuff_rle_B_bpp==7?8:SOsdHwBuff_rle_B_bpp) << 4) | (SOsdHwBuff_rle_B_count));
 	}
-	else {
+	else
+	{
 		WriteTW88(REG406, 0);
 		WriteTW88(REG407, 0);
 	}
@@ -1173,10 +1177,12 @@ void SOsdHwBuffWrite2Hw(void)
 	//      Pls. do not use win0 here.
 	//start = 1+1;
 	//end = 8+1;
-	data_p = &SpiWinBuff[ 2 /*start*/ << 4];
-	for(i=2/*start*/; i <= 9/*end*/; i++) {
+	data_p = &SpiWinBuff[2 /*start*/ << 4];
+	for (i=2/*start*/; i <= 9/*end*/; i++)
+	{
 		reg_i = 0x400 | (i << 4) + 0x20;
-		for(j=0; j < 16; j++) {
+		for (j=0; j < 16; j++)
+		{
 			WriteTW88(reg_i++, *data_p++);	
 		}
 	}
@@ -1198,20 +1204,18 @@ void SpiOsdPixelAlphaAttr(BYTE win, WORD lutloc, BYTE value)
 {
 	BYTE bTemp;
 	
-	WriteTW88Page(PAGE4_SOSD );
+	WriteTW88Page(PAGE4_SOSD);
 
 	bTemp = 0xC3;						//en Write. ADDR type. Select Attr.
-	if(win==1 || win==2)
+	if (win == 1 || win == 2)
 		bTemp |= 0x04;					//select Group B.
-	else if(lutloc >> 8)			
+	else if (lutloc >> 8)			
 		bTemp |= 0x08;					//support 512 palette on Group A
 
 	WriteTW88(REG410, bTemp);
-	WriteTW88(REG411, (BYTE)lutloc ); 	// LUT addr
-	WriteTW88(REG412, value ); 			// LUT addr
+	WriteTW88(REG411, (BYTE)lutloc); 	// LUT addr
+	WriteTW88(REG412, value); 			// LUT addr
 }
-
-
 
 //-----------------------------------------------------------------------------
 /**
@@ -1242,13 +1246,15 @@ void SpiOsdLoadLUT(BYTE _winno, BYTE _type, WORD LutOffset, WORD size, DWORD add
 	BYTE winno = _winno;
 	BYTE type  = _type;
 
-	if(type==LUTTYPE_ADDR) {
+	if (type == LUTTYPE_ADDR)
+	{
 //BUG130124
 //		if((winno != 1) && (winno != 2)) {
 			SpiOsdIoLoadLUT(winno, type, LutOffset, size, address, alpha);
 			return;
 //		}
-	}	
+	}
+
 #ifdef DEBUG_OSD
 	dPrintf("\nSpiOsdLoadLUT%s win:%bd, LutLoc:0x%x size:%d at:0x%06lx", type == LUTTYPE_ADDR ? "S":" ", _winno, LutOffset, size, address);
 #endif
@@ -1267,66 +1273,72 @@ void SpiOsdLoadLUT(BYTE _winno, BYTE _type, WORD LutOffset, WORD size, DWORD add
 
 	//--- SPI-OSD config
 	reg = 0x80;										// LUT Write Mode.
-	if(type==LUTTYPE_ADDR)	reg |= 0x40;			// address ptr inc						
-	else					reg |= 0x20;			// byte ptr inc.
+	if (type == LUTTYPE_ADDR)
+		reg |= 0x40;			// address ptr inc						
+	else
+		reg |= 0x20;			// byte ptr inc.
 
-	if(LutOffset & 0x0F00)  reg |= 0x08;			//select 512.										
-	if(winno == 1 || winno == 2)					// if win1 or win2, 
+	if (LutOffset & 0x0F00)
+		reg |= 0x08;			//select 512.										
+	if (winno == 1 || winno == 2)					// if win1 or win2, 
 		reg |= 0x04;								// select group LUT_B. Note Max 256.
 	WriteTW88(REG410, reg);
-	WriteTW88(REG411, (BYTE)LutOffset ); 			// LUT addr. set 0 on DMA
-
+	WriteTW88(REG411, (BYTE)LutOffset); 			// LUT addr. set 0 on DMA
 
 	//Spi Flash DMA
-	WriteTW88(REG4C0_SPIBASE+0x04, 0x00 );	// DMA stop	
+	WriteTW88(REG4C0_SPIBASE+0x04, 0x00);	// DMA stop	
 
 	WriteTW88(REG4C0_SPIBASE+0x03, 0x80 | SPICMD_x_BYTES + SpiFlash4ByteAddr); //LUT,Increase, 0x0B with 5 commands, 0xeb with 7 commands	           
-	WriteTW88(REG4C0_SPIBASE+0x0a, SPICMD_x_READ ); 			// SPI Command=R
+	WriteTW88(REG4C0_SPIBASE+0x0a, SPICMD_x_READ); 			// SPI Command=R
 
-	if(SpiFlash4ByteAddr) {
-		WriteTW88(REG4C0_SPIBASE+0x0b, (BYTE)(address>>24) );
-		WriteTW88(REG4C0_SPIBASE+0x0c, (BYTE)(address>>16) );
-		WriteTW88(REG4C0_SPIBASE+0x0d, (BYTE)(address>>8) );
-		WriteTW88(REG4C0_SPIBASE+0x0e, (BYTE)(address) );
+	if (SpiFlash4ByteAddr) 
+	{
+		WriteTW88(REG4C0_SPIBASE+0x0b, (BYTE)(address>>24));
+		WriteTW88(REG4C0_SPIBASE+0x0c, (BYTE)(address>>16));
+		WriteTW88(REG4C0_SPIBASE+0x0d, (BYTE)(address>>8));
+		WriteTW88(REG4C0_SPIBASE+0x0e, (BYTE)(address));
 	}
-	else {
-		WriteTW88(REG4C0_SPIBASE+0x0b, (BYTE)(address>>16) );
-		WriteTW88(REG4C0_SPIBASE+0x0c, (BYTE)(address>>8) );
-		WriteTW88(REG4C0_SPIBASE+0x0d, (BYTE)(address) );
+	else 
+	{
+		WriteTW88(REG4C0_SPIBASE+0x0b, (BYTE)(address>>16));
+		WriteTW88(REG4C0_SPIBASE+0x0c, (BYTE)(address>>8));
+		WriteTW88(REG4C0_SPIBASE+0x0d, (BYTE)(address));
 	}
+	
 	//d		h		addr	 addr  byte
 	//0    0x00     0x000		0	0 	
 	//128  0x80		0x200	   80   0
 	//192  0xC0		0x300	   c0   0
-	if(type==LUTTYPE_ADDR) {
+	if (type == LUTTYPE_ADDR)
+	{
 		//if use addrss ptr inc.
 		//addr_ptr = LutOffset;
 		//byte_ptr  0;
 		WriteTW88(REG4C0_SPIBASE+0x06, (BYTE)(LutOffset >> 8));		//LutOffset[8]  ->R4C6[0]
 		WriteTW88(REG4C0_SPIBASE+0x07, (BYTE)LutOffset);			//LutOffset[7:0]->R4C7[7:0]		
 	}
-	else {
+	else
+	{
 		//if use byte ptr inc.
-		WriteTW88(REG4C0_SPIBASE+0x06, (BYTE)(LutOffset >> 6) ); 	//LutOffset[8:6] -> R4C6[2:0]
-		WriteTW88(REG4C0_SPIBASE+0x07, (BYTE)(LutOffset << 2) );	//LutOffset[5:0] -> R4C7[7:2] 
+		WriteTW88(REG4C0_SPIBASE+0x06, (BYTE)(LutOffset >> 6)); 	//LutOffset[8:6] -> R4C6[2:0]
+		WriteTW88(REG4C0_SPIBASE+0x07, (BYTE)(LutOffset << 2));	//LutOffset[5:0] -> R4C7[7:2] 
 		                                                        	//					R4C7[1:0]  start of byte ptr
 	}
 
-	WriteTW88(REG4C0_SPIBASE+0x1a, 0x00 ); // DMA size
-	WriteTW88(REG4C0_SPIBASE+0x08, (BYTE)(size >> 8) );
-	WriteTW88(REG4C0_SPIBASE+0x09, (BYTE)size );
+	WriteTW88(REG4C0_SPIBASE+0x1a, 0x00); // DMA size
+	WriteTW88(REG4C0_SPIBASE+0x08, (BYTE)(size >> 8));
+	WriteTW88(REG4C0_SPIBASE+0x09, (BYTE)size);
 
-
-	WriteTW88(REG4C0_SPIBASE+0x04, 0x01 ); // DMA Start
+	WriteTW88(REG4C0_SPIBASE+0x04, 0x01); // DMA Start
 //P1_3 =0;
 //P1_4 = !P1_4;
 //	while(ReadTW88Page() != PAGE4_SPI);			//trick. check DONE. BusyWait
 //EA = 1;
-
 	
 	//update pixel alpha value.
-	if(alpha!=0xFF) {
-		SpiOsdPixelAlphaAttr(winno,LutOffset+alpha, 0x7F);	
+	if (alpha != 0xFF)
+	{
+		SpiOsdPixelAlphaAttr(winno, LutOffset+alpha, 0x7F);	
 	}
 
 #ifdef DEBUG_OSD
@@ -1342,7 +1354,6 @@ void SpiOsdLoadLUT(BYTE _winno, BYTE _type, WORD LutOffset, WORD size, DWORD add
 	McuSpiClkRestore();
 #endif
 }
-
 
 //-----------------------------------
 // RLC(RunLengthCompress) functions
