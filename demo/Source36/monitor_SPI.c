@@ -507,13 +507,6 @@ void MonitorSPIC(void)
 	WriteTW88Page(page);
 }
 
-
-
-
-
-//=============================================================================
-//
-//=============================================================================
 //	Format is needed only once
 //	Init is needed when starting program
 #ifdef USE_SFLASH_EEPROM
@@ -523,75 +516,77 @@ void MonitorEE(void)
 	BYTE dat1;
 	WORD index;
 
-	index = a2h( argv[2] );
-	dat   = a2h( argv[3] );
+	index = a2h(argv[2]);
+	dat   = a2h(argv[3]);
 
-	//--------------------------------------------------------
-	if( !stricmp( argv[1], "format" ) ) {
+	if (!stricmp(argv[1], "format"))
+	{
 		Printf("\nFormat EEPROM...");
 		E3P_Format();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "init" ) ) {
+	else if (!stricmp(argv[1], "init"))
+	{
 		Printf("\nFind EEPROM variables...");
 		//E3P_Init();
 		E3P_Configure();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "repair" ) ) {
+	else if (!stricmp(argv[1], "repair"))
+	{
 		Printf("\nRepair MoveDone error..call only when EE find have a MoveDone error");
 		E3P_Repair();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "default" ) ) {
+	else if (!stricmp(argv[1], "default"))
+	{
 		Printf("\nEE initialize........");
 		ClearBasicEE();
 		SaveDebugLevelEE(0);
-		SaveFWRevEE( FWVER );
+		SaveFWRevEE(FWVER);
 		E3P_PrintInfo();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "check" ) ) {
+	else if (!stricmp(argv[1], "check"))
+	{
 		Printf("\nEE check");
 		E3P_Check();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "info" ) ) {
+	else if (!stricmp(argv[1], "info"))
+	{
 		Printf("\nEE info");
 		E3P_PrintInfo();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "clean" ) ) {
+	else if (!stricmp(argv[1], "clean"))
+	{
 		Printf("\nEE clean blocks");
 		E3P_Clean();
 		return;
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "W" ) ) {
-		if( argc==4 ) {
-			Printf("\nWrite EEPROM %03x:%02bx ", index, dat );
-			EE_Write( index, dat );
-			dat1 = EE_Read( index );  //BUG
-			dat = EE_Read( index );
+	else if (!stricmp(argv[1], "W"))
+	{
+		if (argc == 4)
+		{
+			Printf("\nWrite EEPROM %03x:%02bx ", index, dat);
+			EE_Write(index, dat);
+			dat1 = EE_Read(index);  //BUG
+			dat = EE_Read(index);
 			Printf(" ==> Read EEPROM[%03x] = %02bx %02bx", index, dat1, dat );
 		}
 	}
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "R" ) ) {
-		if( argc==3 ) {
-			dat = EE_Read( index );
+	else if (!stricmp(argv[1], "R"))
+	{
+		if (argc == 3)
+		{
+			dat = EE_Read(index);
 			Printf("\n ==> Read EEPROM[%03x] = %02bx ", index, dat );
 		}
 	}
-	//--------------------------------------------------------
 #ifdef USE_SFLASH_EEPROM
-	else if( !stricmp( argv[1], "D" ) ) {
+	else if (!stricmp(argv[1], "D"))
+	{
 		Printf("\nDump EEPROM");
 		E3P_DumpBlocks(0);
 		//for(j=0; j<E3P_MAX_INDEX/16; j++) {
@@ -602,8 +597,8 @@ void MonitorEE(void)
 		//}
 	}
 #endif
-	//--------------------------------------------------------
-	else if( !stricmp( argv[1], "?" ) ) {
+	else if (!stricmp(argv[1], "?"))
+	{
 		Printf("\n\n  === Help for EE command ===");
 		Printf("\nEE format         ; format and initialize");
 		Printf("\nEE find           ; initialze internal variables");
@@ -617,17 +612,13 @@ void MonitorEE(void)
 		Printf("\nFYI %bx:DebugLevel %bx:InputMain ",EEP_DEBUGLEVEL,EEP_INPUTSELECTION);
 		Printf("\n");
 	}
-
 	else
 		Printf("\nInvalid command...");	
-	
 }
 #endif
 
-//=============================================================================
 /**
 * SPI Read Status
-*
 */
 static void SPI_Status(void)
 {
@@ -637,7 +628,7 @@ static void SPI_Status(void)
 	BYTE ret;
 
 	ret = SpiFlashChipRegCmd(SPICMD_RDID,0,3, 0);
-	if(ret)
+	if (ret)
 		Puts("\nSPICMD_RDID fail");
 	vid  = SPI_CmdBuffer[0];
 	dat1 = SPI_CmdBuffer[1];
@@ -683,7 +674,6 @@ static void SPI_Status(void)
 	}
 }
 
-//=============================================================================
 /**
 * read and dump SPIFLASH data
 */
@@ -695,7 +685,8 @@ static void SPI_dump(DWORD spiaddr)
 
 	SpiFlashDmaRead2XMem(SPI_Buffer, spiaddr, cnt);  //same SpiFlashDmaRead 
 
-	for (j=0; j<8; j++) {
+	for (j=0; j<8; j++)
+	{
 		Printf("\nSPI %06lx: ", spiaddr + j*0x10);
 		for(i=0; i<8; i++) Printf("%02bx ", SPI_Buffer[j*0x10+i] );
 		Printf("- ");
