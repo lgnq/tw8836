@@ -30,6 +30,7 @@
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
           <SFDFile></SFDFile>
+          <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
           <IncludePath></IncludePath>
@@ -97,6 +98,7 @@
           <StopOnExitCode>3</StopOnExitCode>
           <CustomArgument></CustomArgument>
           <IncludeLibraryModules></IncludeLibraryModules>
+          <ComprImg>1</ComprImg>
           <BankNo>65535</BankNo>
         </CommonProperty>
         <DllOption>
@@ -170,6 +172,10 @@
           <Flash2></Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
+          <pFcarmOut></pFcarmOut>
+          <pFcarmGrp></pFcarmGrp>
+          <pFcArmRoot></pFcArmRoot>
+          <FcArmLst>0</FcArmLst>
         </Utilities>
         <Target51>
           <Target51Misc>
@@ -365,6 +371,7 @@
               <StopOnExitCode>11</StopOnExitCode>
               <CustomArgument></CustomArgument>
               <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>0</ComprImg>
               <BankNo>0</BankNo>
             </CommonProperty>
             <Group51>
@@ -447,6 +454,7 @@
               <StopOnExitCode>11</StopOnExitCode>
               <CustomArgument></CustomArgument>
               <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>0</ComprImg>
               <BankNo>1</BankNo>
             </CommonProperty>
             <Group51>
@@ -604,6 +612,7 @@
               <StopOnExitCode>11</StopOnExitCode>
               <CustomArgument></CustomArgument>
               <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>0</ComprImg>
               <BankNo>2</BankNo>
             </CommonProperty>
             <Group51>
@@ -686,6 +695,7 @@
               <StopOnExitCode>11</StopOnExitCode>
               <CustomArgument></CustomArgument>
               <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>0</ComprImg>
               <BankNo>3</BankNo>
             </CommonProperty>
             <Group51>
@@ -788,6 +798,7 @@
               <StopOnExitCode>11</StopOnExitCode>
               <CustomArgument></CustomArgument>
               <IncludeLibraryModules></IncludeLibraryModules>
+              <ComprImg>0</ComprImg>
               <BankNo>4</BankNo>
             </CommonProperty>
             <Group51>

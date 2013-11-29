@@ -28,8 +28,6 @@
 #include "debug.h"
 #include "BT656.h"
 
-
-
 #include "DebugMsg.h"
 
 #ifdef USE_SFLASH_EEPROM
@@ -39,6 +37,7 @@ void E3P_Read2XMem(BYTE * dest_loc, DWORD src_loc, WORD size)
 {
 	SpiFlashDmaRead2XMem(dest_loc, src_loc, size);
 }
+
 void E3P_SectorErase(DWORD spiaddr)
 {
 	SPI_SectorErase(spiaddr);
@@ -52,6 +51,7 @@ void E3P_PageProgram(DWORD spiaddr, BYTE * xaddr, WORD cnt)
 /* configure and init E3P */
 void E3P_Configure(void)
 {
+/*
 	E3P_GetVersion();
 	E3P_SetStartAddr(E3P_SPI_SECTOR0);				//start from 0x080000
 	E3P_SetSize(E3P_INDEX_PER_BLOCK, E3P_BLOCKS);	//512 bytes 64 * 8.
@@ -59,6 +59,7 @@ void E3P_Configure(void)
 	
 	if (E3P_Init())
 		E3P_Repair();
+*/		
 }
 
 #elif defined(NO_EEPROM)	//.. USE_SFLASH_EEPROM		//=========================================
@@ -103,8 +104,6 @@ void EE_Write(WORD index, BYTE dat)
 	Printf("\nEE_Write(%x,%bx) SKIP",index,dat);	
 } 
 #endif
-
-//-----------------------------------------------------------------------------
 
 //=============================================================================
 // 	EE[0]	T	T
@@ -614,9 +613,6 @@ void ClearBasicEE(void)
 #endif
 }
 
-//=============================================================================
-//
-//=============================================================================
 /**
 * init EEPROM
 * 
@@ -641,15 +637,12 @@ void InitializeEE(void)
 BYTE CheckEEPROM(void)
 {
 #ifdef USE_SFLASH_EEPROM
-//	BYTE ret;
-	//---------------------
+	BYTE ret;
+
 	// Link EEPROM(SFlash)
-	//eee_SPI_SECTOR0		= EE_SPI_SECTOR0;
-	//eee_SPI_BANKS		= EE_SPI_BANKS;
-	//eee_MAX_INDEX		= EE_MAX_INDEX;
-	//eee_INDEX_PER_BLOCK = ;
-	//eee_BLOCKS 			= EE_BLOCKS;
-	//eee_BUF_SIZE		= SPI_BUFFER_SIZE;
+	ret = EE_FindCurrInfo();	//<--first EE function.
+	if (ret)
+		E3P_Repair();
 #endif
 
 	//eeprom

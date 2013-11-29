@@ -4928,7 +4928,6 @@ void MenuEnd(void)
 
 	MenuInputMain = GetInputMain();
 
-
 	FontOsdInit(); //need it for Task message.
 	FOsdSetDeValue();
 

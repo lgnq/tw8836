@@ -626,7 +626,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 
 	//check EEPROM
 #ifdef USE_SFLASH_EEPROM
-	E3P_Configure();
+//	E3P_Configure();
 #endif
 
 	ee_mode = CheckEEPROM();
@@ -639,7 +639,7 @@ BYTE InitSystem(BYTE _fPowerUpBoot)
 
 		#ifdef USE_SFLASH_EEPROM
 		E3P_Format();
-		E3P_Init();
+		EE_FindCurrInfo();
 		#endif
 	
 		InputMain = 0xff;	// start with saved input

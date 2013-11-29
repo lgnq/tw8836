@@ -508,9 +508,6 @@ void DumpDviTable(WORD hActive,WORD vActive)
 }
 #endif						
 
-//===================================================================
-
-
 #endif //..SUPPORT_HDMI_EP9351
 
 void DbgMsg_EEP_Corruptted(void)

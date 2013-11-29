@@ -9,18 +9,19 @@
 #ifdef USE_SFLASH_EEPROM
 #include "e3prom.h"
 
+#define SPI_SECTOR_SIZE		0x1000		// 4K
 #define E3P_SPI_SECTOR0		0x080000L	// EE Start Address
 #define E3P_SPI_BANKS		4
 #define E3P_INDEX_PER_BLOCK	64			// 32 or 64
 #define E3P_BLOCKS			8
 #define E3P_MAX_INDEX		(E3P_INDEX_PER_BLOCK*E3P_BLOCKS)
 
+#define EE_BUF_SIZE			SPI_BUFFER_SIZE		//64 or 128
 
 #define EE_Read(index)			E3P_Read(index)
 #define EE_Write(index, value) 	E3P_Write(index,value)
 
 void E3P_Configure(void);
-
 
 #elif defined(NO_EEPROM)  //..USE_SFLASH_EEPROM
 BYTE EE_Read                (WORD index);
@@ -29,7 +30,6 @@ void EE_Write               (WORD index, BYTE dat);
 #define EE_Read(index)		ReadI2CByte(ADDRESS_EEPROM + ((index >> 8) << 1),(BYTE)index)
 #define EE_Write(index,dat)	WriteI2CByte(ADDRESS_EEPROM + ((index >> 8) << 1),(BYTE)index,dat)
 #endif //..USE_SFLASH_EEPROM
-
 
 ////eeprom.h
 

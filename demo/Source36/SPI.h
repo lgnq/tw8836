@@ -155,5 +155,4 @@ void SPI_SectorErase        ( DWORD spiaddr );
 void SPI_BlockErase         ( DWORD spiaddr );
 void SPI_PageProgram        ( DWORD spiaddr, WORD x_addr, WORD cnt );
 
-
 #endif // __SPI_H__

@@ -22,6 +22,8 @@
 #include "I2C.h"
 #include "SPI.h"
 #include "Settings.h"	//for CLKPLL_DIV_
+#include "EEPROM.h"
+#include "e3prom.h"
 
 //----------------- SPI Mode Definition ---------------------
 
@@ -952,13 +954,779 @@ void SpiOsdIoLoadLUT(BYTE _winno, BYTE type, WORD LutOffset, WORD size, DWORD sp
 //*****************************************************************************
 //	Format: For each 4 bytes [Index] [Index^FF] [Data] [Data^FF]
 //
-//
 #ifdef USE_SFLASH_EEPROM
-//moved to E3P_c24.lib or E3P_bank.lib
+
+BYTE EE_CurrBank[E3P_BLOCKS];
+WORD EE_WritePos[E3P_BLOCKS];
+BYTE EE_buf[E3P_INDEX_PER_BLOCK];
+BYTE EE_mask[(E3P_INDEX_PER_BLOCK+7)/8];
+
+/**
+* print current E3PROM information
+*/
+void E3P_PrintInfo(void)
+{
+	BYTE block;
+	DWORD sector_addr;
+
+	for (block = 0; block < E3P_BLOCKS; block++)
+	{
+		sector_addr = E3P_SPI_SECTOR0 + SPI_SECTOR_SIZE * ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]);
+		Printf("\n\tBlock:%bx Bank%bx WritePos:%x Sector:%06lx", block, EE_CurrBank[block], EE_WritePos[block], sector_addr);
+	}
+}
+
+/**
+* format E3PROM
+*/
+void E3P_Format(void)
+{
+	BYTE  block, j;
+	DWORD spi_addr;
+
+	dPrintf("\nEE_Format start");
+
+	for (block = 0; block < E3P_BLOCKS; block++)
+	{
+		spi_addr = E3P_SPI_SECTOR0 + SPI_SECTOR_SIZE * (DWORD)block * E3P_SPI_BANKS;
+		for (j = 0; j < E3P_SPI_BANKS; j++)
+		{
+			SPI_SectorErase(spi_addr);
+			//should delay 20ms because the flash erase a secotor will take 20ms. Eamon.fang
+			spi_addr += SPI_SECTOR_SIZE;
+		}
+		
+		EE_CurrBank[block] = 0;
+		EE_WritePos[block] = 0;
+	}
+
+	dPrintf("\nEE_Format end - please call 'EE find'");
+}
+
+/**
+* check a MoveDone Bank
+*/
+static BYTE EE_CheckMoveDoneBank(BYTE block, BYTE bank)
+{
+	DWORD sector_addr;
+	
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + bank) * SPI_SECTOR_SIZE;
+
+	SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr + SPI_SECTOR_SIZE - 4, 4L);
+
+	if ((SPI_Buffer[0]==0x00) && (SPI_Buffer[1]==0x00) && (SPI_Buffer[2]==0x00) && (SPI_Buffer[3]==0x00))
+		return 1;	//TRUE
+		
+	return 0;
+}
+
+/**
+* write MoveFone flag
+*/
+static void EE_WriteMoveDone(BYTE block, BYTE bank)
+{
+	DWORD sector_addr;
+	
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + bank) * SPI_SECTOR_SIZE;
+
+	//mark it as done.
+	SPI_Buffer[0] = 0;
+	SPI_Buffer[1] = 0;
+	SPI_Buffer[2] = 0;
+	SPI_Buffer[3] = 0;
+	SPI_PageProgram(sector_addr + SPI_SECTOR_SIZE - 4, (WORD)SPI_Buffer, 4L);
+}
+
+/**
+* write Block
+*
+* Used only in EE_MoveBank and EE_RepairMoveDone
+* so, I assume, we have enough space.
+*/
+static void EE_WriteBlock(BYTE block, BYTE *buf, BYTE *mask)
+{
+	DWORD sector_addr;
+	BYTE idx;
+	BYTE i, j;
+	BYTE wptr, bptr;
+
+#ifdef DEBUG_SFLASH_EEPROM
+	dPrintf("\nEE_WriteBlock(%bd,,)", block);
 #endif
 
-//=============================================================================
-//=============================================================================
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]) * SPI_SECTOR_SIZE;
 
+	//write buf to new bank.
+	wptr = 0;		//write pointer
+	for (i = 0; i < (E3P_INDEX_PER_BLOCK * 4) / SPI_BUFFER_SIZE; i++)
+	{
+		bptr = 0;		//SPI_Buffer pointer
+		for (j = 0; j < SPI_BUFFER_SIZE / 4; j++)
+		{
+			idx = SPI_BUFFER_SIZE / 4 * i + j;
+
+			if (mask[idx>>3] & (1<<(idx&0x07)))
+			{
+				//found valid data
+				SPI_Buffer[bptr++] = idx;
+				SPI_Buffer[bptr++] = idx^0xff;
+				SPI_Buffer[bptr++] = buf[idx];
+				SPI_Buffer[bptr++] = buf[idx] ^ 0xFF;
+			}
+		}
+		
+		if (bptr == 0)
+		{
+#ifdef DEBUG_SFLASH_EEPROM
+			dPrintf("\n0byte. skip %bd",i);
+#endif
+			continue;
+		}
+		
+		SPI_PageProgram(sector_addr + wptr, (WORD)SPI_Buffer, bptr);
+		wptr += bptr;
+	}
+	
+	EE_WritePos[block] = wptr;
+}
+
+/**
+* check a blank bank
+*/
+static BYTE EE_CheckBlankBank(BYTE block, BYTE bank)
+{
+	DWORD sector_addr;
+
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + bank) * SPI_SECTOR_SIZE;
+
+	SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr, 4L);
+
+	if ((SPI_Buffer[0]==0xff) && (SPI_Buffer[1]==0xff) && (SPI_Buffer[2]==0xff) && (SPI_Buffer[3]==0xff))
+		return 1;	 //TRUE
+		
+	return 0;
+}
+
+/* read E3PROM Block
+*
+*	Read index+data on buff[]
+*	each block have max 64 index+data pair. 
+*	each block have max 1024 items(4*1024 / 4).
+*	this function gather the valid 64 index+data pairs on current bank. 
+*
+* note: buf[] size have to be E3P_INDEX_PER_BLOCK
+*      mask[] size have to be (E3P_INDEX_PER_BLOCK/8)
+*
+* if we have a item, the bitmap mask will have a "1".
+* if we donot have a item, the bitmap mask will have a "0".
+*/
+static void EE_ReadBlock(BYTE block, BYTE *buf, BYTE *mask)
+{
+	BYTE i, j, ch0, ch1, ch2, ch3;
+	DWORD sector_addr;
+	WORD remain;
+	BYTE read_cnt;
+
+	//clear buffer and mask bitmap
+	for (i = 0; i < E3P_INDEX_PER_BLOCK; i++)
+		buf[i] = 0x00;
+	
+	for (i = 0; i < ((E3P_INDEX_PER_BLOCK + 7) / 8); i++)
+		mask[i] = 0x00;
+
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]) * SPI_SECTOR_SIZE;
+	remain = EE_WritePos[block];
+
+	for (j = 0; j < SPI_SECTOR_SIZE / EE_BUF_SIZE; j++)
+	{
+		if (remain == 0)
+			break;
+
+		if (remain >= EE_BUF_SIZE)
+			read_cnt = EE_BUF_SIZE;
+		else
+			read_cnt = remain;
+
+		SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr + j * EE_BUF_SIZE, read_cnt);
+
+		remain -= read_cnt;
+
+		for (i = 0; i < read_cnt; i += 4)
+		{
+			ch0 = SPI_Buffer[i];		//index
+			ch1 = SPI_Buffer[i+1];		//^index
+			ch2 = SPI_Buffer[i+2];		//data
+			ch3 = SPI_Buffer[i+3];		//^data
+
+			if (((ch0^ch1) == 0xff) && ((ch2^ch3) == 0xff))
+			{
+				mask[ch0>>3] |= (1 << (ch0 & 0x07));
+				buf[ch0] = ch2;
+			}
+		}
+	}
+}
+
+/**
+* move Bank
+*
+* @return
+*	1:SectorErase happen
+*/
+static BYTE EE_MoveBank(BYTE block)
+{
+	DWORD sector_addr;
+	BYTE prev_bank;
+	BYTE ret = 0;
+	
+#ifdef DEBUG_SFLASH_EEPROM
+	dPrintf("\nEE_MoveBank block:%bd, bank:%bd WritePos:%d", block, EE_CurrBank[block], EE_WritePos[block]);
+#endif
+
+	//read Block data to buf.
+	EE_ReadBlock(block, EE_buf, EE_mask);
+
+	//move to next bank
+	prev_bank = EE_CurrBank[block];
+	EE_CurrBank[block] = (EE_CurrBank[block] + 1) % E3P_SPI_BANKS;
+	EE_WritePos[block] = 0;
+
+	ret = EE_CheckBlankBank(block, EE_CurrBank[block]);
+	//if current bank is not blank, then erase this bank
+	if (ret == 0)
+	{
+		sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]) * SPI_SECTOR_SIZE;
+		SPI_SectorErase(sector_addr);
+		
+		ret = 1; 
+	}
+
+	EE_WriteBlock(block, EE_buf, EE_mask);
+
+	EE_WriteMoveDone(block, prev_bank);
+
+	return ret;
+}
+
+/**
+*	clean block. 
+*
+*	If item is bigger then threshold, move to next bank.
+*	If no blank bank when it is moving, do SectorErase first.
+*	If fSkipErase is 0, do SectorErase for garbage banks.
+* @param
+*	fSkipErase- to reduce SectorErase. 
+*	if 2, do not check the threshold.		
+*
+* If we donot have a blank bank when we move, we do SectorErase. 
+*	
+* @return
+*	low-nibble:	moving occur.
+*	high-nibble: SectorErase occur
+*/
+#define EE_INDEX_THRESHOLD	(64*2*4)	//64 base items * 64 used items. remain 896 items
+
+static BYTE EE_CleanBlock(BYTE block, BYTE fSkipErase)
+{
+	DWORD sector_addr;
+	BYTE i, j;
+
+	BYTE ret=0;
+
+#ifdef DEBUG_SFLASH_EEPROM
+	dPrintf("\nEE_CleanBlock(block:%bd,f:%bd) bank:%bd",block,fSkipErase,EE_CurrBank[block]);
+#endif
+
+	//Do you need to move a bank ?
+	if (fSkipErase==2 || EE_WritePos[block] >= EE_INDEX_THRESHOLD)
+	{
+		ret++;
+
+		//if(EE_MoveBank(EE_CurrBank[block]))	 BK110819
+		if (EE_MoveBank(block))
+			ret += 0x10;
+	}
+
+	if (fSkipErase)
+		//done.
+		return ret;	//it can be 0 or 1, or 0x11.
+
+ 	//erase the used other banks
+	for (i = 1; i < E3P_SPI_BANKS;i++)
+	{   //note: start from 1
+		j = (EE_CurrBank[block] + i) % E3P_SPI_BANKS;		//get target bank
+ 		sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block*E3P_SPI_BANKS + j) * SPI_SECTOR_SIZE;
+
+		SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr, 4L);
+
+		if( (SPI_Buffer[0]==0xff) && (SPI_Buffer[1]==0xff) && (SPI_Buffer[2]==0xff) && (SPI_Buffer[3]==0xff))
+			//next is blank.
+			continue;
+		SPI_SectorErase(sector_addr);
+		ret += 0x10;
+		
+		//debug. read back
+		//SPI_dump(sector_addr);
+	}
+
+	return ret;
+}
+
+/**
+* clean banks
+*/
+void E3P_Clean(void)
+{
+	BYTE block;
+	BYTE ret;
+
+	dPrintf("\nEE_CleanBlocks ");
+	for (block = 0; block < E3P_BLOCKS; block++)
+	{
+		//dPrintf("\n\t Block:%02bx-",block);
+		ret = EE_CleanBlock(block, 0);	//normal
+		if (ret)
+			dPrintf(" clean");
+		else
+			dPrintf(" skip");
+	}
+}
+
+/**
+* read E3PROM
+*
+*	read eeprom index data
+*	Work only on current bank.
+* @return
+*	indexed eeprom data.
+*	if no data, return 0.
+*/
+BYTE E3P_Read(WORD index)
+{
+	int i; //NOTE
+	BYTE block;
+	BYTE sindex;	//sub index
+	DWORD sector_addr;
+	WORD remain;
+	BYTE read_cnt;
+
+	block  = index / E3P_INDEX_PER_BLOCK;
+	sindex = index % E3P_INDEX_PER_BLOCK;		//index in block. max 0xFF
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]) * SPI_SECTOR_SIZE;
+
+	remain = EE_WritePos[block];
+	while (remain)
+	{
+		if (remain >= EE_BUF_SIZE)
+			read_cnt = EE_BUF_SIZE;
+		else
+			read_cnt = remain;
+
+		SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr+remain-read_cnt, read_cnt);
+
+		remain -= read_cnt;
+
+		for (i = read_cnt-4; i >= 0; i -= 4)
+		{
+			if (SPI_Buffer[i] != sindex)
+				continue;
+			
+			if (((SPI_Buffer[i] + SPI_Buffer[i+1]) == 0xff) && ((SPI_Buffer[i+2] + SPI_Buffer[i+3]) == 0xff))
+				return SPI_Buffer[i+2];
+		}
+	}
+
+	ePrintf("\nCannot find EEPROM index %x data in block%bx bank%bx", index, block, EE_CurrBank[block]);
+
+	return 0;
+}
+
+/**
+* write E3PROM
+*
+*	write index & data with index+^index+data+^data format
+*/
+void E3P_Write(WORD index, BYTE dat)
+{
+	BYTE block;
+	BYTE sindex;
+	DWORD sector_addr;
+	BYTE ret;
+
+	block  = index / E3P_INDEX_PER_BLOCK;
+	sindex = index % E3P_INDEX_PER_BLOCK;		//index in block. max 0xFF
+
+	if (EE_WritePos[block] >= SPI_SECTOR_SIZE)
+	{
+		ret = EE_CleanBlock(block, 1);
+		//BKFYI: EE_CurrBank[block] & EE_WritePos[block] will be updated.
+		if (ret)
+		{
+			wPrintf("\nWarning:");
+			if (ret & 0xF0)
+				wPrintf("BankMove ");
+			if (ret & 0x0F)
+				wPrintf("SectorErase ");
+			wPrintf(" in EE_Write");
+		}
+	}
+
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]) * SPI_SECTOR_SIZE;
+
+	//----- Write data
+	SPI_Buffer[0] = (BYTE)sindex;
+	SPI_Buffer[1] = 0xff^(BYTE)sindex;
+	SPI_Buffer[2] = dat;
+	SPI_Buffer[3] = 0xff^dat;
+	SPI_PageProgram(sector_addr + EE_WritePos[block], (WORD)SPI_Buffer, 4L);
+
+	EE_WritePos[block] += 4;
+}
+
+/**
+* find E3PROM information
+*
+* Find EE_CurrBank[] and EE_WritePos[] per block.
+* method 3. you can use all blank sector
+* @return
+*	0:OK.
+*	1:Found broken banks. Need repair.
+*/
+BYTE EE_FindCurrInfo(void)		
+{
+	BYTE i, j, k;
+	DWORD sector_addr;
+	BYTE ret;
+
+	ePrintf("\nEE_FindCurrInfo");
+	ePrintf(" %06lx~%06lx", E3P_SPI_SECTOR0, E3P_SPI_SECTOR0 + (DWORD)SPI_SECTOR_SIZE * E3P_SPI_BANKS * E3P_BLOCKS - 1);
+
+	ret = 0;
+	//----- Check EEPROM corruption -------------------------
+
+	//----- Find EE_CurrBank and EE_WritePos -------------
+
+	for (i = 0; i < E3P_BLOCKS; i++)
+	{
+		//
+		//get EE_CurrBank[]
+		//
+		EE_CurrBank[i] = E3P_SPI_BANKS;  //start from garbage.
+		for (j = 0; j < E3P_SPI_BANKS; j++)
+		{
+			sector_addr = E3P_SPI_SECTOR0 + SPI_SECTOR_SIZE * ((DWORD)i * E3P_SPI_BANKS + j);
+			
+			SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr, 4L);
+
+			//check Blank Bank
+			if ((SPI_Buffer[0]==0xFF) && (SPI_Buffer[1]==0xFF) && (SPI_Buffer[2]==0xFF) && (SPI_Buffer[3]==0xFF))
+			{	
+				//If you already have a used bank, stop here.
+				//If it is a first blank bank after used one, stop here.
+				if (EE_CurrBank[i] != E3P_SPI_BANKS)
+					break;
+				//keep search
+			}
+			else
+			{
+				//found used bank, keep update bank number.
+				//EE_CurrBank[i] = j;
+				//continue check.	
+				
+				//check MoveDone flag at end of secotr.
+				//sector_addr = E3P_SPI_SECTOR0 + SPI_SECTOR_SIZE*((DWORD)i*E3P_SPI_BANKS+j);
+				SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr + SPI_SECTOR_SIZE-4, 4L);
+
+				if ((SPI_Buffer[0]==0x00) && (SPI_Buffer[1]==0x00) && (SPI_Buffer[2]==0x00) && (SPI_Buffer[3]==0x00))
+				{
+					//found MoveDone bank
+					; //skip this bank	
+				}
+				else
+				{
+					if (EE_CurrBank[i] != E3P_SPI_BANKS)
+					{
+						//we found two used banks, maybe it is a broken bank.
+						//But, we will use this broken bank.
+						//and, I am sure, this broken bank have a small items.(less then 64)
+						//so, we don't need to clean it yet.
+						wPrintf("\nFound broken bank at block%bx. %bx and %bx", i, EE_CurrBank[i], j);
+						ret = 1 << i;	//found broken
+					}
+					if (EE_CurrBank[i]==0 && j==(E3P_SPI_BANKS-1))
+					{
+						//bank0 is a corrent one. do not update bank3(last bank)
+						;
+					} 
+					else
+					{
+						EE_CurrBank[i] = j;
+					}
+				}
+			}	 
+		}
+		
+		//if no used bank, start from 0.
+		if (EE_CurrBank[i] == E3P_SPI_BANKS)
+			EE_CurrBank[i] = 0;
+			
+		//	
+		//get EE_WritePos[]
+		//
+		sector_addr = E3P_SPI_SECTOR0 + SPI_SECTOR_SIZE * (E3P_SPI_BANKS * (DWORD)i + EE_CurrBank[i]);
+		for (j=0; j<SPI_SECTOR_SIZE/EE_BUF_SIZE; j++)
+		{
+			SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr + j * EE_BUF_SIZE, EE_BUF_SIZE);
+
+			EE_WritePos[i] = SPI_SECTOR_SIZE;
+			for (k=0; k<EE_BUF_SIZE; k+=4)
+			{
+				if (SPI_Buffer[k]==0xff && SPI_Buffer[k+1]==0xff)
+				{
+					EE_WritePos[i] = j * EE_BUF_SIZE + k;
+					j = 254; //next will be 0xFF, the max BYTE number. So, we can stop.
+					break;
+				}
+			}
+		}
+	}
+
+	E3P_PrintInfo();
+
+	if (ret)
+		wPrintf("\ntype EE repair");
+
+	return ret;
+}
+
+/**
+* fill the LostItems
+*
+*	fill out the lost item data from bank(other)
+*	If we already have a valid item, skip the update.
+*/
+static void EE_FillLostItems(BYTE block, BYTE bank, BYTE *buf, BYTE *mask)
+{
+	DWORD sector_addr;
+	WORD remain;
+	BYTE i, j;
+	BYTE read_cnt;
+	BYTE ch0,ch1,ch2,ch3;
+
+	sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block*E3P_SPI_BANKS + bank) * SPI_SECTOR_SIZE;
+	remain = SPI_SECTOR_SIZE;
+
+	for (j=0; j<SPI_SECTOR_SIZE/EE_BUF_SIZE; j++)
+	{
+		if (remain == 0)
+			break;
+		if (remain >= EE_BUF_SIZE)
+			read_cnt = EE_BUF_SIZE;
+		else
+			read_cnt = remain;
+		SpiFlashDmaRead2XMem(SPI_Buffer, sector_addr + j * EE_BUF_SIZE, read_cnt);
+
+		remain -= read_cnt;
+
+		for (i=0; i<read_cnt; i+=4)
+		{
+			ch0 = SPI_Buffer[i];		//index
+			ch1 = SPI_Buffer[i+1];		//^index
+			ch2 = SPI_Buffer[i+2];		//data
+			ch3 = SPI_Buffer[i+3];		//^data
+
+			if (((ch0^ch1)==0xff) && ((ch2^ch3)==0xff))
+			{
+				//found valid item
+
+				//now, check mask.
+				if (mask[ch0>>3] & (1<<(ch0&0x07)))
+				{
+					//we already have a valid item. just skip.
+				}
+				else
+				{
+					mask[ch0>>3] |= (1 << (ch0 & 0x07));
+					buf[ch0] = ch2;
+				}
+			}
+		}
+	}
+}
+
+/**
+* repair a broken bank
+*
+* If you found a broken bank, call it to repair.
+* After this routine, call the EE_CleanBank.
+* we assume, we have a enough space on current bank.  ===>WRONG
+* When we have a broken bank, the item number of current bank is alwasy less then 64.
+*/
+void E3P_Repair(void) //need new name
+{
+	BYTE block;
+	BYTE prev_bank;
+	BYTE ret;
+
+	dPrintf("\nEE_RepairBank");
+
+	for (block = 0; block < E3P_SPI_BANKS; block++)
+	{
+		dPrintf("\nblock%bx",block);
+		prev_bank = (EE_CurrBank[block] + E3P_SPI_BANKS -1) % E3P_SPI_BANKS;
+		ret = EE_CheckMoveDoneBank(block, prev_bank);
+		ret += EE_CheckBlankBank(block, prev_bank);
+		if (ret == 0)
+		{
+			dPrintf(" repair %bx->%bx", prev_bank, EE_CurrBank[block]); 
+			//prev_bank is not a MoveDone bank.
+			//we need a repair.
+			EE_ReadBlock(block, EE_buf, EE_mask);					//read items from current bank
+			EE_FillLostItems(block, prev_bank, EE_buf, EE_mask);	//read the lost items from prev bank
+			EE_WriteBlock(block, EE_buf, EE_mask);				//update items.
+			EE_WriteMoveDone(block, prev_bank);
+		}
+		else
+		{
+			dPrintf("->skip");
+		}
+	}
+}
+
+/**
+* dump Banks
+*/
+void E3P_DumpBlocks(void)
+{
+	BYTE block;
+	BYTE i, j;
+
+	for (block = 0; block < E3P_BLOCKS; block++)
+	{
+		Printf("\nBlock:%02bx Bank%d WritePos:%x", block, (WORD)EE_CurrBank[block], EE_WritePos[block]);
+
+		EE_ReadBlock(block, EE_buf, EE_mask);
+		for (i = 0; i < (E3P_INDEX_PER_BLOCK / 16); i++)
+		{
+			Printf("\n%03x:", (WORD)block * E3P_INDEX_PER_BLOCK + i * 16);
+			for (j = 0; j < 16; j++)
+			{
+				if (EE_mask[(i*16+j)>>3] & (1<<(j&0x07)))
+					Printf("%02bx ", EE_buf[i*16+j]);
+				else
+					Printf("-- ");
+			}
+		}
+	}
+}
+
+/**
+* check E3PROM
+*
+* EEPROM check routine
+*/
+void E3P_Check(void)
+{
+	BYTE block, bank;
+	BYTE ret;
+	WORD j;
+	DWORD sector_addr;
+
+	//print summary
+	for (block = 0; block < E3P_BLOCKS; block++)
+	{
+		Printf("\nblock%bx ", block);
+		for (bank = 0; bank < E3P_SPI_BANKS; bank++)
+		{
+			ret = EE_CheckBlankBank(block, bank);
+			if (ret)
+			{
+				Printf("_");			//blank
+			}
+			else
+			{
+				ret = EE_CheckMoveDoneBank(block, bank);
+				if (ret)
+					Printf("X");	//done	  	
+				else
+					Printf("U");	//used
+			}
+		}
+	}
+	
+	//dump
+	E3P_DumpBlocks();
+	
+	//check corruptted items
+	for (block = 0; block < E3P_BLOCKS; block++)
+	{
+		sector_addr = E3P_SPI_SECTOR0 + ((DWORD)block * E3P_SPI_BANKS + EE_CurrBank[block]) * SPI_SECTOR_SIZE;
+		//read
+		for (j = 0; j < SPI_SECTOR_SIZE; j += 4)
+		{
+			if (j >= EE_WritePos[block])
+				break;	
+
+			//BKTODO:Use more big buffer size. Max SPI_BUFFER_SIZE(128)
+			SpiFlashDmaRead2XMem(SPI_Buffer,sector_addr+j, 4L);
+
+			//check corruption
+			if ((SPI_Buffer[0]^SPI_Buffer[1]) != 0xFF || (SPI_Buffer[2]^SPI_Buffer[3]) != 0xFF)
+			{
+				Printf("\ncorrupted ?? Block%bx Bank%bx addr:%06lx [%02bx %02bx %02bx %02bx]",
+					block,EE_CurrBank[block],
+					sector_addr+j,
+					SPI_Buffer[0], SPI_Buffer[1], SPI_Buffer[2], SPI_Buffer[3]);
+			}
+		}
+   	}
+}
+
+#elif defined(NO_EEPROM)	//.. USE_SFLASH_EEPROM		//=========================================
+
+CODE BYTE EE_dummy_DATA[0x1C0] = 
+{
+/* 000 */ 0x54, 0x38, 0x33, 0x35, 0x00, 0x09, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 010 */ 0x32, 0x32, 0x3E, 0x32, 0x14, 0x32, 0x32, 0x3E, 0x32, 0x14, 0x32, 0x32, 0x3E, 0x32, 0x14, 0x32,
+/* 020 */ 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 0x32, 
+/* 030 */ 0x3E, 0x32, 0x14, 0x32, 0x32, 0x3E, 0x32, 0x14, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 040 */ 0x00, 0x00, 0x00, 0x32, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 050 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 060 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 070 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 080 */ 0x01, 0xDE, 0x0D, 0xFF, 0x0D, 0xFC, 0x01, 0xF0, 0x07, 0xED, 0x0D, 0x68, 0x0D, 0x5D, 0x02, 0x51, 
+/* 090 */ 0x02, 0x5C, 0x07, 0xD8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 0A0 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 0B0 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 
+/* 0C0 */ 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32, 0xFF, 0x32, 
+/* 0D0 */ 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 
+/* 0E0 */ 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 0F0 */ 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 
+/* 100 */ 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 110 */ 0x00, 0x00, 0x00, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 
+/* 120 */ 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 
+/* 130 */ 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32, 0xFF, 0x32, 0x32, 0x32, 
+/* 140 */ 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 150 */ 0x00, 0x00, 0x00, 0x00, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 160 */ 0x00, 0x00, 0x00, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 170 */ 0x00, 0x00, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 
+/* 180 */ 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 
+/* 190 */ 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 
+/* 1A0 */ 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 
+/* 1B0 */ 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x32, 0xFF, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00 
+};
+
+BYTE EE_Read(WORD index)
+{
+	if(index >= 0x1C0) return 0x00;
+	return EE_dummy_DATA[index];	
+}
+
+void EE_Write(WORD index, BYTE dat)
+{
+	Printf("\nEE_Write(%x,%bx) SKIP",index,dat);	
+} 
+
+#endif
 
 

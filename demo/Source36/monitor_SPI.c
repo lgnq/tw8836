@@ -588,13 +588,18 @@ void MonitorEE(void)
 	else if (!stricmp(argv[1], "D"))
 	{
 		Printf("\nDump EEPROM");
-		E3P_DumpBlocks(0);
-		//for(j=0; j<E3P_MAX_INDEX/16; j++) {
-		//	Printf("\nEEPROM %02bx:", j*0x10);
-		//	for(i=0; i<8; i++) Printf(" %02bx", EE_Read( j*16 + i ) );
-		//	Printf("-");
-		//	for(; i<16; i++) Printf("%02bx ", EE_Read( j*16 + i ) );
-		//}
+		E3P_DumpBlocks();
+/*
+		for (j=0; j<E3P_MAX_INDEX/16; j++)
+		{
+			Printf("\nEEPROM %02bx:", j*0x10);
+			for (i=0; i<8; i++)
+				Printf(" %02bx", EE_Read(j*16 + i));
+			Printf("-");
+			for (; i<16; i++)
+				Printf("%02bx ", EE_Read(j*16 + i));
+		}
+*/		
 	}
 #endif
 	else if (!stricmp(argv[1], "?"))
