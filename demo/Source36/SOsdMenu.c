@@ -4994,7 +4994,61 @@ void MenuQuitMenu(void)
 }
 #endif
 
+/**
+* desc: draw an image
+*/
+void draw_image(struct image_item_info_s *image, BYTE winno, WORD sx, WORD sy, WORD lut_offset)
+{
+	menu_image_header_t *header = &header_table;
 
+	SOsdWinBuffClean(0);
+
+	//init DE
+	SpiOsdSetDeValue();
+	SpiOsdWinHWOffAll(0); //without wait
+
+	SpiOsdEnable(ON);
+
+	//prepare header
+	MenuPrepareImageHeader(image);	//update header_table
+
+	SpiOsdWinImageLoc(winno, header->image_loc); 
+	SpiOsdWinImageSizeWH(winno, header->dx, header->dy);
+	SpiOsdWinScreen(winno, sx, sy, header->dx, header->dy);
+	if (winno == 0)
+	{
+		SpiOsdWin0ImageOffsetXY(0, 0);
+		SpiOsdWin0Animation(1, 0, 0, 0);
+	}
+	SpiOsdWinPixelAlpha(winno, ON);
+	SpiOsdWinGlobalAlpha(winno, 0);
+	SpiOsdWinPixelWidth(winno, header->bpp);
+	SpiOsdWinLutOffset(winno, lut_offset);
+
+	SpiOsdWinBuffEnable(winno, ON);
+
+	//write to HW
+	WaitVBlank(1);
+	
+	if (header->rle)
+	{	//need RLE ?
+		SpiOsdRlcReg(winno, header->bpp, header->rle);
+	}	
+	else
+	{
+		//BK110203
+		//We using RLE only on the background.
+		//if(item == 0) 
+		{
+			SpiOsdDisableRlcReg(0);
+		}
+	}
+	//update HW
+	SOsdWinBuffWrite2Hw(winno, winno);
+
+	//Load Palette
+	SpiOsdLoadLUT(winno, header->lut_type, lut_offset, header->lut_size, header->lut_loc, image->alpha);
+}
 
 #endif //..SUPPORT_SPIOSD
 
