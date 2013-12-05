@@ -1117,6 +1117,7 @@ void MenuStart(void);
 void MenuEnd(void);
 void MenuQuitMenu(void);
 
-void draw_image(struct image_item_info_s *image, BYTE winno, WORD sx, WORD sy, WORD lut_loc);
+void draw_single_image(struct image_item_info_s *image, BYTE winno, WORD sx, WORD sy, WORD lut_loc);
+//void draw_multi_image();
 
 #endif //.__TW8835_MENU_B_H__

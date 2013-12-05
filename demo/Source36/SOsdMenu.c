@@ -4995,9 +4995,9 @@ void MenuQuitMenu(void)
 #endif
 
 /**
-* desc: draw an image
+* desc: draw a single image
 */
-void draw_image(struct image_item_info_s *image, BYTE winno, WORD sx, WORD sy, WORD lut_offset)
+void draw_single_image(struct image_item_info_s *image, BYTE winno, WORD sx, WORD sy, WORD lut_offset)
 {
 	menu_image_header_t *header = &header_table;
 
@@ -5051,5 +5051,4 @@ void draw_image(struct image_item_info_s *image, BYTE winno, WORD sx, WORD sy, W
 }
 
 #endif //..SUPPORT_SPIOSD
-
 
