@@ -1332,6 +1332,7 @@ void SpiOsdLoadLUT(BYTE _winno, BYTE _type, WORD LutOffset, WORD size, DWORD add
 	WriteTW88(REG4C0_SPIBASE+0x04, 0x01); // DMA Start
 //P1_3 =0;
 //P1_4 = !P1_4;
+// should be wait until DAM is finished. Eamon
 //	while(ReadTW88Page() != PAGE4_SPI);			//trick. check DONE. BusyWait
 //EA = 1;
 	
