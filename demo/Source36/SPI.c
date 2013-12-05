@@ -548,12 +548,12 @@ void SPI_Set4BytesAddress(BYTE fOn)
 *
 * @see SPI_WriteEnable
 */
-void SPI_SectorErase( DWORD spiaddr )
+void SPI_SectorErase(DWORD spiaddr)
 {
-	SpiFlashChipRegCmd(SPICMD_WREN,0,0,0);
+	SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
 
 	SpiFlashSetAddress2CmdBuffer(spiaddr);
-	SpiFlashChipRegCmd(SPICMD_SE,3+SpiFlash4ByteAddr,0,0);
+	SpiFlashChipRegCmd(SPICMD_SE, 3+SpiFlash4ByteAddr, 0, 0);
 }
 
 //=============================================================================
@@ -573,12 +573,12 @@ void SPI_SectorErase( DWORD spiaddr )
 *
 * @see SPI_WriteEnable
 */
-void SPI_BlockErase( DWORD spiaddr )
+void SPI_BlockErase(DWORD spiaddr)
 {
-	SpiFlashChipRegCmd(SPICMD_WREN,0,0,0);
+	SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
 
 	SpiFlashSetAddress2CmdBuffer(spiaddr);
-	SpiFlashChipRegCmd(SPICMD_BE,3+SpiFlash4ByteAddr,0,0);
+	SpiFlashChipRegCmd(SPICMD_BE, 3+SpiFlash4ByteAddr, 0, 0);
 }
 
 //=============================================================================
@@ -992,7 +992,9 @@ void E3P_Format(void)
 		for (j = 0; j < E3P_SPI_BANKS; j++)
 		{
 			SPI_SectorErase(spi_addr);
-			//should delay 20ms because the flash erase a secotor will take 20ms. Eamon.fang
+
+			//should delay 20ms because the flash erase a secotor will take 20ms. Eamon
+			
 			spi_addr += SPI_SECTOR_SIZE;
 		}
 		
