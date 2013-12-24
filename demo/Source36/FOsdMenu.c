@@ -105,7 +105,6 @@ CODE struct RegisterInfo PanelContrastRange=		{0,255,128};
 //CODE struct RegisterInfo VideoSharpnessRange=		{0,15,7};
 //CODE struct RegisterInfo DigitalVideoSaturationRange={0, 0x7f, 0x40};
 
-
 #define OFFSET_contrast 		0
 #define OFFSET_bright	 		1
 #define OFFSET_staturation	 	2
@@ -470,16 +469,19 @@ void SetVideoMode(BYTE mode)
 
 BYTE GetVideoDatawithOffset(BYTE offset)
 {
-	if(offset==OFFSET_backlight) {	 //backright
+	if (offset == OFFSET_backlight)
+	{	 //backright
 		OSDItemValue = EE_Read(EEP_BACKLIGHT);
 	}
-	else {
+	else
+	{
 		OSDItemValue = GetVideoDatafromEE(offset);
 	}
+
 	return OSDItemValue;
 }
 
-BYTE ChangeVideoData(BYTE offset, BYTE flag)
+BYTE ChangeVideoData(BYTE id, BYTE flag)
 {
 	int newv, inc;
 
@@ -491,31 +493,33 @@ BYTE ChangeVideoData(BYTE offset, BYTE flag)
 		return OSDItemValue;
 	}
 
-	switch (offset)
+	switch (id)
 	{
-	case OFFSET_contrast:
+	case FMID_VIDEO_CONTRAST:
 		ImgAdjSetContrastY(newv);
 		ImgAdjChangeContrastY();
 		break;
-	case OFFSET_bright:  
+	case FMID_VIDEO_BRIGHTNESS:  
 		ImgAdjSetBrightnessY(newv);
 		ImgAdjChangeBrightnessY();
 		break;
-	case OFFSET_staturation: 
+	case FMID_VIDEO_SATURATION: 
 		ImgAdjSetSaturation(newv);
 		ImgAdjChangeSaturation();
 		 break;
-	case OFFSET_hue:
+	case FMID_VIDEO_HUE:
 		ImgAdjSetHUE(newv);
 		ImgAdjChangeHUE();
 		break;
-	case OFFSET_sharpness:
+	case FMID_VIDEO_SHARPNESS:
 		ImgAdjSetSharpness(newv);
 		ImgAdjChangeSharpness();
 		break;
-	case OFFSET_backlight:	  
+	case FMID_VIDEO_BACKLIGHT:	  
 		BackLightSetRate(newv);
 		BackLightChangeRate();
+		break;
+	default:
 		break;
 	}
 
@@ -1014,7 +1018,7 @@ WORD FOsdMenuGetItemValue(BYTE id)
 	case FMID_VIDEO_HUE:			
 	case FMID_VIDEO_SHARPNESS:	
 	case FMID_VIDEO_BACKLIGHT:	
-		val = GetVideoDatawithOffset(id-FMID_VIDEO_CONTRAST);	
+		val = GetVideoDatawithOffset(id - FMID_VIDEO_CONTRAST);	
 		break;
 
 
@@ -1059,7 +1063,8 @@ WORD FOsdMenuSetItemValue(BYTE id, BYTE flag )
 	dPrintf("\n\tFOsdMenuSetItemValue(%bx,%bx)", id, flag);
 #endif
 
-	switch( id ) {
+	switch (id)
+	{
 	case FMID_SLEEP_TIMER:		val = ChangeSleepTimer( flag );			break;
 
 //#ifdef SUPPORT_OSDPOSITIONMOVE
@@ -1111,7 +1116,7 @@ WORD FOsdMenuSetItemValue(BYTE id, BYTE flag )
 	case FMID_VIDEO_SATURATION:	
 	case FMID_VIDEO_SHARPNESS:	
 	case FMID_VIDEO_BACKLIGHT:
-		val = ChangeVideoData(id-FMID_VIDEO_CONTRAST,flag);			
+		val = ChangeVideoData(id, flag);			
 		break;
 
  	case FMID_AUDIO_VOLUME:		val = ChangeVol( (flag==FOSD_UP ? 1 : -1) );		break;
@@ -1831,16 +1836,15 @@ void FOsdMenuProcSelectKey(void)
 	if( cursor_item==NIL )			
 		return;
 
-	if( MenuChild[ cursor_item ].Id == FMID_VIDEO_HUE 
-	&& DecoderReadVInputSTD()!= NTSC 
-	&& DecoderReadVInputSTD()!= NTSC4 )  		
+	if (MenuChild[cursor_item].Id == FMID_VIDEO_HUE && DecoderReadVInputSTD() != NTSC && DecoderReadVInputSTD() != NTSC4)  		
 		return;
 
 	ret = FOsdMenuDoAction(MenuChild[cursor_item].PreFnId);
-	if(!ret) 
+	if (!ret) 
 		return;
 
-	switch ( MenuChild[cursor_item].Type ) {
+	switch (MenuChild[cursor_item].Type)
+	{
 	case MIT_ACTION:
 		FOsdMenuDoAction(MenuChild[cursor_item].Id);
 		return;
@@ -1859,7 +1863,8 @@ void FOsdMenuProcSelectKey(void)
 
 	case MIT_MENU:
 	case MIT_SELMENU:
-		if(OSDMenuLevel == 1) {
+		if (OSDMenuLevel == 1)
+		{
 			addr = FOSDMENU_MAINADDR + cursor_item*MenuFormat->width + 0;
 			// 3D Effect Cursor Bottom
 			FOsdWinSet3DControl(FOSDMENU_CURSORWIN,(WINDOW_3D_BOTTOM|BG_COLOR_BLACK|EXTENDED_COLOR|WINDOW_3D_ENABLE|WINDOW_ENABLE));
@@ -1875,7 +1880,7 @@ void FOsdMenuProcSelectKey(void)
 		MenuChild = MenuTitle[title_item].Child;
 		cursor_item = FOsdMenuGetCursorItem( MenuTitle[title_item].Id );
 
-		if( cur_osdwin == FOSDMENU_TOPWIN ) // Window #4
+		if (cur_osdwin == FOSDMENU_TOPWIN) // Window #4
 			cur_osdwin = FOSDMENU_ITEMWIN;  // Window #3
 		else
 			FOsdMenuDisplayMenu();

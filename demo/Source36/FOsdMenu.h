@@ -504,21 +504,21 @@ BYTE ChangeTreble(char amount);
 #define FMID_PC_COLOR_B			0x37
 
 #define FMID_VIDEO_MODE			0x90
-#define FMID_VIDEO_MODE1			0x91
-#define FMID_VIDEO_MODE2			0x92
-#define FMID_VIDEO_MODE3			0x93
+#define FMID_VIDEO_MODE1		0x91
+#define FMID_VIDEO_MODE2		0x92
+#define FMID_VIDEO_MODE3		0x93
 #define FMID_VIDEO_USER			0x94
 #define FMID_VIDEO_CONTRAST		0x95
 #define FMID_VIDEO_BRIGHTNESS	0x96
 #define FMID_VIDEO_SATURATION	0x97
-#define FMID_VIDEO_HUE			0x99
-#define FMID_VIDEO_SHARPNESS		0x9a
-#define FMID_VIDEO_BACKLIGHT		0x9c		// add new value 
+#define FMID_VIDEO_HUE			0x98
+#define FMID_VIDEO_SHARPNESS	0x99
+#define FMID_VIDEO_BACKLIGHT	0x9a		// add new value 
 #define FMID_RESET_VIDEOVALUE	0x9b
 #define FMID_VIDEOPICTURE		0x9f
 
 #define FMID_INPUTSTD			0x6f
-#define CHANGE_TO_AUTO		0x60
+#define CHANGE_TO_AUTO			0x60
 #define CHANGE_TO_NTSC		(0x60 | NTSC)
 #define CHANGE_TO_PAL		(0x60 | PAL)
 #define CHANGE_TO_SECAM		(0x60 | SECAM)
@@ -526,9 +526,6 @@ BYTE ChangeTreble(char amount);
 #define CHANGE_TO_PALM		(0x60 | PALM)
 #define CHANGE_TO_PALN		(0x60 | PALN)
 #define CHANGE_TO_PAL60		(0x60 | PAL60)
-
-
-
 
 #define CLOSED_CAPTION		0x7f
 #define CLOSEDCAP_OFF		0x70
