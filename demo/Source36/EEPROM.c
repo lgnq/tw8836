@@ -335,9 +335,6 @@ void SaveInputMainEE( BYTE mode )
 //	EE[33] 	EEP_BT656
 //-----------------------------------------------------------------------------------------
 
-//=============================================================================
-//
-//=============================================================================
 /**
 * get VideoData
 */
@@ -346,13 +343,14 @@ BYTE GetVideoDatafromEE(BYTE offset)
 	XDATA	BYTE val;
 	BYTE	index;
 
-	index = EEP_IA_START+InputMain*IA_TOT_VIDEO;
+	index = EEP_IA_START + InputMain * IA_TOT_VIDEO;
 	//BK121218 temp
 	//if(InputMain==INPUT_LVDS) 
 	//	index = EEP_IA_START+INPUT_DVI*IA_TOT_VIDEO;
 
 	index += offset;
 	val = EE_Read(index);
+
 	return val;
 }
 
