@@ -483,10 +483,11 @@ BYTE ChangeVideoData(BYTE offset, BYTE flag)
 {
 	int newv, inc;
 
-	inc = ( flag==FOSD_UP  ? 1  :  -1  );
+	inc = (flag == FOSD_UP ? 1 : -1);
 
 	newv = OSDItemValue + inc;
-	if( newv< UserRange.Min || newv> UserRange.Max ) {
+	if (newv < UserRange.Min || newv > UserRange.Max)
+	{
 		return OSDItemValue;
 	}
 
@@ -522,8 +523,6 @@ BYTE ChangeVideoData(BYTE offset, BYTE flag)
 
 	return newv;	
 }
-
-
 
 #ifdef WIDE_SCREEN
 

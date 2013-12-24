@@ -996,7 +996,7 @@ void aRGB_SetPolarity(BYTE fUseCAPAS)
 #define LLPLL_POST_1		0xC0 //*
 #define LLPLL_VCO_40TO216	0x30 //*
 #define LLPLL_PUMP_5		0x02 //*
-//-----------------------------------------------------------------------------
+
 /**
 * Set LLPLL Control
 *
@@ -1007,11 +1007,10 @@ void aRGB_SetPolarity(BYTE fUseCAPAS)
 */
 void aRGB_SetLLPLLControl(BYTE value)
 {
-	WriteTW88Page(PAGE1_VADC );
+	WriteTW88Page(PAGE1_VADC);
 	WriteTW88(REG1C2, value);
 }
 #endif
-
 
 //-----------------------------------------------------------------------------
 // LLPLL Divider
@@ -1521,8 +1520,9 @@ BYTE aRGB_LLPLLUpdateDivider(WORD divider, /*BYTE ctrl,*/ BYTE fInit, BYTE delay
 //	aRGB_SetLLPLLControl(ctrl);
 
 	aRGB_LLPLLSetDivider(divider, fInit);
-	if(fInit) {
-		if(WaitStableLLPLL(delay))
+	if (fInit)
+	{
+		if (WaitStableLLPLL(delay))
 			ret = ERR_FAIL;
 	}
 	aRGB_SetFilterBandwidth(7, 0);	//restore
@@ -1530,7 +1530,6 @@ BYTE aRGB_LLPLLUpdateDivider(WORD divider, /*BYTE ctrl,*/ BYTE fInit, BYTE delay
 	return ret;
 }
 #endif
-
 
 #if defined(SUPPORT_COMPONENT) || defined(SUPPORT_PC)
 //-----------------------------------------------------------------------------
@@ -1884,11 +1883,10 @@ static void PC_SetScaler(BYTE mode)
 	WORD hStart, vStart;
 	BYTE bTemp;
 	WORD SyncWidth;
-	WORD Meas_hActive,Meas_vActive;
-	WORD Meas_hStart,Meas_vStart;
+	WORD Meas_hActive, Meas_vActive;
+	WORD Meas_hStart, Meas_vStart;
 //	WORD vSync;
 	WORD wTemp;
-
 
 	//read measured value. 
 	Meas_vActive = MeasGetVActive( &Meas_vStart );				//v_active_start v_active_perios
@@ -1915,26 +1913,24 @@ static void PC_SetScaler(BYTE mode)
 		dPrintf("\nUse table hStart:%d hActive:%d",Meas_hStart,Meas_hActive);
 	}
 
-
-
-
 	//read sync width.
 	//HSyncWidth comes from .., not real value.
 	//Meas_HPulse = MeasGetHSyncRiseToFallWidth();
 	//Meas_VPulse = MeasGetVSyncRiseToFallWidth();
 	//dPrintf("\n\tHPulse: %d, VPulse: %d", Meas_HPulse, Meas_VPulse );
 
-
 	//read Scaler input polarity.
 	//0:rising edge, 1:falling edge.
 	bTemp = ReadTW88(REG041);
-	if(bTemp & 0x08) 	vPol = 1;	
-	else				vPol = 0;
-	if(bTemp & 0x04) 	hPol = 1;	//0:rising edge, 1:falling edge
-	else				hPol = 0;
+	if (bTemp & 0x08)
+		vPol = 1;	
+	else
+		vPol = 0;
+	if (bTemp & 0x04)
+		hPol = 1;	//0:rising edge, 1:falling edge
+	else
+		hPol = 0;
 	dPrintf("\nPCSetInputCrop hPol:%bd vPol:%bd", hPol, vPol );
-
-
 
 	//meas uses active high sync, and use a rising edge.
 	//if you give a active low sync to meas, we will have a wrong result.
@@ -1946,12 +1942,12 @@ static void PC_SetScaler(BYTE mode)
 	//if you use a falling edge in inputcrop, you have to remove SyncWidth.
 	//
 	hStart = Meas_hStart +1;
-	if(hPol) { //if it uses fall_edge, subtract SynchWidth.
+	if (hPol) { //if it uses fall_edge, subtract SynchWidth.
 		SyncWidth = MeasGetHSyncRiseToFallWidth();
 		hStart -= SyncWidth;	
 	}
 	vStart = Meas_vStart +2;
-	if(vPol) {	//if it uses fall_edge, subtract SynchWidth.
+	if (vPol) {	//if it uses fall_edge, subtract SynchWidth.
 		SyncWidth = MeasGetVSyncRiseToFallWidth();
 		vStart -= SyncWidth;
 	}
@@ -1960,7 +1956,8 @@ static void PC_SetScaler(BYTE mode)
 
 	//adjust EEPROM. 0..100. base 50. reversed value.
 	bTemp = GetHActiveEE(mode); //PcBasePosH;
-	if(bTemp != 50) {
+	if (bTemp != 50)
+	{
 		hStart += 50;
 		hStart -= bTemp;
 		dPrintf("\n\tModified HS:%d->%d, VS:%d", RGB_HSTART, hStart, vStart );
@@ -2802,7 +2799,7 @@ BYTE CheckAndSetComponent( void )
 //new 130206
 BYTE CheckAndSetPC(void)
 {
-	BYTE mode,old_mode;
+	BYTE mode, old_mode;
 	BYTE i;
 	BYTE bTemp;
 //	BYTE pol;
@@ -2810,6 +2807,7 @@ BYTE CheckAndSetPC(void)
 #ifdef CHECK_USEDTIME
 	DWORD UsedTime;
 #endif
+
 	BYTE value;
 	BYTE value1;
 //	WORD new_VTotal;
@@ -2818,23 +2816,26 @@ BYTE CheckAndSetPC(void)
 	DECLARE_LOCAL_page
 	volatile BYTE InputStatus; //REG1C1
 
-
-
 	ReadTW88Page(page);
+
 #ifdef CHECK_USEDTIME
 	UsedTime = SystemClock;
 #endif
+
 	Input_aRGBMode = 0;
 	InputSubMode = Input_aRGBMode;
 
 	//check signal. if fail, give up.
-	for(i=0; i < 2; i++) {
-		ret=MeasStartMeasure();
-		if(ret==ERR_SUCCESS)
+	for (i = 0; i < 2; i++)
+	{
+		ret = MeasStartMeasure();
+		if (ret == ERR_SUCCESS)
 			break;
 		delay1ms(10);
 	}	
-	if(ret)	{
+	
+	if (ret)
+	{
 #ifdef DEBUG_PC
 		Printf("\nCheckAndSetPC fail 1");
 #endif
@@ -2844,16 +2845,18 @@ BYTE CheckAndSetPC(void)
 
 	//find PC mode
 	old_mode = 0;
-	while(1) {
+	while (1)
+	{
 		mode = FindInputModePC(&wTemp/*&vTotal*/);
-		if(mode==0) {
+		if (mode == 0)
+		{
 #ifdef DEBUG_PC
 			Printf("\nCheckAndSetPC fail 2. No proper mode");
 #endif
 			WriteTW88Page(page);
 			return 2; //ERR_FAIL;
 		}
-		if(old_mode == mode)
+		if (old_mode == mode)
 			break;
 		old_mode = mode;
 
@@ -2861,8 +2864,9 @@ BYTE CheckAndSetPC(void)
 		//set LLPLL	& wait
 		//
 		aRGB_SetLLPLLControl(0xF2);	// POST[7:6]= 3 -> div 1, VCO: 40~216, Charge Pump: 5uA
-		ret = aRGB_LLPLLUpdateDivider(PCMDATA[ mode ].hTotal - 1, 1, 40 );
-		if(ret==ERR_FAIL) {
+		ret = aRGB_LLPLLUpdateDivider(PCMDATA[mode].hTotal - 1, 1, 40 );
+		if (ret == ERR_FAIL)
+		{
 #ifdef DEBUG_PC
 			Printf("\nCheckAndSetPC fail 3. No stable LLPLL");
 #endif
@@ -2874,9 +2878,10 @@ BYTE CheckAndSetPC(void)
 		delay1ms(120);
 
 		//wait a detection flag.
-		for(i=0; i < 50; i++) {
+		for (i = 0; i < 50; i++)
+		{
 			InputStatus = ReadTW88(REG1C1);
-			if((InputStatus & 0x30) == 0x30)
+			if ((InputStatus & 0x30) == 0x30)
 				break;
 			delay1ms(10);
 		}
@@ -2886,7 +2891,8 @@ BYTE CheckAndSetPC(void)
 
 		//update Phase.
 		value = GetPhaseEE(mode);
-		if(value == 0xFF) {
+		if (value == 0xFF)
+		{
 			//No previous data. We need a AutoTunePhase.
 			AutoTunePhase();
 			value=aRGB_GetPhase();
@@ -2895,50 +2901,52 @@ BYTE CheckAndSetPC(void)
 #endif
 			SavePhaseEE(mode,value);
 		}
-		else {
+		else
+		{
 #ifdef DEBUG_PC
 			dPrintf("\nuse EE Phase 0x%bx",value);
 #endif
 			//we read first, because update routine can make a shaking.
 			value1=aRGB_GetPhase();
-			if(value != value1) {
+			if (value != value1)
+			{
 #ifdef DEBUG_PC
 				dPrintf("  update from 0x%bx",value1);
 #endif
 				aRGB_SetPhase(value, 0);	//BKTODO? Why it does not have a init ?
 			}
 		}
-		ret=WaitStableLLPLL(0);
-		if(ret) {
+		ret = WaitStableLLPLL(0);
+		if (ret)
+		{
 			ePrintf("\nWARNING WaitStableLLPLL faile at %d",__LINE__);
 		}
 
 		//adjust polarity again
-		for(i=0; i < 50; i++) {
+		for (i = 0; i < 50; i++)
+		{
 			InputStatus = ReadTW88(REG1C1);
-			if((InputStatus & 0x30) == 0x30)
+			if ((InputStatus & 0x30) == 0x30)
 				break;
 			delay1ms(10);
 		}
 		aRGB_Set_vSyncOutPolarity(1 /*1 means PC */, InputStatus & 0x80);
 		LLPLL_setInputPolarity(1 /*1 means PC */, InputStatus & 0x40);
 
-
 		//reflash measure value
 		MeasStartMeasure();
 	}
 
-
 	//check polarity.
 	InputStatus = ReadTW88(REG1C1);
-	if((PCMDATA[ mode ].syncpol & 0xC0) != (InputStatus & 0xC0)) {
+	if ((PCMDATA[mode].syncpol & 0xC0) != (InputStatus & 0xC0))
+	{
 		//incorrect polarity.
 		Printf("\nmode:%bd hPol %s->%s vPol %s->%s",mode,
 			PCMDATA[ mode ].syncpol & HPOL_P ? "P" : "N",
 			InputStatus & HPOL_P 			 ? "P" : "N",	 
 			PCMDATA[ mode ].syncpol & VPOL_P ? "P" : "N",
 			InputStatus & VPOL_P 			 ? "P" : "N");	 
-
 	}
 
 	//final check.
@@ -2953,19 +2961,17 @@ BYTE CheckAndSetPC(void)
 
 	PC_SetScaler(mode);
 
-
 	Input_aRGBMode = mode;
 	InputSubMode = Input_aRGBMode;
 
-
 	AdjustPixelClk(0, mode); //BK120117 need a divider value
-
 
 	//update EEPROM pixel clock.
 	//Note: It is not a pixel clock. It is a LLPLL divider.
 	//      
 	bTemp = GetPixelClkEE(mode);  //value 0..100
-	if(bTemp != 50) {
+	if (bTemp != 50)
+	{
 		wTemp = PCMDATA[ mode ].hTotal - 1;
 #ifdef DEBUG_PC
 		Printf("\nEEPROM has a PixelClock value %bd",bTemp);

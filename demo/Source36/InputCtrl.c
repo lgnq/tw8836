@@ -376,9 +376,9 @@ BYTE InputGetColorDomain(void)
 *	REG042[6:4]REG044[7:0]	VCropLength
 *	REG042[3:0]REG046[7:0]	HCropLength
 */
-void InputSetCrop( WORD x, WORD y, WORD w, WORD h )
+void InputSetCrop(WORD x, WORD y, WORD w, WORD h)
 {
-	WriteTW88Page( PAGE0_INPUT );
+	WriteTW88Page(PAGE0_INPUT);
 
 	WriteTW88(REG040_INPUT_CTRL_I, (ReadTW88(REG040_INPUT_CTRL_I) & 0x3F) | ((x & 0x300)>>2) );
 	WriteTW88(REG045, (BYTE)x);

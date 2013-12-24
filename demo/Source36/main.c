@@ -898,35 +898,46 @@ BYTE TaskNoSignal_getCmd(void)
 // MovingGrid TASK ROUTINES				                                               
 //=============================================================================
 
-//-----------------------------------------------------------------------------
 /**
  * on/off Grid task
  *
  * @param onoff
 */
-void TaskSetGrid(BYTE onoff)  {	Task_Grid_on = onoff;	}	
-//-----------------------------------------------------------------------------
+void TaskSetGrid(BYTE onoff)
+{
+	Task_Grid_on = onoff;
+}	
+
 /**
  * get Grid task status
  *
  * @return Task_Grid_on
 */
-BYTE TaskGetGrid(void)		  {	return Task_Grid_on;    }
-//-----------------------------------------------------------------------------
+
+BYTE TaskGetGrid(void)
+{
+	return Task_Grid_on;
+}
+
 /**
  * set Grid task command
  *
  * @param cmd
 */
-void TaskSetGridCmd(BYTE cmd) { Task_Grid_cmd = cmd;	}	
-//-----------------------------------------------------------------------------
+void TaskSetGridCmd(BYTE cmd)
+{
+	Task_Grid_cmd = cmd;
+}	
+
 /**
  * get Grid task command
  *
  * @return Task_Grid_cmd
 */
-BYTE TaskGetGridCmd(void)	  { return Task_Grid_cmd;   } 
-
+BYTE TaskGetGridCmd(void)
+{
+	return Task_Grid_cmd;
+} 
 
 //=============================================================================
 // CheckAndSet LINK ROUTINES				                                               

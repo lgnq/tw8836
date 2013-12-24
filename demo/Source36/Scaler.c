@@ -55,7 +55,6 @@ BYTE VideoAspect;
 
 //static function prototypes
 
-
 //-----------------------------------------------------------------------------
 //LNFIX		R201[2]		on/off
 //			1 = Fix the scaler output line number defined by register LNTT.
@@ -66,9 +65,12 @@ BYTE VideoAspect;
 #ifdef UNCALLED_SEGMENT
 void ScalerSetOutputFixedVline(BYTE onoff)
 {
-	WriteTW88Page(PAGE2_SCALER );
-	if(onoff)	WriteTW88(REG201, ReadTW88(REG201) | 0x04);
-	else		WriteTW88(REG201, ReadTW88(REG201) & 0xFB);
+	WriteTW88Page(PAGE2_SCALER);
+
+	if (onoff)
+		WriteTW88(REG201, ReadTW88(REG201) | 0x04);
+	else
+		WriteTW88(REG201, ReadTW88(REG201) & 0xFB);
 }
 #endif
 
@@ -81,7 +83,6 @@ void ScalerSetFieldOffset(BYTE fieldOffset)
 	WriteTW88Page(PAGE2_SCALER);
 	WriteTW88(REG202, (ReadTW88(REG202) & 0xC0) | filedOffset);
 }
-
 #endif
 
 //-------------------------------------
@@ -95,7 +96,6 @@ XSCALE
 *	R20A[3:0]R209[7:0]	X-Down
 */
 
-//-----------------------------------------------------------------------------
 /**
 * write Horizontal Up Scale register
 *
@@ -109,21 +109,23 @@ XSCALE
 void ScalerWriteXUpReg(WORD value)
 {
 	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG204, (BYTE)(value>>8));		
 	WriteTW88(REG203, (BYTE)value);
 }
+
 #ifdef UNCALLED_SEGMENT
-//-----------------------------------------------------------------------------
 WORD ScalerReadXUpReg(void)
 {
 	WORD wValue;
+
 	WriteTW88Page(PAGE2_SCALER);
-	Read2TW88(REG204,REG203,wValue);
+	Read2TW88(REG204,REG203, wValue);
+
 	return wValue;
 }
 #endif
 
-//-----------------------------------------------------------------------------
 /**
 * write Horizontal Down Scale register
 *
@@ -137,6 +139,7 @@ WORD ScalerReadXUpReg(void)
 void ScalerWriteXDownReg(WORD value)
 {
 	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG20A, (ReadTW88(REG20A) & 0xF0) | (value >> 8));
 	WriteTW88(REG209, (BYTE)value);
 }
@@ -153,17 +156,18 @@ WORD ScalerReadXDownReg(void)
 {
 	WORD HDown;
 
-	WriteTW88Page(PAGE2_SCALER );
-	HDown = ReadTW88(REG20A ) & 0x0F;
+	WriteTW88Page(PAGE2_SCALER);
+
+	HDown = ReadTW88(REG20A) & 0x0F;
 	HDown <<= 8;
 	HDown += ReadTW88(REG209 );
+
 	return HDown;
 }
 #endif
 #endif
 
 #ifdef UNCALLED_SEGMENT
-//-----------------------------------------------------------------------------
 void ScalerSetHScaleReg(WORD down, WORD up)
 {
 	ScalerWriteXDownReg(down);
@@ -171,8 +175,6 @@ void ScalerSetHScaleReg(WORD down, WORD up)
 }
 #endif
 
-
-//-----------------------------------------------------------------------------
 //internal
 /**
 * set Horizontal Scaler value on FULL mode
@@ -191,7 +193,8 @@ void ScalerSetHScale_FULL(WORD Length)
 	ScalerPanoramaOnOff(OFF);
 
 	WriteTW88Page(PAGE2_SCALER);
-	if(PANEL_H >= Length) { 					
+	if (PANEL_H >= Length)
+	{ 					
 		//UP SCALE
 		temp = Length * 0x2000L;
 		//temp += (PANEL_H/2);			//roundup	
@@ -199,27 +202,22 @@ void ScalerSetHScale_FULL(WORD Length)
 		ScalerWriteXUpReg(temp);				//set up scale
 		ScalerWriteXDownReg(0x0400);			//clear down scale
 //		dPrintf("\nScalerSetHScale(%d) DN:0x0400 UP:0x%04lx",Length, temp);
-		if(InputMain==INPUT_COMP
-		|| InputMain==INPUT_DVI
-		|| InputMain==INPUT_HDMITV
-		|| InputMain==INPUT_HDMIPC
-		|| InputMain==INPUT_LVDS)
+		if (InputMain==INPUT_COMP || InputMain==INPUT_DVI || InputMain==INPUT_HDMITV || InputMain==INPUT_HDMIPC || InputMain==INPUT_LVDS)
 			ScalerSetLineBufferSize(Length);
-		if(InputMain==INPUT_PC)
+		
+		if (InputMain==INPUT_PC)
 			ScalerSetLineBufferSize(PANEL_H);
 	}
-	else {										
+	else
+	{										
 		//DOWN SCALE
-		if(InputMain==INPUT_PC
-		|| InputMain==INPUT_COMP
-		|| InputMain==INPUT_DVI
-		|| InputMain==INPUT_HDMITV
-		|| InputMain==INPUT_HDMIPC
-		|| InputMain==INPUT_LVDS) {
+		if (InputMain==INPUT_PC || InputMain==INPUT_COMP || InputMain==INPUT_DVI || InputMain==INPUT_HDMITV || InputMain==INPUT_HDMIPC || InputMain==INPUT_LVDS)
+		{
 			temp = Length * 0x0400L;						
 			temp += 0x0200L;	//roundup	
 		}
-		else {
+		else
+		{
 			Length++;		//BK110613
 			temp = Length * 0x0400L;
 		}						
@@ -227,18 +225,11 @@ void ScalerSetHScale_FULL(WORD Length)
 		ScalerWriteXUpReg(0x2000);			//clear up scale
 		ScalerWriteXDownReg(temp);			//set down scale
 //		dPrintf("\nScalerSetHScale(%d) DN:0x%04lx UP:0x2000",Length, temp);
-		if(InputMain==INPUT_COMP
-		|| InputMain==INPUT_DVI
-		|| InputMain==INPUT_PC
-		|| InputMain==INPUT_HDMIPC
-		|| InputMain==INPUT_HDMITV
-		|| InputMain==INPUT_LVDS
-		)
-			ScalerSetLineBufferSize(PANEL_H );
+		if (InputMain==INPUT_COMP || InputMain==INPUT_DVI || InputMain==INPUT_PC || InputMain==INPUT_HDMIPC || InputMain==INPUT_HDMITV || InputMain==INPUT_LVDS)
+			ScalerSetLineBufferSize(PANEL_H);
 	}
 }
 
-//-----------------------------------------------------------------------------
 //internal
 /**
 * set Horizontal Scaler value on Panorama mode
@@ -255,7 +246,8 @@ void ScalerSetHScale_Panorama(WORD Length)
 	X1 += 32;
 
 	WriteTW88Page(PAGE2_SCALER);
-	if(PANEL_H >= X1) {
+	if (PANEL_H >= X1)
+	{
 		//
 		//UP SCALE
 		//
@@ -272,7 +264,8 @@ void ScalerSetHScale_Panorama(WORD Length)
 //		dPrintf("DN:0x0400 UP:0x%04lx lbuff:%d", temp,linebuff);
 		ScalerSetLineBufferSize(linebuff);
 	}
-	else {
+	else
+	{
 		//
 		// DOWN SCALE
 		//
@@ -284,11 +277,11 @@ void ScalerSetHScale_Panorama(WORD Length)
 //		dPrintf("DN:0x%04lx UP:0x2000 lbuff:%d", temp,linebuff);
 		ScalerSetLineBufferSize(linebuff+1);
 	}
-	ScalerSetPanorama(0x400,0x20);
+	
+	ScalerSetPanorama(0x400, 0x20);
 	ScalerPanoramaOnOff(ON);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set Horizontal Scaler value with ratio
 *
@@ -297,6 +290,7 @@ void ScalerSetHScaleWithRatio(WORD Length, WORD ratio)
 {
 	DWORD temp;
 	WORD new_Length;
+
 //	dPrintf("\nScalerSetHScaleWithRatio(%d,%d)",Length,ratio);
 	ScalerWriteLineBufferDelay(SCALER_HDELAY2_BASE);
 	ScalerPanoramaOnOff(OFF);
@@ -309,7 +303,8 @@ void ScalerSetHScaleWithRatio(WORD Length, WORD ratio)
 	new_Length = temp;
 
 	dPrintf("\nHLength %d->%d", Length, new_Length);
-	if(ratio < 100) {
+	if (ratio < 100)
+	{
 		//down scale
 		ScalerWriteXUpReg(0x2000);			//clear up scale
 		temp = 0x0400L;
@@ -317,7 +312,8 @@ void ScalerSetHScaleWithRatio(WORD Length, WORD ratio)
 		temp /= 100;
 		ScalerWriteXDownReg(temp);
 	}
-	else {
+	else
+	{
 		//upscale
 		ScalerWriteXDownReg(0x0400);		// clear down scale
 		temp = 0x2000L;
@@ -325,14 +321,14 @@ void ScalerSetHScaleWithRatio(WORD Length, WORD ratio)
 		temp /= 100;
 		ScalerWriteXUpReg(temp);
 	}
-	if(new_Length < PANEL_H) {
+
+	if (new_Length < PANEL_H)
+	{
 		//adjust buffer output delay
 		ScalerWriteLineBufferDelay((PANEL_H - new_Length) / 2 +SCALER_HDELAY2_BASE);
 	}
 }
 
-
-//-----------------------------------------------------------------------------
 /**
 * set Horizontal Scaler value
 *
@@ -341,13 +337,11 @@ void ScalerSetHScaleWithRatio(WORD Length, WORD ratio)
 */
 void ScalerSetHScale(WORD Length)	
 {
-	if(InputMain==INPUT_PC)
+	if (InputMain == INPUT_PC)
 		VideoAspect = GetAspectModeEE();	//BK1100914
 
-
-	if((InputMain==INPUT_CVBS || InputMain==INPUT_SVIDEO)
-	&& VideoAspect == VIDEO_ASPECT_NORMAL) {
-
+	if ((InputMain == INPUT_CVBS || InputMain == INPUT_SVIDEO) && VideoAspect == VIDEO_ASPECT_NORMAL)
+	{
 		ScalerWriteLineBufferDelay(SCALER_HDELAY2_BASE);	//BK110916 test. Normal needs it
 		ScalerPanoramaOnOff(OFF);
 
@@ -361,7 +355,7 @@ void ScalerSetHScale(WORD Length)
 
 		ScalerSetLineBufferSize(Length); //BK120111
 	}
-	else if(VideoAspect == VIDEO_ASPECT_PANO)
+	else if (VideoAspect == VIDEO_ASPECT_PANO)
 		ScalerSetHScale_Panorama(Length);
 	else 
 		//	 VideoAspect == VIDEO_ASPECT_FULL
@@ -369,9 +363,7 @@ void ScalerSetHScale(WORD Length)
 		ScalerSetHScale_FULL(Length);
 }
 
-
 //YSCALE
-//-----------------------------------------------------------------------------
 /**
 * Up / down scaling ratio control in Y-direction. 
 *
@@ -384,11 +376,11 @@ void ScalerSetHScale(WORD Length)
 void ScalerWriteVScaleReg(WORD value)
 {
 	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG206, (BYTE)(value>>8));
 	WriteTW88(REG205, (BYTE)value);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * read Vertical Scale register value
 *
@@ -397,15 +389,16 @@ void ScalerWriteVScaleReg(WORD value)
 WORD ScalerReadVScaleReg(void)
 {
 	WORD VScale;
+
 	WriteTW88Page(PAGE2_SCALER);
+
 	Read2TW88(REG206,REG205, VScale);
+
 	return VScale;
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set Vertical Scale with Ratio
-*
 */
 void ScalerSetVScaleWithRatio(WORD Length, WORD ratio)
 {
@@ -418,6 +411,7 @@ void ScalerSetVScaleWithRatio(WORD Length, WORD ratio)
 	temp /= 100;	//new length
 	new_Length = temp - Length;			//offset.
 	new_Length = Length - new_Length;	//final 
+
 	dPrintf("\nVLength %d->%d", Length, new_Length);
 
 	temp = new_Length * 0x2000L;
@@ -425,7 +419,6 @@ void ScalerSetVScaleWithRatio(WORD Length, WORD ratio)
 	ScalerWriteVScaleReg(temp);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set Vertical Scale
 *
@@ -436,12 +429,12 @@ void ScalerSetVScaleWithRatio(WORD Length, WORD ratio)
 */
 void ScalerSetVScale(WORD Length)
 {
-	DWORD	temp;
+	DWORD temp;
 
 	WriteTW88Page(PAGE2_SCALER);
 
-    if((InputMain==INPUT_CVBS || InputMain==INPUT_SVIDEO) 
-	&& VideoAspect == VIDEO_ASPECT_ZOOM) {
+    if ((InputMain==INPUT_CVBS || InputMain==INPUT_SVIDEO) && VideoAspect == VIDEO_ASPECT_ZOOM)
+	{
 		//rate 720->800
 		//
 		dPrintf("\nLength:%d",Length);
@@ -454,14 +447,15 @@ void ScalerSetVScale(WORD Length)
 	//else 
 	{
 		temp = Length * 0x2000L;
-		if(/*InputMain==INPUT_PC */
-		 InputMain ==INPUT_COMP
-		|| InputMain ==INPUT_DVI) {
-			if ( Length > PANEL_V ) {		// down scaling //BK110916??
+		if (/*InputMain==INPUT_PC */ InputMain ==INPUT_COMP || InputMain ==INPUT_DVI)
+		{
+			if (Length > PANEL_V)
+			{		// down scaling //BK110916??
 				temp += 0x1000L;			// round up.
 			}
 		}
-		else {
+		else
+		{
 			//temp += (PANEL_V / 2);	//roundup
 		}
 		temp /= PANEL_V;
@@ -476,7 +470,6 @@ void ScalerSetVScale(WORD Length)
 //Scaler Panorama
 //-------------------------------------
 
-//-----------------------------------------------------------------------------
 /**
 * set Panorama mode
 *
@@ -486,11 +479,13 @@ void ScalerSetVScale(WORD Length)
 void ScalerPanoramaOnOff(BYTE fOn)
 {
 	WriteTW88Page(PAGE2_SCALER);
-	if(fOn)	WriteTW88(REG201, ReadTW88(REG201) | 0x40);
-	else    WriteTW88(REG201, ReadTW88(REG201) & ~0x40);
+
+	if (fOn)
+		WriteTW88(REG201, ReadTW88(REG201) | 0x40);
+	else
+		WriteTW88(REG201, ReadTW88(REG201) & ~0x40);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set the panorama parameters
 *
@@ -504,15 +499,18 @@ void ScalerPanoramaOnOff(BYTE fOn)
 void ScalerSetPanorama(WORD px_scale, short px_inc)
 {
 	BYTE temp;
+
 	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG207, px_scale >> 4);
 	WriteTW88(REG212, (ReadTW88(REG212) & 0x0F) | (BYTE)(px_scale & 0x0F));
+
 	temp = (BYTE)(px_inc >> 8);
 	temp <<= 4;
+
 	WriteTW88(REG217, (ReadTW88(REG217) & 0x0F) | temp);
 	WriteTW88(REG208, (BYTE)px_inc);
 }
-
 
 //-------------------------------------
 //	Scaler LineBuffer
@@ -522,7 +520,6 @@ void ScalerSetPanorama(WORD px_scale, short px_inc)
 //See the Horizontal Timing on "AN-TW8832,33 Scaler & TCON".
 //set the "Output Delay" and "Output Length" of the Line Buffer Output on Horizontal Timming Flow.
 
-//-----------------------------------------------------------------------------
 /**
 * Write scaler LineBuffer output delay
 *
@@ -535,10 +532,11 @@ void ScalerSetPanorama(WORD px_scale, short px_inc)
 */
 void ScalerWriteLineBufferDelay(BYTE delay)
 {
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+	
 	WriteTW88(REG20B, delay);
 }
-//-----------------------------------------------------------------------------
+
 /**
 * Read scaler LineBuffer output delay
 *
@@ -546,11 +544,11 @@ void ScalerWriteLineBufferDelay(BYTE delay)
 */
 BYTE ScalerReadLineBufferDelay(void)
 {
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+
 	return ReadTW88(REG20B);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set Scaler OutputLength that is related with the line buffer size. 
 *
@@ -563,10 +561,11 @@ BYTE ScalerReadLineBufferDelay(void)
 */
 void ScalerSetLineBufferSize(WORD len)
 {
-	if(len>PANEL_H)
-		len=PANEL_H;
+	if (len > PANEL_H)
+		len = PANEL_H;
 
 	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG20E, (ReadTW88(REG20E) & 0x8F) | ((len & 0x700) >> 4));
 	WriteTW88(REG20C, (BYTE)len);
 }
@@ -603,8 +602,6 @@ void ScalerSetLineBufferSize(WORD len)
 //}
 //#endif
 
-
-//-----------------------------------------------------------------------------
 /**
 * set Horizontal DE position(DEstart) & length(active, DEwidth).
 *
@@ -619,11 +616,12 @@ void ScalerWriteHDEReg(WORD pos)
 {
 	//do not add debugmsg, it will makes a blink.
 	//dPrintf("\nScalerWriteHDEReg pos:%bd",pos);
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG221, (ReadTW88(REG221) & 0xCF) | ((pos >> 4) & 0x30));
 	WriteTW88(REG210, (BYTE)pos);
 }
-//-----------------------------------------------------------------------------
+
 /**
 * read HDE register
 *
@@ -632,13 +630,15 @@ void ScalerWriteHDEReg(WORD pos)
 WORD ScalerReadHDEReg(void)
 {
 	WORD wTemp;
-	WriteTW88Page(PAGE2_SCALER );
+
+	WriteTW88Page(PAGE2_SCALER);
+
 	wTemp = ReadTW88(REG221) & 0x30; wTemp <<= 4;
 	wTemp |= ReadTW88(REG210);
+
 	return wTemp;
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Calculate HDE value.
 *
@@ -649,10 +649,11 @@ WORD ScalerReadHDEReg(void)
 WORD ScalerCalcHDE(void)
 {
 	WORD wTemp;
+
 	wTemp = ScalerReadLineBufferDelay();
+
 	return wTemp+32;
 }
-
 
 //-----------------------------------------------------------------------------
 //register
@@ -665,12 +666,16 @@ WORD ScalerCalcHDE(void)
 WORD ScalerReadOutputWidth(void)
 {
 	WORD HActive;
+
 	WriteTW88Page(PAGE2_SCALER);
+
 	HActive = ReadTW88(REG212) & 0x0F;
 	HActive <<= 8;
 	HActive |= ReadTW88(REG211);
+
 	return HActive;
 }
+
 //set Scaler.Output.Width
 //#ifdef UNCALLED_SEGMENT
 ////-----------------------------------------------------------------------------
@@ -694,11 +699,11 @@ WORD ScalerReadOutputWidth(void)
 //-----------------------------------------------------------------------------
 void ScalerSetHSyncPosLen(WORD pos, BYTE len)
 {
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+	
 	WriteTW88(REG213, (BYTE)pos);
 	WriteTW88(REG221, (ReadTW88(REG221) & 0xFC) | (pos>>8));
 	WriteTW88(REG214, (ReadTW88(REG214) & 0xF0) | len);
-
 }
 #endif
 
@@ -707,26 +712,30 @@ void ScalerSetHSyncPosLen(WORD pos, BYTE len)
 //VA_LEN	R217[3:0]R216[7:0]	  width
 //			Output DE control in number of the output lines. A 12-bit register
 
-//-----------------------------------------------------------------------------
 /**
 * Read Vertical DE register
 */
 WORD ScalerReadVDEReg(void)
 {
 	WORD wTemp;
-	WriteTW88Page(PAGE2_SCALER );
-	wTemp = ReadTW88(REG220) & 0x30;	wTemp <<= 4;
+
+	WriteTW88Page(PAGE2_SCALER);
+
+	wTemp = ReadTW88(REG220) & 0x30;
+	wTemp <<= 4;
 	wTemp |= ReadTW88(REG215);
+
 	return wTemp;
 }
-//-----------------------------------------------------------------------------
+
 /**
 * Write Vertical DE register
 */
 void ScalerWriteVDEReg(WORD pos)
 {
 	//dPrintf("\nScalerSetVDEAndWidth pos:%bd len:%d",pos,len);
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG220, (ReadTW88(REG220) & 0xCF) | ((pos >> 4) & 0x30));
 	WriteTW88(REG215, (BYTE)pos);
 }
@@ -742,17 +751,20 @@ void ScalerWriteOutputHeight(WORD height)
 	WriteTW88(REG216, (BYTE)height);
 }
 #endif
-//-----------------------------------------------------------------------------
+
 /**
 * Read Outout Height register
 */
 WORD ScalerReadOutputHeight(void)
 {
  	WORD height;
+
 	WriteTW88Page(PAGE2_SCALER );
+
 	height = ReadTW88(REG217) & 0x0F;
 	height <<= 8;
 	height |= ReadTW88(REG216);	//V Width
+
 	return height;
 }
 
@@ -809,6 +821,7 @@ WORD ScalerCalcVDE(void)
 	return (WORD)dTemp;
 }
 #endif
+
 WORD ScalerCalcVDE2(WORD vStart, char vde_offset)
 {
 	BYTE VPol;
@@ -819,8 +832,7 @@ WORD ScalerCalcVDE2(WORD vStart, char vde_offset)
 
 	WriteTW88Page(PAGE5_MEAS);
 	//Read2TW88(REG536,REG537, VStart);	//incorrect....
-	Read2TW88(REG52A,REG52B, VPulse);
-
+	Read2TW88(REG52A, REG52B, VPulse);
 
 	WriteTW88Page(PAGE0_INPUT);
 	VPol = ReadTW88(REG041) & 0x08 ? 1: 0;
@@ -848,7 +860,6 @@ void ScalerSetVDEPosHeight(BYTE pos, WORD len)
 }
 #endif
 
-
 //-----------------------------------------------------------------------------
 //register
 //	R212[3:0]R211[7:0]	HA_LEN
@@ -862,7 +873,6 @@ void ScalerSetOutputWidthAndHeight(WORD width, WORD height)
 	ScalerWriteOutputHeight(height);
 }
 #endif
-
 
 //-----------------------------------------------------------------------------
 //VS_LEN		R218[7:6]	VSyhch width
@@ -878,8 +888,6 @@ void ScalerSetVSyncPosLen(WORD pos, BYTE len)
 }
 #endif
 
-
-//-----------------------------------------------------------------------------
 /**
 * Write Freerun VTotal value
 *
@@ -887,11 +895,12 @@ void ScalerSetVSyncPosLen(WORD pos, BYTE len)
 */
 void ScalerWriteFreerunVtotal(WORD value)
 {
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+	
 	WriteTW88(REG20D, (ReadTW88(REG20D)&0x3F)|(value>>2)&0xC0);
 	WriteTW88(REG219, (BYTE)value );
 }
-//-----------------------------------------------------------------------------
+
 /**
 * Read Freerun VTotal value
 *
@@ -902,12 +911,14 @@ WORD ScalerReadFreerunVtotal(void)
 	WORD value;
 
 	WriteTW88Page(PAGE2_SCALER );
+
 	value = ReadTW88(REG20D) & 0xC0;
 	value <<= 2;
 	value |= ReadTW88(REG219);
+
 	return value;
 }
-//-----------------------------------------------------------------------------
+
 /**
 * calcualte Freerun VTotal value
 *
@@ -932,7 +943,6 @@ WORD ScalerCalcFreerunVtotal(void)
 	return (WORD)temp32;
 }
 
-
 //-----------------------------------------------------------------------------
 //DM_TOP	R21A[7:0]	top 	 
 //DM_BOT	R21B[7:0]	bottom 
@@ -946,7 +956,6 @@ void ScalerSetVDEMask(BYTE top, BYTE bottom)
 }
 #endif
 
-//-----------------------------------------------------------------------------
 /**
 * Write Freerun Htotal value 
 *
@@ -954,11 +963,12 @@ void ScalerSetVDEMask(BYTE top, BYTE bottom)
 */
 void ScalerWriteFreerunHtotal(WORD value)
 {
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+
 	WriteTW88(REG21C, (ReadTW88(REG21C)&0x0F)|(value>>4)&0xF0);
-	WriteTW88(REG21D, (BYTE)value );
+	WriteTW88(REG21D, (BYTE)value);
 }
-//-----------------------------------------------------------------------------
+
 /**
 * read Freerun HTotal value
 *
@@ -968,13 +978,15 @@ WORD ScalerReadFreerunHtotal(void)
 {
 	WORD value;
 
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
+
 	value = ReadTW88(REG21C) & 0xF0;
 	value <<= 4;
 	value |= ReadTW88(REG21D);
+
 	return value;
 }
-//-----------------------------------------------------------------------------
+
 /**
 * calculate the Freerun HTotal value
 *
@@ -994,7 +1006,6 @@ WORD ScalerCalcFreerunHtotal(void)
 	WriteTW88Page(PAGE2_SCALER);
 	PCLKO = ReadTW88(REG20D)&0x03;
 
-
 	temp32 = MeasGetHPeriod();
 	temp32 *= VScale;
 	temp32 /= 8192L;
@@ -1004,7 +1015,6 @@ WORD ScalerCalcFreerunHtotal(void)
 	
 	return (WORD)temp32;
 }
-
 
 //RRUN		R21C[2]
 //			Panel free run control. 1 = free run with HTOTAL and LNTT.
@@ -1032,9 +1042,12 @@ BYTE ScalerIsFreerunManual(void)
 	BYTE value;
 
 	WriteTW88Page(PAGE2_SCALER);
+
 	value = ReadTW88(REG21C);
+
 	if (value & 0x04)
 		return 1;
+
 	return 0;
 }
 #endif
@@ -1046,19 +1059,25 @@ void ScalerSetFreerunAutoManual(BYTE fAuto, BYTE fManual)
 {
 	BYTE value;
 	
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
 	value = ReadTW88(REG21C);
-	if(fAuto != 0x02) {
-		if(fAuto)	value |= 0x02;		//on auto freerun
-		else 		value &= ~0x02;		//off auto freerun		
+	if (fAuto != 0x02)
+	{
+		if (fAuto)
+			value |= 0x02;		//on auto freerun
+		else
+			value &= ~0x02;		//off auto freerun		
 	}
-	if(fManual != 0x02) {
-		if(fManual)	value |= 0x04;		//on manual freerun
-		else 		value &= ~0x04;		//off manual freerun		
+	if (fManual != 0x02)
+	{
+		if (fManual)
+			value |= 0x04;		//on manual freerun
+		else
+			value &= ~0x04;		//off manual freerun		
 	}
 	WriteTW88(REG21C, value);
 }
-//-----------------------------------------------------------------------------
+
 /**
 * set MuteAuto & MuteManual
 */
@@ -1068,18 +1087,23 @@ void ScalerSetMuteAutoManual(BYTE fAuto, BYTE fManual)
 	
 	WriteTW88Page(PAGE2_SCALER );
 	value = ReadTW88(REG21E);
-	if(fAuto != 0x02) {
-		if(fAuto)	value |= 0x02;		//on auto mute
-		else 		value &= ~0x02;		//off auto mute		
+	if (fAuto != 0x02)
+	{
+		if (fAuto)
+			value |= 0x02;		//on auto mute
+		else
+			value &= ~0x02;		//off auto mute		
 	}
-	if(fManual != 0x02) {
-		if(fManual)	value |= 0x01;		//on manual mute
-		else 		value &= ~0x01;		//off manual mute		
+	if (fManual != 0x02)
+	{
+		if (fManual)
+			value |= 0x01;		//on manual mute
+		else
+			value &= ~0x01;		//off manual mute		
 	}
 	WriteTW88(REG21E, value);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * set MuteManual
 */
@@ -1093,7 +1117,6 @@ void ScalerSetMuteManual(BYTE on)
 	else
 		WriteTW88(REG21E, (ReadTW88(REG21E) & ~0x01));		//off manual mute
 }
-
 
 //PanelFreerun value
 //
@@ -1125,37 +1148,40 @@ void ScalerSetFreerunValue(BYTE fForce)
 	WORD VTotal;
 	BYTE ret;
 
-	if(fForce) {
+	if (fForce)
+	{
 		//scaled NTSC Freerun value
 		HTotal = 1085;  
 		VTotal = 553;
 	}
-	else {
-
+	else
+	{
 		//Before measure, disable an En.Change Detection. and then start a measure.
 		//MeasStartMeasure will capture a reference value for "En.Change detection".
 		MeasEnableChangedDetection(OFF);
 
 		//call measure once to update the value or use a table value
-		ret=MeasStartMeasure();
-		if(ret) {
+		ret = MeasStartMeasure();
+		if (ret)
+		{
 			dPrintf("\nFreerunValue failed!!");
 			HTotal = 1085;	//1100;	//1018;	//1107;
 			VTotal = 553;	//553;	//542;
 		}
-		else {
+		else
+		{
 			HTotal = ScalerCalcFreerunHtotal();
 			VTotal = ScalerCalcFreerunVtotal();
 		}
 		//turn on the En.Changed Detection.
 		MeasEnableChangedDetection(ON);
 	}
+	
 	dPrintf("\nFreerunValue(%bd) HTotal:%d VTotal:%d",fForce,HTotal,VTotal);
 	ScalerWriteFreerunHtotal(HTotal);
 	ScalerWriteFreerunVtotal(VTotal);
 }
 
-//-----------------------------------------------------------------------------
 /**
 * check the freerun value before we go into the freerun mode.
 *	
@@ -1168,7 +1194,7 @@ void ScalerCheckPanelFreerunValue(void)
 	WORD Total, Min;
 	BYTE changed;
 
-	WriteTW88Page(PAGE2_SCALER );
+	WriteTW88Page(PAGE2_SCALER);
 	changed = 0;
 
 	// Horizontal
@@ -1176,7 +1202,8 @@ void ScalerCheckPanelFreerunValue(void)
 	Min = ScalerReadOutputWidth();	//H Width
 	Min += ScalerReadHDEReg();		//H-DE
 	Min += 2;
-	if(Total < Min) {
+	if (Total < Min)
+	{
 		dPrintf("\nScaler Freerun HTotal %d->%d",Total, Min);
 		Total = Min;
 		ScalerWriteFreerunHtotal(Total);
@@ -1188,19 +1215,20 @@ void ScalerCheckPanelFreerunValue(void)
 	Min = ScalerReadOutputHeight();	//V Width
 	Min += ScalerReadVDEReg();		//V-DE
 	Min += 2;
-	if(Total < Min) {
+	if (Total < Min)
+	{
 		dPrintf("\nScaler Freerun VTotal %d->%d",Total, Min);
 		Total = Min;
 		ScalerWriteFreerunVtotal(Total);
 		changed++;
 	}
 
-	if(changed) {
+	if (changed)
+	{
 		SpiOsdSetDeValue();	//BK111013
 		FOsdSetDeValue();
 	}
 }
-
 
 //===================================================
 // New Scaler routines comes from TW8809.
@@ -1219,7 +1247,8 @@ void ScalerSetScaleRate(WORD hIn, WORD vIn, WORD hOut, WORD vOut)
 	WORD hdScale,xScale,yScale;
 
 	// X scale
-	if(hIn > hOut) {
+	if (hIn > hOut)
+	{
 		//X downscale
 		xScale = 0x2000;
 		dTemp = hIn;
@@ -1227,7 +1256,8 @@ void ScalerSetScaleRate(WORD hIn, WORD vIn, WORD hOut, WORD vOut)
 		dTemp /= hOut;
 		hdScale = dTemp;
 	}
-	else {
+	else
+	{
 		//X upscale
 		hdScale = 0x400;
 		dTemp = hIn;
@@ -1268,7 +1298,6 @@ void ScalerSetScaleRate(WORD hIn, WORD vIn, WORD hOut, WORD vOut)
 void ScalerSetOutputTimeRegs(BYTE index, WORD InputVDeStart,WORD InputVDEWidth) 
 {
 	struct s_DTV_table *pVid;
-
 
 							//------------------------------
 							//TW8809 BT656 Output registers
@@ -1522,7 +1551,6 @@ void ScalerTest_Decoder(BYTE scaler_mode)
 //} t_VIDEO_TIME;
 t_VIDEO_TIME VideoTime;
 
-
 void ScalerTest_Component(BYTE scaler_mode)
 {
 
@@ -1625,7 +1653,8 @@ void ScalerTest_PC(BYTE scaler_mode)
 
 	Printf("\nScalerTest_PC(%bd)",scaler_mode);
 
-	if(MeasStartMeasure()) {
+	if (MeasStartMeasure())
+	{
 		//something wrong.
 		dPrintf("==>FAIL!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		return;
@@ -1658,23 +1687,27 @@ void ScalerTest_PC(BYTE scaler_mode)
 	Printf("\nMeas hActive:%d vActive:%d vTotal:%d vfreq:%bd", hActive, vActive,vTotal, vfreq);
 
 	//search from table
-	for(index=0; index < VESA_TABLE_MAX; index++) {
+	for (index=0; index < VESA_TABLE_MAX; index++)
+	{
 		pVid = &VESA_table[index];
-		if(pVid->hDeWidth == 0xFFFF && pVid->vDeWidth==0xFFFF) {
+		if (pVid->hDeWidth == 0xFFFF && pVid->vDeWidth==0xFFFF)
+		{
 			//return 0xFF;	//give up
 			index = 0xFF;
 			break;
 		}
-		if(vTotal < (pVid->vTotal-1) || vTotal > (pVid->vTotal+1))
+		if (vTotal < (pVid->vTotal-1) || vTotal > (pVid->vTotal+1))
 			continue;
-		if(vfreq < (pVid->vfreq-1) || vfreq > (pVid->vfreq+1))
+		if (vfreq < (pVid->vfreq-1) || vfreq > (pVid->vfreq+1))
 			continue;
-		if(vActive < (pVid->vDeWidth-2) || vActive >  (pVid->vDeWidth+2))
+		if (vActive < (pVid->vDeWidth-2) || vActive >  (pVid->vDeWidth+2))
 			continue;
 		//found
 		break;
 	}
-	if(index == 0xFF) {
+
+	if (index == 0xFF)
+	{
 		Printf("\n=>GiveUp");
 		return;
 	}
@@ -1689,23 +1722,23 @@ void ScalerTest_PC(BYTE scaler_mode)
 		pVid->pixelfreq
 		);
 
-
 	//add "1" for overscan on vActive
 	InputSetCrop(pVid->hBPorch-16, pVid->vBPorch+1, pVid->hDeWidth, pVid->vDeWidth+1);
 	Printf("\nCrop H Pol:%bd Start:%d Active:%d", 0, pVid->hBPorch-16, pVid->hDeWidth);
 	Printf("\n     V Pol:%bd Start:%d Active:%d", 0, pVid->vBPorch+1,pVid->vDeWidth+1);
 
-
 	hActive = pVid->hDeWidth;
 	vActive = pVid->vDeWidth;
 	vStart =  pVid->vBPorch +1;
 
-	if(scaler_mode==SCALER_MODE_720X480P) {
-		ScalerSetScaleRate(hActive,vActive,720,480);
+	if (scaler_mode == SCALER_MODE_720X480P)
+	{
+		ScalerSetScaleRate(hActive, vActive, 720, 480);
 		ScalerSetOutputTimeRegs(VID_720X480P_IDX, vStart, vActive);
 	}
-	else {
-		ScalerSetScaleRate(hActive,vActive,800,480);
+	else
+	{
+		ScalerSetScaleRate(hActive, vActive, 800, 480);
 		ScalerSetOutputTimeRegs(VID_800X480P_IDX, vStart, vActive);
 	}	
 }
@@ -2263,7 +2296,6 @@ void ScalerTest_DTV(void)
 }
 #endif
 
-
 //mode
 //	0:Original Scaler
 //	1:New method
@@ -2271,8 +2303,10 @@ void ScalerTest_DTV(void)
 void ScalerTest(BYTE mode)
 {
 	//scaler test
-	if(mode) {
-		switch(InputMain) {
+	if (mode)
+	{
+		switch (InputMain)
+		{
 		case INPUT_CVBS:
 			ScalerTest_Decoder(mode);
 			break;
@@ -2300,8 +2334,10 @@ void ScalerTest(BYTE mode)
 			break;
 		}
 	}
-	else {
+	else
+	{
 		//CheckAndSetInput will recover the test value.
 		CheckAndSetInput();
 	}
 }
+

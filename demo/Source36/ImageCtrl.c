@@ -909,7 +909,6 @@ void SetImage(BYTE type)
 	}
 }
 
-//-----------------------------------------------------------------------------
 //BKTODO:110518
 BYTE SetAspectHW(BYTE mode)
 {
@@ -927,7 +926,7 @@ BYTE SetAspectHW(BYTE mode)
 }
 
 BYTE OsdTime;
-//-----------------------------------------------------------------------------
+
 /**
 * Get OsdChangeTime value
 */
@@ -937,43 +936,45 @@ BYTE OsdGetTime(void)
 	return OsdTime;
 }
 
-//-----------------------------------------------------------------------------
 /**
 * increase/decrease OsdChangeTime value
 */
 BYTE OsdVaryTime(BYTE dat)
 {
-	if(dat > OsdTime) {
-		if(dat < 10)
+	if (dat > OsdTime)
+	{
+		if (dat < 10)
 			OsdTime = 10;
 		else if(dat < 100)
 			OsdTime++;
 	}
-	else if(dat < OsdTime) {
-		if(dat < 10)
+	else if (dat < OsdTime)
+	{
+		if (dat < 10)
 			OsdTime = 0;
 		else 
 			OsdTime--;
 	}
 
-	dPrintf("\nOsdSetTime:%bd",OsdTime);
+	dPrintf("\nOsdSetTime:%bd", OsdTime);
+	
 	return OsdTime;
 }
-//-----------------------------------------------------------------------------
+
 /**
 * set OsdChangeTime value
 */
 BYTE OsdSetTime(BYTE dat)
 {
-	if(dat <= 100)
+	if (dat <= 100)
 		OsdTime = dat;
-	if(OsdTime < 5)
+	if (OsdTime < 5)
 		OsdTime = 0;
 
-	dPrintf("\nOsdSetTime:%bd",OsdTime);
+	dPrintf("\nOsdSetTime:%bd", OsdTime);
 	return OsdTime;
 }
-//-----------------------------------------------------------------------------
+
 /**
 * save OsdChangeTime value to EEPROM
 */

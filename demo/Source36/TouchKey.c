@@ -55,14 +55,12 @@
 #define ADC_MODE_AUX2	6
 #define ADC_MODE_AUX3	7
 
-
 WORD 	OldPosX, OldPosY;
 BYTE	TouchStatus, LastTouchStatus;
 DWORD	veloX, veloY;
 
 DWORD TscTimeStart, TscTimeEnd, TscTimeLastEnd;
 BYTE TscHwReady=0;
-
 
 //#define MOVE_MIN	20
 #define TSC_MOVE_MIN_THRESHOLD		10		//5:NG
@@ -71,7 +69,6 @@ BYTE TscHwReady=0;
 #define TSC_PRESS_RECOVER_THRESHOLD	100		//1sec
 #define TSC_Z_THRESHOLD				220
 #define TSC_MOVED_THRESHOLD 		50		//500msec
-
 
 #define		RES_X	800
 #define 	RES_Y	480
@@ -87,7 +84,6 @@ bit		tsc_debug = 0;
 
 bit 	TouchPressedOld=0;
 BYTE	TouchChangedOld=0;
-
 
 //=============================================================================
 //		AUX 
@@ -181,7 +177,7 @@ DATA BYTE	keytic;
 //#define KEY_MENU			3
 //#define KEY_DOWN			4
 //#define KEY_LEFT			5
-//#define	KEY_INPUT		6
+//#define KEY_INPUT			6
 
 // key sampleing values
 //  key name    average     range
@@ -304,7 +300,6 @@ BYTE GetKey(BYTE repeat)
 // TOUCH
 //===========================================
 
-
 #ifdef SUPPORT_TOUCH
    //extern
 //	TraceAuto
@@ -312,28 +307,29 @@ BYTE GetKey(BYTE repeat)
 /**
 * set TouchAuto flag. only for test
 */
-void SetTouchAuto( BYTE on )
+void SetTouchAuto(BYTE on)
 {
 	TraceAuto = 0;
-	if ( on )
+	
+	if (on)
 		TouchAuto = 1;
 	else
 		TouchAuto = 0;
 }
+
 /**
 * set traceauto flag. only for test
 */
-void SetTraceAuto( BYTE on )
+void SetTraceAuto(BYTE on)
 {
 	TouchAuto = 0;
-	if ( on )
+	
+	if (on)
 		TraceAuto = 1;
 	else
 		TraceAuto = 0;
 }
 #endif
-
-
 
 /*
 	  +-----------------+---------------------+
@@ -374,44 +370,57 @@ code WORD	Def_TouchCalibY[] = { 3432, 3421, 593,  604, 2008 };
 * output
 *	PosX,PosY
 */
-void _TscGetScreenPos( void )
+void _TscGetScreenPos(void)
 {
 	DWORD calcX, calcY;
 
-	if ( TouchX < TouchCalibX[4] ) {				// center of 
-		if ( TouchY > TouchCalibY[4] ) {
+	if (TouchX < TouchCalibX[4])
+	{				// center of 
+		if (TouchY > TouchCalibY[4])
+		{
 			// GetZone0;
 			//calc = (TouchCalibX[4] - TouchX) / (TouchCalibX[4] - TouchCalibX[0]) / (CalibDataX[4] - CalibDataX[0]);
 			calcX = TouchCalibX[4] - TouchX;
-			calcX *= (DWORD)( CalibDataX[4] - CalibDataX[0] );
-			calcX /= (DWORD)( TouchCalibX[4] - TouchCalibX[0] );
-			if ( calcX >= CalibDataX[4] )	PosX = 0;
-			else							PosX = CalibDataX[4] - calcX;
+			calcX *= (DWORD)(CalibDataX[4]  - CalibDataX[0]);
+			calcX /= (DWORD)(TouchCalibX[4] - TouchCalibX[0]);
+			if (calcX >= CalibDataX[4])
+				PosX = 0;
+			else
+				PosX = CalibDataX[4] - calcX;
 
 			calcY = TouchY - TouchCalibY[4];
-			calcY *= ( CalibDataY[4] - CalibDataY[0] );
-			calcY /= ( TouchCalibY[0] - TouchCalibY[4] );
-			if ( calcY >= CalibDataY[4] )	PosY = 0;
-			else							PosY = CalibDataY[4] - calcY;
+			calcY *= (CalibDataY[4]  - CalibDataY[0]);
+			calcY /= (TouchCalibY[0] - TouchCalibY[4]);
+			if (calcY >= CalibDataY[4])
+				PosY = 0;
+			else
+				PosY = CalibDataY[4] - calcY;
 		}
-		else {
+		else
+		{
 			//GetZone3
 			//calc = (TouchCalibX[4] - TouchX) / (TouchCalibX[4] - TouchCalibX[3]) / (CalibDataX[4] - CalibDataX[3]);
 			calcX = TouchCalibX[4] - TouchX;
-			calcX *= (DWORD)( CalibDataX[4] - CalibDataX[3] );
-			calcX /= (DWORD)( TouchCalibX[4] - TouchCalibX[3] );
-			if ( calcX >= CalibDataX[4] )	PosX = 0;
-			else							PosX = CalibDataX[4] - calcX;
+			calcX *= (DWORD)(CalibDataX[4]  - CalibDataX[3]);
+			calcX /= (DWORD)(TouchCalibX[4] - TouchCalibX[3]);
+			if (calcX >= CalibDataX[4])
+				PosX = 0;
+			else
+				PosX = CalibDataX[4] - calcX;
 
 			calcY = TouchCalibY[4] - TouchY;
-			calcY *= (DWORD)( CalibDataY[3] - CalibDataY[4] );
-			calcY /= (DWORD)( TouchCalibY[4] - TouchCalibY[3] );
-			if ( calcY >= CalibDataY[4] )	PosY = RES_Y - 1;
-			else							PosY = CalibDataY[4] + calcY;
+			calcY *= (DWORD)(CalibDataY[3]  - CalibDataY[4]);
+			calcY /= (DWORD)(TouchCalibY[4] - TouchCalibY[3]);
+			if (calcY >= CalibDataY[4])
+				PosY = RES_Y - 1;
+			else
+				PosY = CalibDataY[4] + calcY;
 		}
 	}
-	else {   
-		if ( TouchY > TouchCalibY[4] )  {
+	else
+	{   
+		if (TouchY > TouchCalibY[4])
+		{
 			//GetZone1
 			calcX = TouchX - TouchCalibX[4];
 			calcX *= ( CalibDataX[1] - CalibDataX[4] );
@@ -425,7 +434,8 @@ void _TscGetScreenPos( void )
 			if ( calcY >= CalibDataY[4] )	PosY = 0;
 			else							PosY = CalibDataY[4] - calcY;
 		}
-		else  {
+		else
+		{
 			//GetZone2
 			calcX = TouchX - TouchCalibX[4];
 			calcX *= ( CalibDataX[2] - CalibDataX[4] );
@@ -444,54 +454,49 @@ void _TscGetScreenPos( void )
 }
 #endif
 
-//=============================================================================
-//	 
-//=============================================================================
 /**
 * init Touch
 */
-void InitAuxADC( void )
+void InitAuxADC(void)
 {
 	BYTE val;
+	
 	dPuts("\nInitTouch");
+
 #ifdef SUPPORT_TOUCH
 	TscTimeStart = TscTimeEnd = TscTimeLastEnd = 0;;
 
 	//read CalibDataX[] and CalibDataY[] from EEPROM.
 	ReadCalibDataFromEE();
 
-
-	WriteTW88Page(PAGE0_TOUCH );
+	WriteTW88Page(PAGE0_TOUCH);
 	CpuTouchStep = 0;
-	WriteTW88(REG0B0, 0x02 );				//power up. with Z2 measure
-	WriteTW88(REG0B1, 0xF8 );				//TODO:Touch Ready & Touch Pen is not implemented yet.
-											// 
+	WriteTW88(REG0B0, 0x02);				//power up. with Z2 measure
+	WriteTW88(REG0B1, 0xF8);				//TODO:Touch Ready & Touch Pen is not implemented yet.
 
-	//--------------------------------------------
 	//Check connector
-	WriteTW88(REG0B4, 0x02 ); 
-	WriteTW88(REG0B0, 0x20 | ReadTW88(REG0B0) );	//need a start command
+	WriteTW88(REG0B4, 0x02); 
+	WriteTW88(REG0B0, 0x20 | ReadTW88(REG0B0));	//need a start command
 	delay1ms(1);	//need more then 1CLK cycle.
 	val = ReadTW88(REG0B2);
-	if( val < 0x80  ) {
-		dPrintf("--FAIL.%bx",val);
+	if (val < 0x80)
+	{
+		dPrintf("--FAIL.%bx", val);
 		// do not power down. Still you need a keypad.
 		TscHwReady = 0;
 	}
-	else {
-		dPrintf("--OK.%bx",val);
+	else
+	{
+		dPrintf("--OK.%bx", val);
 		TscHwReady = 1;
 	}
-	WriteTW88(REG0B0, ~0x20 & ReadTW88(REG0B0) );
-
-
+	WriteTW88(REG0B0, ~0x20 & ReadTW88(REG0B0));
 
 #if 1	//120323 Touch Spec. can support from div8~64 : 4MHz~320K.
-	WriteTW88(REG0B4, 0x0A );				// div 8, rsel=10k, continuous sensing mode
+	WriteTW88(REG0B4, 0x0A);				// div 8, rsel=10k, continuous sensing mode
 #else
 	WriteTW88(REG0B4, 0x0C );				// div 32, rsel=10k, continuous sensing mode
 #endif
-
 
 	SFR_EINT6 = 0;
 	CpuTouchPressed = 0;
@@ -500,14 +505,12 @@ void InitAuxADC( void )
 	CpuTouchSkipCount = 0;
 	SFR_ET1 = 1;
 
-
 	SetTouchStatus(TOUCHEND);
 	SetLastTouchStatus(TOUCHEND);
 #else
 	dPuts("-removed");
 #endif
 }
-
 
 //return
 //	success: if need an Action
@@ -518,10 +521,10 @@ void InitAuxADC( void )
 BYTE GetTouch2(void)
 {
 	BYTE ret;
-	short movX,movY;
+	short movX, movY;
 	BYTE TC;		 //Touch change counter
 	bit	 TP;		 //pressed status
-	DWORD dt_start,dt_end;
+	DWORD dt_start, dt_end;
 	DWORD TscTimeCurr;
 	BYTE new_status;
 
@@ -548,19 +551,25 @@ BYTE GetTouch2(void)
 	//}
 #endif
 
-	if ( TouchChangedOld == TC ) {
-		if(TouchStatus==TOUCHMOVED && ((TscTimeEnd + TSC_MOVED_THRESHOLD) < SystemClock)) {			//500msec delay
+	if (TouchChangedOld == TC)
+	{
+		if (TouchStatus==TOUCHMOVED && ((TscTimeEnd + TSC_MOVED_THRESHOLD) < SystemClock))
+		{			//500msec delay
 			dTscPrintf("\nTouch TOUCHMOVED Action dt:%ld", SystemClock - TscTimeEnd);
+			
 			return 1;			
 		}
+
 		return 0;			// no measurement
 	}
 
 	ret = 0;
 	TscTimeCurr = SystemClock;
 
-	if(TouchPressedOld) {
-		if(TP) {
+	if (TouchPressedOld)
+	{
+		if (TP)
+		{
 //-----------
 LABEL_TP11: /* Pressed=>Pressed */
 //-----------
@@ -571,43 +580,55 @@ LABEL_TP11: /* Pressed=>Pressed */
 			//--------------------
 			movX = PosX - OldPosX;
 			movY = PosY - OldPosY;
-			if(TWabsShort(movX) <= TSC_MOVE_MIN_THRESHOLD) {
-				if(TouchStatus >= TOUCHMOVE)
+			if (TWabsShort(movX) <= TSC_MOVE_MIN_THRESHOLD)
+			{
+				if (TouchStatus >= TOUCHMOVE)
 					new_status |= TSC_MOVE;	
 			}
-			else {
+			else
+			{
 				new_status |= TSC_MOVE;
-				if(movX > 0) new_status |= TSC_MOVEXPLUS;	//right
-				else         new_status |= TSC_MOVEX;		//left
+				if (movX > 0)
+					new_status |= TSC_MOVEXPLUS;	//right
+				else
+					new_status |= TSC_MOVEX;		//left
 			}
-			if(TWabsShort(movY) <= TSC_MOVE_MIN_THRESHOLD) {
-				if(TouchStatus >= TOUCHMOVE)
+			if (TWabsShort(movY) <= TSC_MOVE_MIN_THRESHOLD)
+			{
+				if (TouchStatus >= TOUCHMOVE)
 					new_status |= TSC_MOVE;	
 			}
-			else {
+			else
+			{
 				new_status |= TSC_MOVE;
-				if(movY > 0) new_status |= TSC_MOVEYPLUS;	//down
-				else         new_status |= TSC_MOVEY;		//up
+				if (movY > 0)
+					new_status |= TSC_MOVEYPLUS;	//down
+				else
+					new_status |= TSC_MOVEY;		//up
 			}
-			if(TouchStatus == new_status) {
+			if (TouchStatus == new_status)
+			{
 				dTscPrintf("\nTSC keep Stat:%bx", TouchStatus);
 			}
-			else {
+			else
+			{
 				PrintTouchStatusParam(new_status);
-				PrintTouchStatus(0,new_status);
+				PrintTouchStatus(0, new_status);
 				TscUpdateStatus(new_status);
 			}
-			dTscPrintf(" xypos=%dx%d",PosX, PosY);
-			dTscPrintf(" z:%d(0x%x-0x%x)",CpuZ2-CpuZ1,CpuZ2,CpuZ1);
+			dTscPrintf(" xypos=%dx%d", PosX, PosY);
+			dTscPrintf(" z:%d(0x%x-0x%x)", CpuZ2-CpuZ1, CpuZ2, CpuZ1);
 
-			if(new_status & (TSC_MOVEX | TSC_MOVEY)) { //move X or Y
+			if (new_status & (TSC_MOVEX | TSC_MOVEY))
+			{ //move X or Y
 				OldPosX = PosX;
 				OldPosY = PosY;
 			}
 			//...
 			ret = 1;
 		}
-		else {
+		else
+		{
 //-----------
 //LABEL_TP10: /*Press=>Detached */
 //-----------
@@ -616,46 +637,56 @@ LABEL_TP11: /* Pressed=>Pressed */
 			dt_start = TscTimeCurr - TscTimeStart;	//pressed position(previous)
 			dt_end   = TscTimeCurr - TscTimeEnd;	//detached position(previous)
 
-
-			if(LastTouchStatus>=TOUCHMOVE) {
+			if (LastTouchStatus >= TOUCHMOVE)
+			{
 				PrintTouchStatus(1, TOUCHMOVED);
 				TscUpdateStatus(TOUCHMOVED);
-				ret=0;
+				ret = 0;
 			}
-			else if(dt_start > TSC_LONGCLICK_THRESHOLD) {	//more then 10sec
+			else if (dt_start > TSC_LONGCLICK_THRESHOLD)
+			{	//more then 10sec
 				PrintTouchStatus(1, TOUCHLONGCLICK);
 				TscUpdateStatus(TOUCHLONGCLICK);
 				ret = 1;
 			}
-			else if(dt_end < TSC_DCLICK_THRESHOLD) {
-				if(TouchStatus >= TOUCHMOVE) {
+			else if (dt_end < TSC_DCLICK_THRESHOLD)
+			{
+				if (TouchStatus >= TOUCHMOVE)
+				{
 					PrintTouchStatus(1, TOUCHMOVED);
-					TscUpdateStatus(TOUCHMOVED);	 dTscPuts("(DCLK->MOVED)");
+					TscUpdateStatus(TOUCHMOVED);
+					dTscPuts("(DCLK->MOVED)");
 					ret = 0;
 				}
-				else { 
+				else
+				{ 
 					PrintTouchStatus(1, TOUCHDOUBLECLICK);
 					TscUpdateStatus(TOUCHDOUBLECLICK);
 					ret = 1;
 				}
 			}
-			else {
-				if(TouchStatus >= TOUCHMOVE) {
+			else
+			{
+				if (TouchStatus >= TOUCHMOVE)
+				{
 					PrintTouchStatus(1, TOUCHMOVED);
-					TscUpdateStatus(TOUCHMOVED);	 dTscPuts("(CLK->MOVED)");
+					TscUpdateStatus(TOUCHMOVED);
+					dTscPuts("(CLK->MOVED)");
 					ret = 0;
 				}
-				else {
+				else
+				{
 					PrintTouchStatus(1, TOUCHCLICK); 
 					TscUpdateStatus(TOUCHCLICK);
 					ret = 1;
 				}
 			}
-			dTscPrintf(" xypos=%dx%d",PosX, PosY);
-			dTscPrintf(" z:%d(0x%x-0x%x)",CpuZ2-CpuZ1,CpuZ2);
-			dTscPrintf(" dt_start:%ld dt_end:%ld",dt_start,dt_end);
+			dTscPrintf(" xypos=%dx%d", PosX, PosY);
+			dTscPrintf(" z:%d(0x%x-0x%x)", CpuZ2-CpuZ1, CpuZ2);
+			dTscPrintf(" dt_start:%ld dt_end:%ld", dt_start, dt_end);
 
-			if(TouchStatus == TOUCHMOVED) {
+			if (TouchStatus == TOUCHMOVED)
+			{
 				movX = OldPosX - StartX;
 				movX = TWabsShort(movX);
 				movY = OldPosY - StartY;
@@ -667,45 +698,53 @@ LABEL_TP11: /* Pressed=>Pressed */
 				veloY = 1000;
 				veloY *= movY;
 				veloY /= dt_start;
-				dTscPrintf(" Velocity X:%ld Y:%ld", veloX,veloY );
+				dTscPrintf(" Velocity X:%ld Y:%ld", veloX, veloY);
 			}
 			TscTimeEnd = TscTimeCurr;
 		}
 	}
-	else {
-		if(TP) {
+	else
+	{
+		if (TP)
+		{
 //-----------
 //LABEL_TP01: /*Detached=>Pressed.*/
 //-----------
 			//NOTE:update TscTimeStart. StartX,StartY
-			dt_end   = TscTimeCurr - TscTimeEnd;	//detached position(previous)
+			dt_end = TscTimeCurr - TscTimeEnd;	//detached position(previous)
 
-			if(TouchStatus==TOUCHMOVED) {
+			if (TouchStatus == TOUCHMOVED)
+			{
 				//if TP0_MOVED, TouchStatus=TOUCHMOVE and then goto LABEL_TP11.
 				//Touch is pressed before TSC_MOVED_THRESHOLD. It will ignore the previous unpress state.
-				PrintTouchStatus(1,TOUCHMOVE); dTscPuts(" RECOVER1 ");
+				PrintTouchStatus(1, TOUCHMOVE);
+				dTscPuts(" RECOVER1 ");
 				TscUpdateStatus(TOUCHMOVE);
 				goto LABEL_TP11;
 			}
-			else if(LastTouchStatus==TOUCHMOVED && dt_end < TSC_PRESS_RECOVER_THRESHOLD) {	 //assume TouchStatus==TOUCHEND
-				PrintTouchStatus(1,TOUCHMOVE); dTscPuts(" RECOVER2 ");
+			else if (LastTouchStatus==TOUCHMOVED && dt_end < TSC_PRESS_RECOVER_THRESHOLD)
+			{	 //assume TouchStatus==TOUCHEND
+				PrintTouchStatus(1, TOUCHMOVE);
+				dTscPuts(" RECOVER2 ");
 				TscUpdateStatus(TOUCHMOVE);
 				goto LABEL_TP11;
 			}
-			else {
-				PrintTouchStatus(1,TOUCHPRESS);
+			else
+			{
+				PrintTouchStatus(1, TOUCHPRESS);
 				TscUpdateStatus(TOUCHPRESS);
 				_TscGetScreenPos();
 				OldPosX = StartX = PosX;
 				OldPosY = StartY = PosY;
 				TscTimeLastEnd = TscTimeEnd; //NOTE
 				TscTimeStart = TscTimeCurr;
-				dTscPrintf(" xypos=%dx%d",PosX, PosY);
-				dTscPrintf(" z:%d(0x%x-0x%x)",CpuZ2-CpuZ1,CpuZ2);	
+				dTscPrintf(" xypos=%dx%d", PosX, PosY);
+				dTscPrintf(" z:%d(0x%x-0x%x)", CpuZ2-CpuZ1, CpuZ2);	
 			}
 			ret = 1;
 		}
-		else {
+		else
+		{
 //-----------
 //LABEL_TP00: /*Deteched=>Deteched */
 //-----------
@@ -728,7 +767,7 @@ LABEL_TP11: /* Pressed=>Pressed */
 /**
 * trace Touch. only for debug
 */
-void TraceTouch( void )
+void TraceTouch(void)
 {
 	bit TouchPressedOld;
 
@@ -740,29 +779,33 @@ void TraceTouch( void )
 
 	//CheckTouch();
 
-	if ( TouchPressedOld ) {   		// before it pressed with start
-		if ( CpuTouchPressed ) {
+	if (TouchPressedOld)
+	{   		// before it pressed with start
+		if (CpuTouchPressed)
+		{
 			_TscGetScreenPos();
 			FOsdWinScreenXY( 0, PosX, PosY);
 			FOsdWinScreenWH( 0, 1, 1 );
 		}
-		else {
+		else
+		{
 			//Prompt();
 		}
 	}
-	else {
-		if ( CpuTouchPressed ) {
+	else
+	{
+		if (CpuTouchPressed)
+		{
 			_TscGetScreenPos();
 			FOsdWinScreenXY( 0, PosX, PosY);
 			FOsdWinScreenWH( 0, 1, 1 );
 		}
-		else {
+		else
+		{
 		}
 	}
 }
 #endif
-
-
 
 //=============================================================================
 //		Print Status 
@@ -777,34 +820,52 @@ void PrintTouchStatusParam(BYTE TscStatus)
 	BYTE temp = TscStatus;
 #else
  	dPuts("\nTSC ");
-	if(TscStatus & 0x80) {
+	if (TscStatus & 0x80)
+	{
 		dPuts("PRESS ");
-		if(TscStatus & 0x40) {
+		if (TscStatus & 0x40)
+		{
 			dPuts("MOVE ");
-			if(TscStatus & 0x02) {
-				if(	TscStatus & 0x01)	dPuts("DN ");
-				else                    dPuts("UP ");
+			if (TscStatus & 0x02)
+			{
+				if (TscStatus & 0x01)
+					dPuts("DN ");
+				else
+					dPuts("UP ");
 			} 
-			if(TscStatus & 0x08) {
-				if(	TscStatus & 0x04)	dPuts("RIGHT ");
-				else                    dPuts("LEFT ");
+			if (TscStatus & 0x08)
+			{
+				if (TscStatus & 0x04)
+					dPuts("RIGHT ");
+				else
+					dPuts("LEFT ");
 			} 
 		}
 	}
-	else {
-		if(TscStatus & 0x40) {
+	else
+	{
+		if (TscStatus & 0x40)
+		{
 			dPuts("MOVED ");
-			if(TscStatus & 0x02) {
-				if(	TscStatus & 0x01)	dPuts("DN ");
-				else                    dPuts("UP ");
+			if (TscStatus & 0x02)
+			{
+				if (TscStatus & 0x01)
+					dPuts("DN ");
+				else
+					dPuts("UP ");
 			} 
-			if(TscStatus & 0x08) {
-				if(	TscStatus & 0x04)	dPuts("RIGHT ");
-				else                    dPuts("LEFT ");
+			if (TscStatus & 0x08)
+			{
+				if (TscStatus & 0x04)
+					dPuts("RIGHT ");
+				else
+					dPuts("LEFT ");
 			} 
 		}	
-		else {
-			switch(TscStatus & 0x07) {
+		else
+		{
+			switch (TscStatus & 0x07)
+			{
 			case 0: dPuts("END "); break;
 			case 1: dPuts("CLK "); break;
 			case 2: dPuts("DCLK "); break;
@@ -815,6 +876,7 @@ void PrintTouchStatusParam(BYTE TscStatus)
 	}
 #endif
 }
+
 /**
 * print touch status
 */
@@ -825,12 +887,13 @@ void PrintTouchStatus(BYTE new, BYTE NewTscStatus)
 	temp = new;
 	temp = NewTscStatus;
 #else
-	if(new) dPuts("\nTSC stat:");
-	dPrintf("%bx=>%bx=>%bx ",	LastTouchStatus,TouchStatus,NewTscStatus);
+	if (new)
+		dPuts("\nTSC stat:");
+
+	dPrintf("%bx=>%bx=>%bx ", LastTouchStatus, TouchStatus, NewTscStatus);
 #endif
 }
 #endif
-
 
 //=============================================================================
 //		WaitTouchButtonUp 
@@ -839,10 +902,12 @@ void PrintTouchStatus(BYTE new, BYTE NewTscStatus)
 /**
 * wait until touch is detached
 */
-void WaitTouchButtonUp( void )
+void WaitTouchButtonUp(void)
 {
 	dPuts("\nWaitTouchButtonUp start");
-	do {
+	
+	do
+	{
 		GetTouch2();
 		delay1ms(10);
 	} while (( TouchStatus != TOUCHCLICK ) 
@@ -850,9 +915,11 @@ void WaitTouchButtonUp( void )
 		  && ( TouchStatus != TOUCHLONGCLICK )
 		  && ( TouchStatus != TOUCHMOVED )
 		  && ( TouchStatus != TOUCHEND ));
+	
 	dPuts("===>END");
 }
 #endif
+
 //=============================================================================
 //		SetTouchStatus 
 //		SetTouchStatus 
@@ -861,34 +928,41 @@ void WaitTouchButtonUp( void )
 /**
 * set TouchStatus
 */
-void SetTouchStatus( BYTE ts )
+void SetTouchStatus(BYTE ts)
 {
-	dTscPrintf("\nSetTouchStatus(%bx)",ts);
-	if(TouchStatus != ts) {
+	dTscPrintf("\nSetTouchStatus(%bx)", ts);
+	
+	if (TouchStatus != ts)
+	{
 		LastTouchStatus = TouchStatus;
 		TouchStatus = ts;
 	}
 }
+
 /**
 * update Touch Status
 */
 void TscUpdateStatus(BYTE TscStat)
 {
 	//dTscPrintf("\nTouch Stat:%bx->%bx->%bx",LastTouchStatus,TouchStatus,TscStat);  
-	if(TouchStatus != TscStat) {
+	if (TouchStatus != TscStat)
+	{
 		LastTouchStatus = TouchStatus;
 		TouchStatus = TscStat;	
 	}
 }
+
 /**
 * set Last Touch Status
 */
-void SetLastTouchStatus( BYTE ts )
+void SetLastTouchStatus(BYTE ts)
 {
 	dTscPrintf("\nSetLastTouchStatus(%bd)",ts);
+
 	LastTouchStatus = ts;
 }
 #endif
+
 //=============================================================================
 //		CalibTouch 
 //=============================================================================
@@ -986,19 +1060,17 @@ void PrintCalibData(void)
 }
 #endif
 
-
-
 #ifdef SUPPORT_TOUCH
 /**
 * calibrate Touch
 */
-void CalibTouch( BYTE n )
+void CalibTouch(BYTE n)
 {
 	bit TouchPressedOld;
 	DWORD	CalibX, CalibY;
 	WORD	count;
 
-	dTscPrintf("\nCalibTouch(%bd)",n);
+	dTscPrintf("\nCalibTouch(%bd)", n);
 
 	GetTouch2();
 
@@ -1007,29 +1079,37 @@ void CalibTouch( BYTE n )
 	CalibY = 0;
 	count = 0;
 	
-	while (count < 100 /*32768*/) {
-		if ( TouchChangedOld == CpuTouchChanged ) continue;
+	while (count < 100 /*32768*/)
+	{
+		if (TouchChangedOld == CpuTouchChanged)
+			continue;
 		TouchPressedOld = CpuTouchPressed;
 		GetTouch2();
 
-		if ( TouchPressedOld ) {   		// before it pressed with start
-			if ( CpuTouchPressed ) {
+		if (TouchPressedOld)
+		{   		// before it pressed with start
+			if (CpuTouchPressed)
+			{
 				CalibX += TouchX;
 				CalibY += TouchY;
 				count++;
 			}
-			else {
+			else
+			{
 				TouchPressedOld = CpuTouchPressed;
 				dTscPrintf("\nTouch End: %d, %d", TouchX, TouchY );
 				break;
 			}
 		}
-		else {
-			if ( CpuTouchPressed ) {
+		else
+		{
+			if (CpuTouchPressed)
+			{
 				dTscPrintf("\nTouch Start with: %d, %d", TouchX, TouchY );
 				TouchPressedOld = CpuTouchPressed;
 			}
-			else {
+			else
+			{
 			}
 		}
 	}
@@ -1053,6 +1133,4 @@ void TouchDump( void )
 {
 }
 #endif
-
-
 

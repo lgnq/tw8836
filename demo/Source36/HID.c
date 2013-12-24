@@ -591,7 +591,7 @@ BYTE ActionRemo(BYTE _RemoDataCode, BYTE AutoKey)
 
 #ifdef SUPPORT_TOUCH
 //extern BYTE	TouchStatus;
-extern WORD PosX,PosY;
+extern WORD PosX, PosY;
 /**
 * action for Touch
 */
@@ -622,6 +622,7 @@ BYTE ActionTouch(void)
 				return 0;
 			}
 		}
+		
 		if (TscStatus == TOUCHDOUBLECLICK)
 		{
 			MenuStart();
@@ -669,6 +670,7 @@ BYTE ActionTouch(void)
 			MenuCheckTouchInput(TscStatus, xpos, ypos);
 			//note: do not call SetTouchStatus(0);
 		}
+		
 		return 0;
 	}
 	//else if(TscStatus == TOUCHMOVE) {
@@ -876,7 +878,7 @@ void CheckKeyIn(void)
 *	-0: No Input
 *	-other: input type
 */
-BYTE	CheckHumanInputs( BYTE skip_tsc )
+BYTE CheckHumanInputs(BYTE skip_tsc)
 {
 #ifdef SUPPORT_TOUCH
 #else
@@ -888,7 +890,7 @@ BYTE	CheckHumanInputs( BYTE skip_tsc )
 	//
 	//if(CheckRemo())
 	//	return 1;
-	if(RemoDataReady)
+	if (RemoDataReady)
 		return HINPUT_REMO;
 
 	//
@@ -905,10 +907,12 @@ BYTE	CheckHumanInputs( BYTE skip_tsc )
 	//check touch
 	//	
 #ifdef SUPPORT_TOUCH
-	if(skip_tsc==0) {
-		if ( CpuTouchPressed || CpuTouchChanged ) {
+	if (skip_tsc == 0)
+	{
+		if (CpuTouchPressed || CpuTouchChanged)
+		{
 			dPrintf("\nSenseTouch CpuTouchPressed:%bd CpuTouchChanged:%bd",CpuTouchPressed,CpuTouchChanged);
-			return ( HINPUT_TSC );		// input!!!
+			return (HINPUT_TSC);		// input!!!
 		}
 	}
 #endif
@@ -916,9 +920,10 @@ BYTE	CheckHumanInputs( BYTE skip_tsc )
 	//
 	//check RS232 monitor input
 	//	
-	if (RS_ready()) {
+	if (RS_ready())
+	{
 		dPuts("\nGet serial data");
-		return ( HINPUT_SERIAL );		// input!!!
+		return (HINPUT_SERIAL);		// input!!!
 	}
 	return (HINPUT_NO);
 }

@@ -313,13 +313,14 @@ void pop_menu_stack_level(void)
     curr_menu = menu_level_stack[menu_level];
 	menu_lock_scroll = 0;	//clear
 }
+
 /**
 * desc: get menu level.
 *	To solve the Bank issue.
 */
 BYTE MenuGetLevel(void)
 {
-	return menu_level+menu_on;
+	return menu_level + menu_on;
 }
 
 //=========================
@@ -540,33 +541,39 @@ void RemoveLogoWithWait(BYTE fPowerUpBoot)
 	NoSignalLogoShow = 0;
 
 	//wait & dimmer
-	if(fPowerUpBoot) {
-		for ( i=0; i<128; i++ ) {
+	if (fPowerUpBoot)
+	{
+		for (i=0; i<128; i++)
+		{
 			human_input = CheckHumanInputs(1);
-			if (human_input && human_input!= HINPUT_TSC  ) break;
+			if (human_input && human_input!= HINPUT_TSC)
+				break;
 			delay1ms(10);
 		}
-		if ( i != 128 ) {
+		if (i != 128)
+		{
 			wMenuPuts("\nLogo Stop by interrupt");
 			goto END_END;
 		}
 	
-		for ( i=0; i < 128; i++ ) {
+		for (i=0; i < 128; i++)
+		{
 			SpiOsdWinGlobalAlpha(WIN_LOGO, i);
 			WaitVBlank(1);	//it needs
 			SOsdWinBuffWrite2Hw(WIN_LOGO, WIN_LOGO);
 	  		delay1ms(10);
 			human_input = CheckHumanInputs(1);
-			if (human_input && human_input!= HINPUT_TSC  ) 
+			if (human_input && human_input!= HINPUT_TSC) 
 				break;
 		}
-		if ( i != 128 ) {
+		if (i != 128)
+		{
 			wMenuPuts("\nLogo Stop by interrupt");
 		}
 	}
 END_END:	
 	WaitVBlank(1);
-	SpiOsdWinBuffEnable( WIN_LOGO, OFF ); //disable window.
+	SpiOsdWinBuffEnable(WIN_LOGO, OFF); //disable window.
 	SpiOsdEnable(OFF);
 }
 
@@ -3635,10 +3642,11 @@ void proc_osd_time(void)
 	curr_menu->select = MENU_SLIDER_BAR_INPUT_RED;
 	//ref:menu_value_timeout = EE_Read(EEP_OSD_TIMEOUT);
 	//BKTODO: Need callback functions
-	InitSlideCtrl(&img_slide_timer, &OsdGetTime,&OsdVaryTime,&OsdSetTime,&OsdChangeTime); //BKTODO
+	InitSlideCtrl(&img_slide_timer, &OsdGetTime, &OsdVaryTime, &OsdSetTime, &OsdChangeTime); //BKTODO
 
 	curr_menu->items[0].p();		
 }
+
 void proc_osd_trans(void) 
 {
 	push_menu_stack_level();
@@ -4608,11 +4616,12 @@ void proc_touch_cancel(void)
 #ifdef SUPPORT_TOUCH
 BYTE MenuIsTouchCalibMode(void)
 {
-	if(curr_menu == &menu_touch_page) {
-		if(curr_menu->focus >= curr_menu->item_start && curr_menu->focus < (curr_menu->item_start+5))
+	if (curr_menu == &menu_touch_page)
+	{
+		if (curr_menu->focus >= curr_menu->item_start && curr_menu->focus < (curr_menu->item_start+5))
 			return (curr_menu->focus - curr_menu->item_start +1);
-
 	}
+
 	return 0;
 }
 #endif
@@ -4623,7 +4632,6 @@ void MenuTouchCalibStart(void)
 	//MenuStart();
 	
 	SaveCalibDataToEE(0);	//use default
-
 
 	push_menu_stack_level();
 	curr_menu = &menu_touch_page;

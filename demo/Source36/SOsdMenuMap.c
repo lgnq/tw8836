@@ -333,7 +333,8 @@ struct menu_page_info_s menu_demo_page = { MENU_TYPE_NORMAL, 3,3, 3,6,	menu_demo
 //touch calibration page
 //main->setting->touch
 //----------------------
-code struct menu_sitem_info_s menu_touch_page_items[]= {												 //  ^ < V >
+code struct menu_sitem_info_s menu_touch_page_items[]=
+{												 //  ^ < V >
 { TYPE_BG, proc_touch_bg,	X_START+0,Y_START+0,	ALIGN_TOPLEFT,		&img_touch_bg,NULL,						0,SOSD_WIN1,0x000,  0,0,0,0},
 { TYPE_BG, proc_touch_bg_end,X_START+0,Y_START+0,	ALIGN_TOPLEFT,		&img_touch_bg_end,NULL,					0,SOSD_WIN1,0x000,  0,0,0,0},
 
@@ -347,8 +348,6 @@ code struct menu_sitem_info_s menu_touch_page_items[]= {												 //  ^ < V >
 { 0, proc_touch_button5,	X_START+400-10,Y_START+240-9,ALIGN_TOPLEFT,	&img_touch_button,&img_touch_button1,	0,SOSD_WIN8,0x080,  2,2,2,2} //8
 };
 struct menu_page_info_s menu_touch_page = { MENU_TYPE_NORMAL, 4,4, 4,5, menu_touch_page_items, NULL };		
-
-
 
 //==========================
 // LIST MENU
