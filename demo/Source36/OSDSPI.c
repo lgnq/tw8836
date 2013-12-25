@@ -1206,7 +1206,7 @@ void SpiOsdPixelAlphaAttr(BYTE win, WORD lutloc, BYTE value)
 	
 	WriteTW88Page(PAGE4_SOSD);
 
-	bTemp = 0xC3;						//en Write. ADDR type. Select Attr.
+	bTemp = 0x83;						//en Write. ADDR type. Select Attr.
 	if (win == 1 || win == 2)
 		bTemp |= 0x04;					//select Group B.
 	else if (lutloc >> 8)			
