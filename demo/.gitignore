@@ -23,11 +23,11 @@
 *.SearchResults
 
 .sconsign.dblite
-project.uvproj
-project.uvopt
-project.uvgui.*
-project.eww
-project.ewp
+*.uvproj
+*.uvopt
+*.uvgui.*
+*.eww
+*.ewp
 
 JLinkLog.txt
 JLinkSettings.ini
