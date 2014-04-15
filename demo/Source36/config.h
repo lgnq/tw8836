@@ -54,7 +54,7 @@
 #undef  NO_EEPROM				
 #define SUPPORT_SPIOSD
 
-#undef SUPPORT_UDFONT			//RAM Font. Only for TEST
+#define SUPPORT_UDFONT			//RAM Font. Only for TEST
 #undef SUPPORT_UART1			//cannot share with BT656 output(ExtCVBS)
 
 #define SUPPORT_TOUCH
