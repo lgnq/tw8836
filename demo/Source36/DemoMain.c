@@ -358,15 +358,15 @@ void MovingGridDemo( BYTE n )
 //=============================================================================
 //		void MovingGridLUT( BYTE n )
 //=============================================================================
-void MovingGridLUT( BYTE n )
+void MovingGridLUT(BYTE n)
 {
-	WORD	offset;
+	WORD offset;
 
 	offset = n;
 	offset *= 1024;
 	WaitVBlank(1);
 	SpiOsdLoadLUT( WIN_GRID_MSG ,LUTTYPE_ADDR, 0, 0x400, DGRID_LUT_START + offset, 0xFF );	//win ?0
-	if(WIN_GRID_IMG==1 || WIN_GRID_IMG==2)
+	if (WIN_GRID_IMG==1 || WIN_GRID_IMG==2)
 		SpiOsdLoadLUT( WIN_GRID_IMG ,LUTTYPE_ADDR, 0, 0x400, DGRID_LUT_START + offset, 0xFF );	//win ?1
 #ifdef DEBUG_OSD
 	dPuts("\nFinished LUT GRID LUT change");

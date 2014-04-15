@@ -61,11 +61,6 @@ extern void MenuKeyInput(BYTE key);
 
 //extern TestMainMenuImage(BYTE type);
 
-
-
-//=============================================================================
-//
-//=============================================================================
 /*
 	menu start
 	menu [up|down|right|left]
@@ -75,7 +70,8 @@ extern void MenuKeyInput(BYTE key);
 void MonitorMenu(void)
 {
 //	int x, y;
-	if(!stricmp( argv[1], "?")) {
+	if (!stricmp(argv[1], "?"))
+	{
 		Puts("\n  === Help for MENU command ===");
 		Puts("\nmenu start					;start main menu");
 		Puts("\nmenu [up|down|right|left]	;menu arrow key");
@@ -84,56 +80,72 @@ void MonitorMenu(void)
 		return;
 	}
 
-	if(argc != 3)	{
+	if (argc != 3)
+	{
 		//Puts("\nmenu x y");
 
-		if(TaskGetGrid()) {
-			if(!stricmp( argv[1], "up")) {
+		if (TaskGetGrid())
+		{
+			if (!stricmp(argv[1], "up"))
+			{
 				TaskSetGridCmd(NAVI_KEY_UP);
 			}
-			else if(!stricmp( argv[1], "down")) {
+			else if (!stricmp(argv[1], "down"))
+			{
 				TaskSetGridCmd(NAVI_KEY_DOWN);
 			}
-			else if(!stricmp( argv[1], "left")) {
+			else if (!stricmp(argv[1], "left"))
+			{
 				TaskSetGridCmd(NAVI_KEY_LEFT);
 			}
-			else if(!stricmp( argv[1], "right")) {
+			else if (!stricmp(argv[1], "right"))
+			{
 				TaskSetGridCmd(NAVI_KEY_RIGHT);
 			}
-			else if(!stricmp( argv[1], "enter")) {
+			else if (!stricmp(argv[1], "enter"))
+			{
 				TaskSetGridCmd(NAVI_KEY_ENTER);
 			}
 			return;
 		}
-		if(MenuGetLevel()) {
-			if(!stricmp( argv[1], "up")) {
+
+		if (MenuGetLevel())
+		{
+			if (!stricmp(argv[1], "up"))
+			{
 				MenuKeyInput(NAVI_KEY_UP);
 			}
-			else if(!stricmp( argv[1], "down")) {
+			else if (!stricmp(argv[1], "down"))
+			{
 				MenuKeyInput(NAVI_KEY_DOWN);
 			}
-			else if(!stricmp( argv[1], "left")) {
+			else if (!stricmp(argv[1], "left"))
+			{
 				MenuKeyInput(NAVI_KEY_LEFT);
 			}
-			else if(!stricmp( argv[1], "right")) {
+			else if (!stricmp(argv[1], "right"))
+			{
 				MenuKeyInput(NAVI_KEY_RIGHT);
 			}
-			else if(!stricmp( argv[1], "enter")) {
+			else if (!stricmp(argv[1], "enter"))
+			{
 				MenuKeyInput(NAVI_KEY_ENTER);
 			}
 		}
 
-
-		if(!stricmp( argv[1], "start" ))  {
+		if (!stricmp(argv[1], "start"))
+		{
 			Printf("\ncall MenuStart");
 			//proc_home_menu_start();
 			MenuStart();
 		}
-		else if(!stricmp( argv[1], "exit" ))  {
+		else if (!stricmp(argv[1], "exit"))
+		{
 			Printf("\ncall MenuEnd");
 			MenuEnd();
 		}
-		else if(!stricmp( argv[1], "test1")) {
+		else if (!stricmp(argv[1], "test1"))
+		{
 			//draw 1bpp FOSD Palette
 			//environmemt
 			//	w ff 3
@@ -142,29 +154,35 @@ void MonitorMenu(void)
 			//
 			DumpFontOsdPalette();
 		}
-		else if(!stricmp( argv[1], "test2")) {
+		else if (!stricmp(argv[1], "test2"))
+		{
 			//FOSD FIFO test.
 			Test16x32FontSet();
 		}
-		else if(!stricmp( argv[1], "test3")) {
+		else if (!stricmp(argv[1], "test3"))
+		{
 			TestUpper256Char();
 		}
-		else if(!stricmp( argv[1], "test4")) {
+		else if (!stricmp(argv[1], "test4"))
+		{
 			TestMultiBPP4();
 		}
-		else if(!stricmp( argv[1], "test5")) {
+		else if (!stricmp(argv[1], "test5"))
+		{
 			TestNum1BPP3BPP();
 		}
-		else if(!stricmp( argv[1], "main1")) {
+		else if (!stricmp(argv[1], "main1"))
+		{
 			TestMainMenuImage(1);
 		}
-		else if(!stricmp( argv[1], "main2")) {
+		else if (!stricmp(argv[1], "main2"))
+		{
 			TestMainMenuImage(2);
 		}
-		else if(!stricmp( argv[1], "main3")) {
+		else if (!stricmp(argv[1], "main3"))
+		{
 			TestMainMenuImage(3);
 		}
-
 
 		return;
 	}
@@ -174,9 +192,6 @@ void MonitorMenu(void)
 //	MenuCheckTouchInput(x,y);
 }
 
-//=============================================================================
-//
-//=============================================================================
 //FONT OSD
 void MonitorFOsd(void)
 {

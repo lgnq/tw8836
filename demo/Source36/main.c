@@ -104,8 +104,6 @@ XDATA BYTE Task_Grid_cmd;
 #define RET_MAIN_LOOP_PSM_BY_REMO	1
 #define RET_MAIN_LOOP_PSM_BY_PORT	2
 
-
-
 //=============================================================================
 // Prototype				                                               
 //=============================================================================
@@ -122,7 +120,6 @@ BYTE WaitPowerOn(void);
 void InterruptPollingHandlerRoutine(void);
 void CheckAndClearOSD(void);
 
-
 //-----------------------------------------------------------------------------
 // Task NoSignal
 //-----------------------------------------------------------------------------
@@ -132,7 +129,6 @@ void NoSignalTaskOnWaitMode(void);
 void TaskNoSignal_setCmd(BYTE cmd); 
 BYTE TaskNoSignal_getCmd(void); 
 
-
 //-----------------------------------------------------------------------------
 // MovingGrid TASK ROUTINES				                                               
 //-----------------------------------------------------------------------------
@@ -141,8 +137,6 @@ void TaskSetGrid(BYTE onoff);
 BYTE TaskGetGrid(void);
 void TaskSetGridCmd(BYTE cmd);
 BYTE TaskGetGridCmd(void);
-
-
 
 //=============================================================================
 // MAIN
@@ -524,17 +518,21 @@ void InitCore(BYTE fPowerUpBoot)
 	}
 
 	Puts("\nInitCore");	
+
 	//----- Set SPI mode
 	SpiFlashVendor = SPI_QUADInit();
 	if (SpiFlashVendor == 0)
 		Puts("\nWarning:System can be corrupted");
+
 	SPI_SetReadModeByRegister(SPI_READ_MODE);		// Match DMA READ mode with SPI-read
+
 	if (SpiFlashVendor == SFLASH_VENDOR_EON_256)
 	{
 		SPI_Set4BytesAddress(ON);
 		if (SpiFlash4ByteAddr)
 			Puts(" EN4B");
 	}
+
 	if (SpiFlashVendor == SFLASH_VENDOR_MX_256)
 	{
 #if 1
