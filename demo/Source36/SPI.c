@@ -706,6 +706,10 @@ BYTE SPI_QUADInit(void)
 		SpiFlashVendor = SFLASH_VENDOR_SPANSION;	
 	}
 #endif
+	else if (vid == 0xC8)	//GigaDevice
+	{
+		SpiFlashVendor = SFLASH_VENDOR_GD;
+	}
 	else
 	{
 		Printf(" UNKNOWN SPIFLASH !!");
@@ -726,7 +730,7 @@ BYTE SPI_QUADInit(void)
 	else if (vid == 0xEF)					// WB
 	{
 		//if(cid == 0x18) {				//Q128 case different status read command
-			ret=SpiFlashChipRegCmd(SPICMD_RDSR2,0, 1, 0);
+			ret=SpiFlashChipRegCmd(SPICMD_RDSR2, 0, 1, 0);
 			temp = SPI_CmdBuffer[0];							//dat0[1]:QE
 			dPrintf("\nStatus2 before QUAD: %02bx", temp);
 			//if 0, need to enable quad
@@ -749,6 +753,14 @@ BYTE SPI_QUADInit(void)
 		if (temp != 0x6B)
 			temp = 0; //need an enable routine
 	}
+	else if (vid == 0xC8) //SFLASH_VENDOR_GD
+	{
+		ret = SpiFlashChipRegCmd(SPICMD_RDSR2, 0, 1, 0);	//cmd, read Volatile register
+		temp = SPI_CmdBuffer[0];
+		Printf("\nVolatile Register: %02bx", temp );
+		if (temp != 0x02)
+			temp = 0; //need an enable routine
+	}	
 #ifdef SUPPORT_SFLASH_SPANSION
 	else if (vid == 0x01) 	  //SFLASH_VENDOR_SPANSION
 	{
@@ -831,6 +843,16 @@ BYTE SPI_QUADInit(void)
 			SpiFlashChipRegCmd(SPICMD_WRDI, 0, 0, 0);
 		}
 #endif
+	}
+	else if (vid == 0xC8) 	 //SFLASH_VENDOR_GD
+	{
+		SpiFlashChipRegCmd(SPICMD_WREN, 0, 0, 0);
+
+		SPI_CmdBuffer[0] = 0x02;	//cmd, en QAUD mode
+		SpiFlashChipRegCmd(SPICMD_WRSR2, 1, 0, 0);
+
+		Puts("\nVolatile 6 dummy SET" );
+		SpiFlashChipRegCmd(SPICMD_WRDI, 0, 0, 0);
 	}
 #ifdef SUPPORT_SFLASH_SPANSION
 	else if (vid == 0x01) 	//SPANSION

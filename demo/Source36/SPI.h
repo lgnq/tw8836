@@ -12,6 +12,7 @@
 #define SPICMD_RDSR2			0x35	//read status2 register(WB). dat[1]:QE
 #define SPICMD_RDINFO			0x2B	//read information register. S[2]=1:4byte mode 
 #define SPICMD_WRSR				0x01	//write status register
+#define SPICMD_WRSR2			0x31	//write status2 register	//eamon
 #define SPICMD_EN4B				0xB7	//enter 4Byte mode
 #define SPICMD_EX4B				0xE9	//exit 4Byte mode
 #define SPICMD_ENHBL			0x67	//enter high bank latch mode
@@ -86,6 +87,7 @@
 #define SFLASH_VENDOR_EON_256	5	//EN25Q256 ID(1C 70 19)
 #define SFLASH_VENDOR_MX_256	6	//MX25L25635F ID(C2 20 19)
 #define SFLASH_VENDOR_SPANSION	7	//Not yet verified.
+#define SFLASH_VENDOR_GD		8	//GD25Q128C ID(C8 40 18)
 
 extern BYTE SpiFlashVendor;
 
