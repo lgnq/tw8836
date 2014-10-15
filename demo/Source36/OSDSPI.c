@@ -155,7 +155,6 @@ void SpiOsdSetDeValue(void)
 #endif
 }
 
-//-----------------------------------------------------------------------------
 /**
 * Description
 *	Enable SpiOsd.

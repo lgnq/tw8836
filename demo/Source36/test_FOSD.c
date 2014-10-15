@@ -290,6 +290,7 @@ void TestUpper256Char(void)
 			WriteTW88(REG307, (BYTE)index);
 		}
 	}
+	
 	//RTL BUG: If auto inc from 0 to 0xFF, 0xFE and 0xFF position not working.
 	//WaitVBlank(1);
 	bgColor = 4;	//red

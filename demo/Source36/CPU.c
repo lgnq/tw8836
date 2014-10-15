@@ -1281,13 +1281,15 @@ void RestartWatchdog(void)
 */
 void EnableWatchdog(BYTE mode)
 {
-	Printf("\nEnableWatchdog(%bd)",mode);
+	Printf("\nEnableWatchdog(%bd)", mode);
+
 #ifdef DEBUG_WATCHDOG
 	SFR_EWDI = 0;		// Disable WDT Interrupt
 #endif
 
 	SFR_CKCON &= 0x3F;
-	switch(mode) {
+	switch (mode)
+	{
 //#ifdef MODEL_TW8835
 //	case 0: 	SFR_CKCON |= 0xc0;	break;	// WDT clock = 2^26	 0x04000000	9.95sec@32KHz
 //	case 1: 	SFR_CKCON |= 0x80;	break;	// WDT clock = 2^23: 0x00800000 1.25sec@32KHz test only
@@ -1307,6 +1309,7 @@ void EnableWatchdog(BYTE mode)
 	SFR_WDCON = 0x03;	// - - - - WDIF WTRF EWT RWT.  Reset Watchdog
 
 	SFR_EIP |= 0x20;	//??BK120502
+
 #ifdef DEBUG_WATCHDOG
 	SFR_EWDI = 1;		// Enable WDT Interrupt (disable for test)
 #endif

@@ -98,11 +98,6 @@ BYTE LEDCOn(BYTE step)
 #endif
 #endif
 
-
-//-----------------------------------------------------------------------------
-/**
-* power up LED
-*/
 void LedPowerUp(void)
 {
 	volatile BYTE bTemp;
@@ -135,10 +130,6 @@ void LedPowerUp(void)
 	}
 }
 
-//-----------------------------------------------------------------------------
-/**
-* enable BT656 output
-*/
 void BT656OutputEnable(BYTE fOn, BYTE clear_port)
 {
 	DECLARE_LOCAL_page
